@@ -4327,7 +4327,7 @@ body.no-data #sectionNav { display: none; }
                 const el = $h('heroSun');
                 if (el) el.innerHTML = sr && ss ? `<span><i class="fa-solid fa-sun text-amber-300 mr-1.5"></i>Sunrise <b class="text-white">${fmtClock(sr)}</b>${afterSunset ? ' <span class="text-slate-400">tomorrow</span>' : ''}</span>`
                     + `<span><i class="fa-solid fa-moon text-indigo-300 mr-1.5"></i>Sunset <b class="text-white">${fmtClock(ss)}</b></span>`
-                    + `<span><i class="fa-solid fa-hourglass-half text-amber-200/80 mr-1.5"></i>Daylight <b class="text-white">${dayLength(sr, ss)}</b>${diff ? ` <span class="text-slate-400">(${Math.abs(diff)}m ${diff < 0 ? 'shorter' : 'longer'} ${afterSunset ? 'the day after' : 'tomorrow'})</span>` : ''}</span>` : '';
+                    + `<span><i class="fa-solid fa-hourglass-half text-amber-200/80 mr-1.5"></i>Daylight <b class="text-white">${dayLength(sr, ss)}</b>${diff ? ` <span class="text-slate-400">(${diff < 0 ? 'losing' : 'gaining'} ${Math.abs(diff)} minute${Math.abs(diff) === 1 ? '' : 's'} ${afterSunset ? 'the day after' : 'tomorrow'})</span>` : ''}</span>` : '';
             }
             const ni = nightInfo();
             const rf = recordFlags(0);
