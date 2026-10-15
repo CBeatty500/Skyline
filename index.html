@@ -398,9 +398,20 @@ body.no-data #sectionNav { display: none; }
                 </div>
             </div>
 </div>
+            <div id="sec-forecast">            <!-- 5-Day Best Bet Operational Grid -->
+            <div>
+                <h3 class="text-lg font-bold text-slate-200 mb-3 flex items-center justify-between">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-calendar-days text-blue-400"></i> 12-Day Forecast</span>
+                    <span class="flex items-center gap-2 flex-wrap justify-end"><span id="bestBetConfidenceBadge" class="text-xs bg-slate-500/20 text-slate-300 border border-slate-500/40 px-2.5 py-1 rounded font-medium">--</span></span>
+                </h3>
+                <div class="fc-wrap"><div id="forecastGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Forecast cards injected dynamically -->
+                </div><div id="fcSlider" class="fc-slider" role="slider" tabindex="0" aria-label="Scroll forecast days"><div class="fc-track"><div id="fcThumb" class="fc-thumb"></div></div></div></div>
+            </div>
+</div>
             <div id="sec-quick" class="glass-panel rounded-2xl p-5 md:p-6">
                 <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
-                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-table-cells text-amber-400"></i> Quick View · Forecast &amp; Climate</h3>
+                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-table-cells text-amber-400"></i> Quick View Forecast &amp; Climate</h3>
                     <span id="quickViewSource" class="text-[11px] text-slate-400 font-mono"></span>
                 </div>
                 <div class="overflow-x-auto -mx-1 px-1">
@@ -422,17 +433,6 @@ body.no-data #sectionNav { display: none; }
                 </div>
             </div>
 
-            <div id="sec-forecast">            <!-- 5-Day Best Bet Operational Grid -->
-            <div>
-                <h3 class="text-lg font-bold text-slate-200 mb-3 flex items-center justify-between">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-calendar-days text-blue-400"></i> 12-Day Forecast</span>
-                    <span class="flex items-center gap-2 flex-wrap justify-end"><span id="bestBetConfidenceBadge" class="text-xs bg-slate-500/20 text-slate-300 border border-slate-500/40 px-2.5 py-1 rounded font-medium">--</span></span>
-                </h3>
-                <div class="fc-wrap"><div id="forecastGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <!-- Forecast cards injected dynamically -->
-                </div><div id="fcSlider" class="fc-slider" role="slider" tabindex="0" aria-label="Scroll forecast days"><div class="fc-track"><div id="fcThumb" class="fc-thumb"></div></div></div></div>
-            </div>
-</div>
                         <!-- NWS Area Forecast Discussion (US locations) -->
             <div id="afdPanel" class="glass-panel rounded-2xl overflow-hidden border border-slate-800 hidden">
                 <button id="afdToggle" onclick="toggleAFD()" class="w-full flex items-center justify-between gap-3 px-6 py-4 text-left hover:bg-slate-800/50 transition-colors">
