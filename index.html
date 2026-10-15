@@ -1078,7 +1078,7 @@ body.no-data #sectionNav { display: none; }
                 cliTotals = cl;
                 precipNormals = null;
                 nwsAlerts = nws.alerts || [];
-                historicalData = null; histLoading = true;
+                historicalData = null; climLite = null; histLoading = true;
                 if (ensembleData.elevation !== undefined) currentLoc.ele = ensembleData.elevation;
                 buildClimIndex();
 
@@ -1094,7 +1094,8 @@ body.no-data #sectionNav { display: none; }
                 renderDiscussion();
 
                 // Climate history (large request) loads last, then the dashboard re-renders with records and normals
-                const histDone = climateGate(inUS && !!cl).then(() => getHistorical(lat, lon)).then(hist => {
+                if (!cl) getClimLite(lat, lon).then(d => { if (token !== fetchToken || !d || historicalData) return; climLite = d; buildClimIndex(); renderDashboard(); renderDiscussion(); }).catch(() => {});
+                const histDone = climateGate(true).then(() => getHistorical(lat, lon)).then(hist => {
                     if (token !== fetchToken) return;
                     historicalData = (hist && hist.daily && hist.daily.time && hist.daily.time.length > 0) ? hist : null;
                     histLoading = false;
@@ -1107,7 +1108,7 @@ body.no-data #sectionNav { display: none; }
                 loadStationClimate(token, nws, lat, lon);
             } catch (err) {
                 console.error("Fetch operational data failed:", err);
-                if (token === fetchToken) showToast("Error retrieving forecast data for this location. Please try again.");
+                if (token === fetchToken) showToast(/429/.test(String(err && err.message)) ? "The free forecast service (Open-Meteo) has hit its request limit for now. Try again in a few minutes." : `Error retrieving forecast data for this location (${esc(String((err && err.message) || 'unknown error'))}). Please try again.`);
             } finally {
                 if (token === fetchToken) {
                     btnText.innerText = "Fetch Weather";
@@ -1186,8 +1187,9 @@ body.no-data #sectionNav { display: none; }
 
         function buildClimIndex() {
             climIndex = null;
-            if (!historicalData) return;
-            const { time, temperature_2m_max: mx, temperature_2m_min: mn } = historicalData.daily;
+            const src = historicalData || climLite;
+            if (!src) return;
+            const { time, temperature_2m_max: mx, temperature_2m_min: mn } = src.daily;
             const ok = v => (v !== null && v !== undefined && !isNaN(v)) ? v : null;
             const idx = {};
             for (let i = 0; i < time.length; i++) {
@@ -3597,6 +3599,18 @@ body.no-data #sectionNav { display: none; }
         // ---------- Official station climate: daily records (ACIS, threaded station record, the source NWS uses) and
         //            1991-2020 daily normals (NOAA NCEI). These replace the ERA5 grid values wherever available. ----------
         let stationClim = null;
+        let climLite = null;   // 1991-2020 daily max/min from the reanalysis: normals only (about a quarter of the full archive's cost)
+        async function getClimLite(lat, lon) {
+            const key = `climlite1:${lat}:${lon}`;
+            const c = await idb.get(key);
+            if (c && Date.now() - c.t < 180 * 864e5) return { daily: c.d };
+            const r = await fetch(`https://archive-api.open-meteo.com/v1/archive?latitude=${lat}&longitude=${lon}&start_date=1991-01-01&end_date=2020-12-31&daily=temperature_2m_max,temperature_2m_min&timezone=auto`);
+            if (!r.ok) return c ? { daily: c.d } : null;
+            const j = await r.json();
+            if (!(j && j.daily && j.daily.time && j.daily.time.length)) return null;
+            await idb.set(key, { t: Date.now(), d: j.daily });
+            return j;
+        }
         async function fetchStationClimate(nws, lat, lon) {
             const icao = (nws && nws.obs && nws.obs.stationId) || `${(+lat).toFixed(2)},${(+lon).toFixed(2)}`;
             const key = `stnclim3:${icao}`;
@@ -3945,7 +3959,7 @@ body.no-data #sectionNav { display: none; }
         // ---------- Daily Climate: what was measured — today so far and the past 30 days (NWS climate report) ----------
         function renderDailyRecordsTable() {
             renderQuickView();
-            if ((!historicalData && !stationClim && !(cliTotals && cliTotals.byMD)) || !bestBetResults || !bestBetResults.length) return;
+            if ((!historicalData && !climLite && !stationClim && !(cliTotals && cliTotals.byMD)) || !bestBetResults || !bestBetResults.length) return;
             const tbody = document.getElementById('dailyRecordsTableBody');
             const rr = document.getElementById('recordsRange');
             const hasCli = !!(cliTotals && cliTotals.rows);
