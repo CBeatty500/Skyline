@@ -1188,6 +1188,26 @@ body.no-data #sectionNav { display: none; }
 
         // Rest-of-today wording, period by period, using the same hourly rule as the hourly forecast's rain icons
         // (a wet weather code with at least a 30% chance or measurable rain), so the two always agree.
+        // A forecast hour is wet when the chance is 40%+ (whatever the deterministic code says), or the code is wet with 30%+
+        // (20%+ with a measurable amount). Returns the weather code to show, or 0 when dry.
+        function spcThunderAt(t) {
+            const d1 = spcData && spcData.days && spcData.days[0];
+            if (!d1 || !d1.cat) return false;
+            const end = d1.valid ? d1.valid.getTime() + 24 * 36e5 : Date.now() + 18 * 36e5;
+            return t < end;
+        }
+        function hourWetCode(j) {
+            const h = ensembleData && ensembleData.hourly;
+            if (!h) return 0;
+            const hp = h.precipitation_probability && h.precipitation_probability[j] != null ? h.precipitation_probability[j] : 0;
+            const ha = h.precipitation && h.precipitation[j] != null ? h.precipitation[j] : 0, hc = h.weather_code ? h.weather_code[j] || 0 : 0;
+            const wetCode = hc >= 51 && hc <= 99;
+            if (!((wetCode && (hp >= 30 || (ha >= 0.1 && hp >= 20))) || hp >= 40)) return 0;
+            const tC = h.temperature_2m ? h.temperature_2m[j] : null, snowy = (h.snowfall && h.snowfall[j] > 0) || (tC != null && tC <= 0.5);
+            let code = wetCode ? hc : snowy ? 85 : 80;
+            if (code < 95 && !snowy && (code >= 80 || !wetCode) && spcThunderAt(new Date(h.time[j]).getTime())) code = 95;
+            return code;
+        }
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -1206,15 +1226,16 @@ body.no-data #sectionNav { display: none; }
                     if (h.is_day && h.is_day[j]) day++;
                     const hp = h.precipitation_probability && ok(h.precipitation_probability[j]) ? h.precipitation_probability[j] : 0;
                     const ha = h.precipitation && ok(h.precipitation[j]) ? h.precipitation[j] : 0, hc = h.weather_code ? h.weather_code[j] : 0;
-                    if (hc >= 51 && hc <= 99 && (hp >= 30 || (ha >= 0.1 && hp >= 20))) {
-                        wetH++; wpp = Math.max(wpp, hp); amt += ha; code = Math.max(code, hc);
+                    const wc = hourWetCode(j);
+                    if (wc) {
+                        wetH++; wpp = Math.max(wpp, hp); amt += ha; code = Math.max(code, wc);
                         if (h.snowfall && ok(h.snowfall[j])) sn += h.snowfall[j];
                     }
                 }
                 const sky = skyCondition(cl.length ? cl.reduce((x, y) => x + y, 0) / cl.length : null, day >= n / 2).text.toLowerCase();
                 let state = sky;
                 if (wetH) {
-                    const kind = code >= 95 ? 'thunderstorms' : sn >= 0.5 ? 'snow showers' : 'showers';
+                    const kind = code >= 95 ? (spcThunderAt(Date.now()) && wpp < 80 ? 'showers and thunderstorms' : 'thunderstorms') : sn >= 0.5 ? 'snow showers' : 'showers';
                     const widespread = wetH >= Math.max(2, n / 2);
                     if (wpp >= 80 && widespread) state = code >= 95 ? 'thunderstorms' : sn >= 0.5 ? 'snow' : 'rain';
                     else if (wpp >= 60) state = `${sky} with ${kind} likely`;
@@ -1989,6 +2010,7 @@ body.no-data #sectionNav { display: none; }
             spcData = d;
             renderActiveAlerts();
             refreshSPC();
+            try { renderHourlySlider(); renderHero(); } catch (e) {}
         }
 
         function spcDayLabel(d) {
@@ -3740,8 +3762,8 @@ body.no-data #sectionNav { display: none; }
                 const label = j === s ? 'Now' : `${hr === 0 ? t.toLocaleDateString('en-US', { weekday: 'short' }) + ' ' : ''}${t.toLocaleTimeString([], { hour: 'numeric', hour12: true })}`;
                 const isDay = h.is_day ? h.is_day[j] : (hr > 6 && hr < 20 ? 1 : 0);
                 const hp = h.precipitation_probability ? h.precipitation_probability[j] : 0, ha = h.precipitation ? h.precipitation[j] : 0, hc = h.weather_code[j];
-                const wetCode = hc >= 51 && hc <= 99;
-                let cond = (wetCode && (hp >= 30 || (ha >= 0.1 && hp >= 20)) || hc === 45 || hc === 48) ? getWeatherCondition(hc, isDay)
+                const wc = hourWetCode(j);
+                let cond = wc ? getWeatherCondition(wc, isDay) : (hc === 45 || hc === 48) ? getWeatherCondition(hc, isDay)
                            : skyCondition(h.cloud_cover ? h.cloud_cover[j] : null, isDay);
                 if (j === s && ccH) cond = (ccH.text && conditionFromText(ccH.text, ccH.isDay)) || getWeatherCondition(ccH.code, ccH.isDay); // 'Now' shows what is observed
                 const pp = h.precipitation_probability ? h.precipitation_probability[j] : null;
@@ -4879,8 +4901,9 @@ body.no-data #sectionNav { display: none; }
                 if (bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} more today.`);
                 if (bb.laterProb != null) parts.push(`Once it ends, ${bb.laterProb}% chance of more later today.`);
             } else {
+                const ph = restOfDayPhrase() || '';
                 parts.push(`${restOfDayPhrase() || cond.text.split(', ')[0] + ' for the rest of today'}. High near ${formatTemp(bb.bestMax)}.`);
-                if (precipExpected(bb.precipProb, bb.bestPrecip) && bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} possible.`);
+                if (/shower|rain|storm|snow|drizzle|sleet|mix/i.test(ph) && bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} possible.`);
             }
             if (bb.bestGust >= 40) parts.push(`Gusts to ${formatSpeed(bb.bestGust)}.`);
             parts.push(`Overnight low near ${formatTemp(bb.bestMin)}.`);
