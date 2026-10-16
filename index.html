@@ -3269,7 +3269,7 @@ body.no-data #sectionNav { display: none; }
 
             // Location Meta Header
             document.getElementById('displayLocationName').innerText = currentLoc.name;
-            document.getElementById('displayLocationMeta').innerText = `Lat: ${currentLoc.lat.toFixed(4)}°, Lon: ${currentLoc.lon.toFixed(4)}°, Elev: ${Math.round((currentLoc.ele || 0) * 3.28084).toLocaleString()} ft (${Math.round(currentLoc.ele || 0)} m)`;
+            document.getElementById('displayLocationMeta').innerText = `Lat: ${currentLoc.lat.toFixed(4)}° ${String.fromCharCode(183)} Lon: ${currentLoc.lon.toFixed(4)}° ${String.fromCharCode(183)} Elev: ${Math.round((currentLoc.ele || 0) * 3.28084).toLocaleString()} ft (${Math.round(currentLoc.ele || 0)} m)`;
 
             const nwsBadgeText = document.getElementById('nwsStatusText');
             if (nwsForecastData) {
