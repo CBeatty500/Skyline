@@ -1230,6 +1230,45 @@ body.no-data #sectionNav { display: none; }
             return { text: 'Overcast', icon: 'fa-cloud', color: 'text-slate-400' };
         }
 
+        function restOfDayPhrase() {
+            if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
+            const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
+            const first = h.time.findIndex(t => t.startsWith(d.time[0]));
+            if (first < 0) return null;
+            const ok = v => v !== null && v !== undefined && !isNaN(v);
+            const segs = [['this morning', 0, 12], ['this afternoon', 12, 18], ['this evening', 18, 24]];
+            const parts = [];
+            segs.forEach(([label, a, b]) => {
+                const s = Math.max(first + a, cur), e = first + b;
+                if (e - s < 2) return;                       // less than two hours of it left
+                let pp = 0, amt = 0, sn = 0, code = 0, cl = [], day = 0, n = 0, wetH = 0;
+                for (let j = s; j < e && j < h.time.length; j++) {
+                    n++;
+                    if (h.precipitation_probability && ok(h.precipitation_probability[j])) pp = Math.max(pp, h.precipitation_probability[j]);
+                    if (h.precipitation && ok(h.precipitation[j])) amt += h.precipitation[j];
+                    if (h.snowfall && ok(h.snowfall[j])) sn += h.snowfall[j];
+                    if (h.weather_code && ok(h.weather_code[j])) code = Math.max(code, h.weather_code[j]);
+                    if (h.cloud_cover && ok(h.cloud_cover[j])) cl.push(h.cloud_cover[j]);
+                    if (h.is_day && h.is_day[j]) day++;
+                    const hp = h.precipitation_probability ? h.precipitation_probability[j] : 0, ha = h.precipitation ? h.precipitation[j] : 0;
+                    if (ok(hp) && (hp >= 50 || (hp >= 40 && ok(ha) && ha >= 0.3))) wetH++;
+                }
+                let state;
+                if (wetH >= Math.max(2, n / 3)) {     // wet through a good part of the period, not just its last hour
+                    state = code >= 95 ? 'thunderstorms' : sn >= 0.5 ? (amt - sn / 0.7 > 1 ? 'a wintry mix' : 'snow') : pp >= 70 ? 'rain' : 'a chance of showers';
+                } else {
+                    state = skyCondition(cl.length ? cl.reduce((x, y) => x + y, 0) / cl.length : null, day >= n / 2).text.toLowerCase();
+                }
+                const last = parts[parts.length - 1];
+                if (last && last.state === state) last.labels.push(label.replace('this ', ''));
+                else parts.push({ state, labels: [label] });
+            });
+            if (!parts.length) return null;
+            if (parts.length === 1) return `${parts[0].state[0].toUpperCase()}${parts[0].state.slice(1)} for the rest of today`;
+            const txt = parts.map(p => `${p.state} ${p.labels.length > 1 ? p.labels.slice(0, -1).join(', ') + ' and ' + p.labels.slice(-1) : p.labels[0]}`).join(', then ');
+            return txt[0].toUpperCase() + txt.slice(1);
+        }
+
         function precipExpected(p, amtMm) { return (p || 0) >= 50 || ((p || 0) >= 40 && (amtMm || 0) >= 2.5); }
 
         // Daily icon that honors the real precipitation chance/amount and cloud cover
@@ -4487,7 +4526,7 @@ body.no-data #sectionNav { display: none; }
                 if (bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} more today.`);
                 if (bb.laterProb != null) parts.push(`Once it ends, ${bb.laterProb}% chance of more later today.`);
             } else {
-                parts.push(`${cond.text.split(' · ')[0]} for the rest of today, topping out near ${formatTemp(bb.bestMax)}.`);
+                parts.push(`${restOfDayPhrase() || cond.text.split(' · ')[0] + ' for the rest of today'}, topping out near ${formatTemp(bb.bestMax)}.`);
                 if (nc && nc.persist) {
                     const ago = nc.endedAgo < 0.75 ? 'within the last hour' : `about ${Math.round(nc.endedAgo)} hour${Math.round(nc.endedAgo) === 1 ? '' : 's'} ago`;
                     parts.push(`${NOWCAST_WORD[nc.kind]} ended ${ago}; ${bb.precipProb}% chance of more today${precipExpected(bb.precipProb, bb.bestPrecip) && bb.bestPrecip >= 0.25 ? `, about ${formatPrecip(bb.bestPrecip)}` : ''}.`);
