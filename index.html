@@ -1871,7 +1871,7 @@ body.no-data #sectionNav { display: none; }
         const leadKey = l => l >= 3 ? '3+' : String(l);
         function learnLocKey() { return `${(+currentLoc.lat).toFixed(2)},${(+currentLoc.lon).toFixed(2)}`; }
         async function saveForecastSnapshot() {
-            if (!bestBetResults || !bestBetResults.length || !ensembleData) return;
+            if (!bestBetResults || !bestBetResults.length || !ensembleData || NOLEARN) return;
             const k = 'fcs1:' + learnLocKey(), today = ensembleData.daily.time[0];
             const st = (await idb.get(k)) || { days: {} };
             bestBetResults.slice(0, 7).forEach((b, i) => {
@@ -1907,8 +1907,16 @@ body.no-data #sectionNav { display: none; }
             } catch (e) {}
             return out;
         }
+        // shared nightly verification published by the repository's GitHub Action (all devices, every day)
+        let sharedLearnP = null;
+        function sharedLearning() {
+            if (!sharedLearnP) sharedLearnP = fetch('https://raw.githubusercontent.com/CBeatty500/Skyline/main/data/learning.json', { cache: 'no-cache' })
+                .then(r => r.ok ? r.json() : null).catch(() => null);
+            return sharedLearnP;
+        }
+        const NOLEARN = /[?&]nolearn=1/.test(location.search);
         async function updateLearning() {
-            if (!ensembleData) return;
+            if (!ensembleData || NOLEARN) return;
             const loc = learnLocKey(), today = ensembleData.daily.time[0];
             const st = (await idb.get('fcs1:' + loc)) || { days: {} };
             const meas = await measuredDays();
@@ -1955,10 +1963,18 @@ body.no-data #sectionNav { display: none; }
                             pp: 1 + (ratio - 1) * (b.nP / (b.nP + 10)) };
             });
             learnState = { buckets, corr, total: ver.list.length };
+            try {
+                const sh = await sharedLearning();
+                if (sh && sh.locations) {
+                    let best = null;
+                    Object.values(sh.locations).forEach(e => { if (e && e.corr && e.lat != null) { const km = distKm(+currentLoc.lat, +currentLoc.lon, e.lat, e.lon); if (km <= 12 && (!best || km < best.km)) best = { ...e, km }; } });
+                    if (best && (best.total || 0) >= learnState.total) learnState = { buckets: best.buckets, corr: best.corr, total: best.total, shared: true, updated: best.updated };
+                }
+            } catch (e) {}
         }
         // apply learned corrections (leads 1+ for highs; tonight's low counts as lead 0)
         function applyLearning() {
-            if (!learnState || !bestBetResults) return;
+            if (!learnState || !bestBetResults || NOLEARN) return;
             bestBetResults.forEach((b, i) => {
                 const c = learnState.corr[leadKey(i)]; if (!c) return;
                 b.learnRawMax = b.bestMax; b.learnRawMin = b.bestMin; b.learnRawPP = b.precipProb;
@@ -1983,7 +1999,7 @@ body.no-data #sectionNav { display: none; }
             }).join('');
             return `<div class="overflow-x-auto"><table class="w-full text-xs font-mono text-slate-300"><thead class="text-[10px] uppercase text-slate-400"><tr>
                 <th class="p-2 text-left">Lead</th><th class="p-2 text-left">Cases</th><th class="p-2 text-left">High bias (avg miss)</th><th class="p-2 text-left">Low bias (avg miss)</th><th class="p-2 text-left">Rain chance vs observed</th><th class="p-2 text-left">Correction applied</th></tr></thead><tbody>${rows}</tbody></table></div>
-                <div class="text-[11px] text-slate-400 mt-2">Bias = forecast minus measured, recent cases weighted most. Corrections grow with the number of cases and are capped at ±3°C (±5.4°F); rain chances are scaled only after 10+ scored days. Stored on this device for this location (${learnState.total} scored forecasts).</div>`;
+                <div class="text-[11px] text-slate-400 mt-2">Bias = forecast minus measured, recent cases weighted most. Corrections grow with the number of cases and are capped at ±3°C (±5.4°F); rain chances are scaled only after 10+ scored days. ${learnState.shared ? `From the shared nightly verification (${learnState.total} scored forecasts, updated ${new Date(learnState.updated).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}).` : `Stored on this device for this location (${learnState.total} scored forecasts).`}</div>`;
         }
 
         function restOfDayPhrase() {
