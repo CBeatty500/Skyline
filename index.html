@@ -1067,8 +1067,14 @@ body.no-data #sectionNav { display: none; }
             return out;
         }
 
+        let lastLocKey = null;
+        try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch (e) {}
         async function fetchForecastData() {
             const token = ++fetchToken;
+            {
+                const k = currentLoc && currentLoc.lat != null ? `${(+currentLoc.lat).toFixed(3)},${(+currentLoc.lon).toFixed(3)}` : null;
+                if (k !== lastLocKey) { if (lastLocKey !== null || window.scrollY > 0) window.scrollTo({ top: 0, behavior: lastLocKey === null ? 'auto' : 'smooth' }); lastLocKey = k; }
+            }
             const btnText = document.getElementById('generateBtnText');
             const loader = document.getElementById('generateLoader');
             btnText.innerText = "Loading Data...";
