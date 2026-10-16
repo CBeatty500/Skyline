@@ -1846,6 +1846,11 @@ body.no-data #sectionNav { display: none; }
         const SPC_MS = 'https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/';
         const WINTER_RE = /snow|freezing|ice\b|icing|sleet|blizzard|winter/i;
 
+        function spcFetch(u, ms = 12000) {
+            const ac = typeof AbortController !== 'undefined' ? new AbortController() : null;
+            const t = ac ? setTimeout(() => ac.abort(), ms) : null;
+            return fetch(u, ac ? { signal: ac.signal } : {}).finally(() => { if (t) clearTimeout(t); });
+        }
         function spcInConus(lat, lon) { return lat > 23 && lat < 51 && lon > -127 && lon < -65; }
         function spcTime(v) {
             if (v == null || v === '') return null;
@@ -1872,31 +1877,17 @@ body.no-data #sectionNav { display: none; }
         }
         async function spcQuery(layer, lat, lon) {
             const u = `${SPC_MS}${layer}/query?geometry=${lon},${lat}&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&f=json`;
-            const r = await fetch(u);
+            const r = await spcFetch(u);
             if (!r.ok) throw new Error('HTTP ' + r.status);
             const j = await r.json();
             if (j.error || !Array.isArray(j.features)) throw new Error('outlook service');
             return j.features.map(f => { const o = {}; Object.entries(f.attributes || {}).forEach(([k, v]) => { o[k.toLowerCase()] = v; }); return o; });
         }
-        // backup for the categorical risk: IEM point history, keep the outlook in effect now (or the latest for that day)
-        async function spcIEMCat(day, lat, lon) {
-            const j = await (await fetch(`https://mesonet.agron.iastate.edu/json/spcoutlook.py?lat=${lat.toFixed(3)}&lon=${lon.toFixed(3)}&day=${day}&cat=categorical&last=1`)).json();
-            const now = Date.now();
-            const cur = (j.outlooks || []).filter(o => Date.parse(o.utc_expire) > now && Date.parse(o.utc_product_issue) <= now);
-            if (!cur.length) return { cat: null, valid: null };
-            const latest = Math.max(...cur.map(o => Date.parse(o.utc_product_issue)));
-            let best = null, valid = null;
-            cur.filter(o => Date.parse(o.utc_product_issue) === latest).forEach(o => {
-                const c = SPC_CAT[String(o.threshold).toUpperCase()];
-                if (c && (!best || c.n > best.n)) { best = { ...c, code: String(o.threshold).toUpperCase() }; valid = spcTime(o.utc_issue); }
-            });
-            return { cat: best, valid };
-        }
         // newest-first list of product texts for an AWIPS id (e.g. SWOMCD, SWODY1, QPFHSD)
         async function spcProducts(pil, n, maxAgeH) {
             const fresh = t => { const d = spcIssued(t); return !maxAgeH || !d || Date.now() - d < maxAgeH * 36e5; };
             try {
-                const r = await fetch(`https://mesonet.agron.iastate.edu/cgi-bin/afos/retrieve.py?pil=${pil}&limit=${n}&fmt=text`);
+                const r = await spcFetch(`https://mesonet.agron.iastate.edu/cgi-bin/afos/retrieve.py?pil=${pil}&limit=${n}&fmt=text`);
                 if (r.ok) {
                     const t = (await r.text()).replace(/\r/g, '');
                     const parts = t.split(/[\x01\x03]|(?=^[A-Z]{4}\d{2} [A-Z]{4} \d{6}[ A-Z]*$)/m).map(s => s.trim()).filter(s => s.length > 80 && !/^</.test(s));
@@ -1904,9 +1895,9 @@ body.no-data #sectionNav { display: none; }
                 }
             } catch (e) {}
             try {
-                const j = await (await fetch(`https://api.weather.gov/products/types/${pil.slice(0, 3)}/locations/${pil.slice(3)}`)).json();
+                const j = await (await spcFetch(`https://api.weather.gov/products/types/${pil.slice(0, 3)}/locations/${pil.slice(3)}`)).json();
                 const items = (j['@graph'] || []).filter(p => !maxAgeH || Date.now() - Date.parse(p.issuanceTime) < maxAgeH * 36e5).slice(0, n);
-                const texts = await Promise.all(items.map(p => fetch(p['@id'] || `https://api.weather.gov/products/${p.id}`).then(r => r.json()).then(x => x.productText || '').catch(() => '')));
+                const texts = await Promise.all(items.map(p => spcFetch(p['@id'] || `https://api.weather.gov/products/${p.id}`).then(r => r.json()).then(x => x.productText || '').catch(() => '')));
                 return texts.filter(Boolean);
             } catch (e) { return []; }
         }
@@ -1944,7 +1935,7 @@ body.no-data #sectionNav { display: none; }
             };
         }
 
-        async function fetchSPC(lat, lon) {
+        async function fetchSPC(lat, lon, onDays) {
             const res = { days: [], mds: [], texts: [], winter: null, catFailed: false, conus: spcInConus(lat, lon) };
             if (!res.conus) return res;
             const dayP = Promise.all([1, 2, 3].map(async d => {
@@ -1957,7 +1948,7 @@ body.no-data #sectionNav { display: none; }
                         if (c && (!out.cat || c.n > out.cat.n)) { out.cat = { ...c, code }; out.valid = spcTime(a.valid); }
                     });
                 } catch (e) {
-                    try { Object.assign(out, await spcIEMCat(d, lat, lon)); } catch (e2) { out.failed = true; res.catFailed = true; }
+                    out.failed = true; res.catFailed = true;
                 }
                 if (out.cat && out.cat.n >= 1) {
                     await Promise.all(Object.keys(L).filter(k => k !== 'cat').map(k => spcQuery(L[k], lat, lon)
@@ -1974,6 +1965,7 @@ body.no-data #sectionNav { display: none; }
                 });
             }).catch(() => []);
             res.days = await dayP;
+            if (onDays) onDays(res);
             res.mds = await mdP;
             // outlook discussions for each day that has a severe risk here
             const want = res.days.filter(d => d.cat && d.cat.n >= 1).map(d => d.day);
@@ -1992,7 +1984,7 @@ body.no-data #sectionNav { display: none; }
             spcData = null;
             refreshSPC();
             let d;
-            try { d = await fetchSPC(lat, lon); } catch (e) { d = { days: [], mds: [], texts: [], winter: null, catFailed: true, conus: true }; }
+            try { d = await fetchSPC(lat, lon, r => { if (token !== fetchToken) return; spcData = { ...r, mds: [], texts: [], winter: null }; renderActiveAlerts(); refreshSPC(); }); } catch (e) { d = { days: [], mds: [], texts: [], winter: null, catFailed: true, conus: true }; }
             if (token !== fetchToken) return;
             spcData = d;
             renderActiveAlerts();
