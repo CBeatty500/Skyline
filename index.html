@@ -3455,7 +3455,7 @@ body.no-data #sectionNav { display: none; }
         function obsAdjustedHourly() {
             const h = ensembleData && ensembleData.hourly, cc = getCurrentConditions();
             if (!h || !cc || cc.temp === null || cc.temp === undefined) return null;
-            const ck = `${h.time[0]}|${cc.temp}|${cc.dew}|${(nwsObsToday || []).length}|${todayModelSkill ? JSON.stringify(todayModelSkill.weights) : ''}`;
+            const ck = `${h.time[0]}|${cc.temp}|${cc.dew}|${(nwsObsToday || []).length}|${todayModelSkill ? JSON.stringify(todayModelSkill.weights) : ''}|${(bestBetResults || []).slice(0, 3).map(b => b.bestMax).join(',')}`;
             if (_adjCache && _adjCache.k === ck) return _adjCache.v;
             const cur = hourlyStart(), ok = v => v !== null && v !== undefined && !isNaN(v);
             const ct = ensembleData.current && ensembleData.current.time;
@@ -3529,6 +3529,25 @@ body.no-data #sectionNav { display: none; }
                     for (let j = cur + 1; j < D.length; j++) if (D[j] !== null && T[j] !== null) D[j] = Math.min(D[j], T[j]);
                 }
             }
+            // today: never above the forecast high; the next two days: the daytime peak equals the forecast high
+            (bestBetResults || []).slice(0, 3).forEach((b, di) => {
+                if (!b || !ok(b.bestMax)) return;
+                const idx = [];
+                for (let j = Math.max(cur + 1, 0); j < T.length; j++) { const t = h.time[j]; if (t.startsWith(b.date) && +t.slice(11, 13) >= 6 && +t.slice(11, 13) <= 21 && T[j] !== null) idx.push(j); }
+                if (idx.length < 3) return;
+                const vals = idx.map(j => T[j]), M = Math.max(...vals), base = Math.min(...vals), H = b.bestMax;
+                if (di === 0 && M <= H) return;
+                if (Math.abs(M - H) < 0.15) return;
+                const delta = {};
+                idx.forEach(j => {
+                    const nv = (M - base > 0.5 && H > base) ? base + (T[j] - base) * (H - base) / (M - base) : T[j] + (H - M);
+                    delta[j] = nv - T[j];
+                });
+                const last = idx[idx.length - 1], dl = delta[last];
+                idx.forEach(j => { T[j] += delta[j]; });
+                for (let k = 1; k <= 3; k++) { const j = last + k; if (j < T.length && T[j] !== null) T[j] += dl * (1 - k / 4); }
+            });
+            for (let j = cur + 1; j < D.length; j++) if (D[j] !== null && T[j] !== null) D[j] = Math.min(D[j], T[j]);
             const v = { T, D, bT, bD, cur, trend };
             _adjCache = { k: ck, v };
             return v;
