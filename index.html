@@ -337,6 +337,11 @@ body.no-data #sectionNav { display: none; }
 .al-chev { color: #94a3b8; font-size: 12px; transition: transform .2s; } .al-open .al-chev { transform: rotate(180deg); }
 #alertsList > :last-child:nth-child(odd) { }
 @media (min-width: 1024px) { .hero-grid.al-many #alertsList > :last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 4px); } }
+.al-links { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; }
+.al-links a, .al-links button { font-size: 11.5px; font-weight: 600; color: #bae6fd; text-decoration: underline; text-underline-offset: 2px; background: none; border: 0; padding: 0; cursor: pointer; }
+.al-links a:hover, .al-links button:hover { color: #fff; }
+.al-more { margin-top: 6px; } .al-more > summary { cursor: pointer; font-size: 11.5px; font-weight: 600; color: #e2e8f0; opacity: .85; }
+.al-full { margin-top: 6px; white-space: pre-wrap; font-size: 11.5px; line-height: 1.5; color: #e2e8f0; max-height: 18rem; overflow-y: auto; }
 .rec-btn { background: none; border: 0; padding: 0; cursor: pointer; }
 .rec-pop { position: fixed; z-index: 80; max-width: 280px; padding: 8px 11px; border-radius: 10px; background: #1e293b; border: 1px solid rgba(251,191,36,.55); color: #fde68a; font: 500 12px/1.45 'Outfit', system-ui, sans-serif; box-shadow: 0 12px 30px -10px rgba(0,0,0,.7); }
 #heroAlertSlot #alertsContainer { background: rgba(8,16,34,.3); border-color: rgba(255,255,255,.14); box-shadow: none; }
@@ -2517,13 +2522,15 @@ body.no-data #sectionNav { display: none; }
                 const top = risk.reduce((x, y) => y.cat.n > x.cat.n ? y : x);
                 a.push({ type: top.cat.n >= 3 || (top.day === 1 && top.cat.n >= 2) ? 'danger' : 'warning', tag: 'SPC',
                     title: `${top.cat.name} of Severe Storms ${spcDayLabel(top)} (${top.cat.n} of 5)`,
-                    text: risk.map(d => `${spcDayLabel(d)}: ${d.cat.name}${spcHaz(d)}`).join('. ') + '. Details in the forecast discussion.' });
+                    text: risk.map(d => `${spcDayLabel(d)}: ${d.cat.name}${spcHaz(d)}`).join('. ') + '.',
+                    links: [{ label: 'Severe weather discussion', fn: 'openSevere()' }, { label: 'SPC outlook', href: `https://www.spc.noaa.gov/products/outlook/day${top.day}otlk.html` }] });
             }
             spcData.mds.forEach(m => {
                 const w = WINTER_RE.test(m.concerning);
                 a.push({ type: w ? 'warning' : (m.watchProb >= 60 || /watch \d/i.test(m.concerning) ? 'danger' : 'warning'), tag: 'SPC',
                     title: `Mesoscale Discussion ${m.num}`,
-                    text: `${m.concerning || 'Concerning this area'}${m.watchProb != null ? `. Watch probability ${m.watchProb}%` : ''}. Valid until ${spcFmtTime(m.end)}.` });
+                    text: `${m.concerning || 'Concerning this area'}${m.watchProb != null ? `. Watch probability ${m.watchProb}%` : ''}. Valid until ${spcFmtTime(m.end)}.`,
+                    links: [{ label: 'Read the discussion', fn: `openSevere(${m.num})` }, { label: 'SPC page', href: `https://www.spc.noaa.gov/products/md/${(m.end || new Date()).getUTCFullYear()}/md${String(m.num).padStart(4, '0')}.html` }] });
             });
             return a;
         }
@@ -2570,7 +2577,11 @@ body.no-data #sectionNav { display: none; }
         }
         function refreshSPC() {
             const box = document.getElementById('spcSection'), badge = document.getElementById('afdSpcBadge');
-            if (box) box.innerHTML = spcSectionHTML();
+            if (box) {
+                const keep = new Set([...box.querySelectorAll('.spc-det[open] > summary')].map(x => x.textContent.slice(0, 40)));
+                box.innerHTML = spcSectionHTML();
+                box.querySelectorAll('.spc-det > summary').forEach(x => { if (keep.has(x.textContent.slice(0, 40))) x.parentElement.open = true; });
+            }
             if (badge) {
                 const r = spcData ? spcData.days.filter(d => d.cat && d.cat.n >= 1) : [];
                 const top = r.length ? r.reduce((x, y) => y.cat.n > x.cat.n ? y : x) : null;
@@ -2578,6 +2589,26 @@ body.no-data #sectionNav { display: none; }
                 badge.innerHTML = top ? `<span class="spc-chip" style="background:${top.cat.c}">${top.cat.code} ${esc(spcDayLabel(top))}</span>` : '';
                 if (md) badge.innerHTML += `<span class="spc-chip" style="background:#93c5fd">MD</span>`;
             }
+        }
+
+        // jump from an alert to its discussion in the forecast discussion section
+        function openSevere(mdNum) {
+            const c = (typeof SECTIONS !== 'undefined') ? SECTIONS.find(x => x.key === 'afd') : null;
+            if (c && c._panel && c._panel.classList.contains('collapsed')) setSecOpen(c, true, true);
+            const go = () => {
+                const dets = [...document.querySelectorAll('#spcSection .spc-det')];
+                let target = null;
+                if (mdNum != null) target = dets.find(d => (d.querySelector('summary') || {}).textContent && d.querySelector('summary').textContent.includes(`Mesoscale Discussion ${mdNum}`));
+                else target = dets.find(d => /Convective Outlook discussion/.test((d.querySelector('summary') || {}).textContent || ''));
+                if (target) target.open = true;
+                (target || document.getElementById('spcSection') || document.getElementById('afdPanel')).scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+            setTimeout(go, 350);
+        }
+        function openAFDPanel() {
+            const c = (typeof SECTIONS !== 'undefined') ? SECTIONS.find(x => x.key === 'afd') : null;
+            if (c && c._panel && c._panel.classList.contains('collapsed')) setSecOpen(c, true, true);
+            requestAnimationFrame(() => { const t = document.getElementById('afdText') || document.getElementById('afdPanel'); if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
         }
 
 
@@ -4457,7 +4488,17 @@ body.no-data #sectionNav { display: none; }
             const alerts = nwsAlerts.map(a => ({
                 type: (a.severity === 'Extreme' || a.severity === 'Severe') ? 'danger' : 'warning',
                 title: a.event, tag: 'NWS Official',
-                text: (a.headline || '') + (a.areaDesc ? ` — ${a.areaDesc}` : '')
+                text: (a.headline || '') + (a.areaDesc ? ` — ${a.areaDesc}` : ''),
+                full: [a.description, a.instruction].filter(Boolean).join('\n\n'),
+                links: (() => {
+                    const L = [];
+                    const vt = (a.parameters && Array.isArray(a.parameters.VTEC) ? a.parameters.VTEC : []).join(' ');
+                    const w = vt.match(/\.(SV|TO)\.A\.(\d{4})\./);
+                    if (w) L.push({ label: `SPC watch ${+w[2]}`, href: `https://www.spc.noaa.gov/products/watch/ww${w[2]}.html` });
+                    if (nwsOffice) L.push({ label: 'Area forecast discussion', fn: 'openAFDPanel()' });
+                    if (/thunder|tornado|severe/i.test(a.event || '')) L.push({ label: 'Severe weather discussion', fn: 'openSevere()' });
+                    return L;
+                })()
             }));
             alerts.push(...spcAlerts());
             if (bestBetResults.length > 0) {
@@ -4498,6 +4539,8 @@ body.no-data #sectionNav { display: none; }
                     <div class="p-3 rounded-xl border ${a.type === 'danger' ? 'bg-rose-950/40 border-rose-500/50 text-rose-200' : 'bg-amber-950/40 border-amber-500/50 text-amber-200'} text-xs">
                         <strong class="font-bold text-sm block mb-1"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>${esc(a.title)} <span class="ml-1 text-[10px] font-mono font-normal opacity-70">[${a.tag}]</span></strong>
                         <p class="leading-relaxed opacity-90">${esc(a.text.slice(0, 320))}</p>
+                        ${a.full ? `<details class="al-more"><summary>Full alert text</summary><div class="al-full">${esc(a.full)}</div></details>` : ''}
+                        ${a.links && a.links.length ? `<div class="al-links">${a.links.map(l => l.href ? `<a href="${l.href}" target="_blank" rel="noopener">${esc(l.label)} <i class="fa-solid fa-arrow-up-right-from-square text-[9px]"></i></a>` : `<button type="button" onclick="${l.fn}">${esc(l.label)} <i class="fa-solid fa-arrow-down text-[9px]"></i></button>`).join('')}</div>` : ''}
                     </div>`).join('');
             heroAlertCount = alerts.length;
             heroAlertItems = alerts.map(a => ({ type: a.type, title: a.title }));
