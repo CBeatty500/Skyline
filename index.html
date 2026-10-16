@@ -1793,25 +1793,36 @@ body.no-data #sectionNav { display: none; }
             return out;
         }
         async function radarNowcast(lat, lon) {
-            const N = 25, C = 12, dLat = 1.5, dLon = 1.5 / Math.cos(lat * Math.PI / 180);
+            // 33 x 33 samples over +-1.5 deg (about 10 km apart); three frames 15 minutes apart
+            const N = 33, C = 16, dLat = 1.5, dLon = 1.5 / Math.cos(lat * Math.PI / 180);
             const pts = [];
             for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) pts.push([+(lon - dLon + 2 * dLon * x / (N - 1)).toFixed(4), +(lat + dLat - 2 * dLat * y / (N - 1)).toFixed(4)]);
             const kmX = 2 * dLon * 111.32 * Math.cos(lat * Math.PI / 180) / (N - 1), kmY = 2 * dLat * 111.32 / (N - 1);
             const info = await (await fetch(`${RADAR_IS}?f=json`)).json();
             const tEnd = info && info.timeInfo && info.timeInfo.timeExtent ? info.timeInfo.timeExtent[1] : null;
             if (!tEnd || Date.now() - tEnd > 45 * 60e3) throw new Error('radar not current');
-            const [B, A] = await Promise.all([radarFrame(pts, tEnd), radarFrame(pts, tEnd - 30 * 60e3)]);
+            const [B, M, A] = await Promise.all([radarFrame(pts, tEnd), radarFrame(pts, tEnd - 15 * 60e3), radarFrame(pts, tEnd - 30 * 60e3)]);
             const g = (arr, x, y) => (x < 0 || y < 0 || x >= N || y >= N) ? 0 : arr[y * N + x];
-            // motion: best overlap of the 30-minute-old echoes shifted onto the latest ones
+            // motion: the shift that best lays the earlier echoes onto the later ones (normalized overlap), refined to a
+            // fraction of a cell; a shift at the edge of the search is not a real match
             const w = z => Math.max(0, z - 15);
-            let best = { sx: 0, sy: 0, s: -1 }, nA = 0, nB = 0;
-            for (let i = 0; i < N * N; i++) { nA += w(A[i]) ** 2; nB += w(B[i]) ** 2; }
-            if (nA > 0 && nB > 0) for (let sy = -4; sy <= 4; sy++) for (let sx = -4; sx <= 4; sx++) {
-                let s = 0; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) s += w(g(A, x, y)) * w(g(B, x + sx, y + sy));
-                s /= Math.sqrt(nA * nB); if (s > best.s + 1e-9 || (Math.abs(s - best.s) < 1e-9 && Math.abs(sx) + Math.abs(sy) < Math.abs(best.sx) + Math.abs(best.sy))) best = { sx, sy, s };
-            }
-            const moving = best.s > 0.25;
-            const vx = moving ? best.sx / 30 : 0, vy = moving ? best.sy / 30 : 0;   // cells per minute (x east, y south)
+            const match = (P, Q, R) => {
+                let nP = 0, nQ = 0; for (let i = 0; i < N * N; i++) { nP += w(P[i]) ** 2; nQ += w(Q[i]) ** 2; }
+                if (!(nP > 0 && nQ > 0)) return null;
+                const S = {}, sc = (sx, sy) => { const k = sx + ',' + sy; if (S[k] === undefined) { let v = 0; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { const a = w(g(P, x, y)); if (a) v += a * w(g(Q, x + sx, y + sy)); } S[k] = v / Math.sqrt(nP * nQ); } return S[k]; };
+                let best = { sx: 0, sy: 0, s: -1 };
+                for (let sy = -R; sy <= R; sy++) for (let sx = -R; sx <= R; sx++) { const v = sc(sx, sy) - 0.004 * Math.hypot(sx, sy); if (v > best.s) best = { sx, sy, s: v }; }
+                if (Math.abs(best.sx) === R || Math.abs(best.sy) === R) return null;
+                const sub = (m, c, p) => { const d = m - 2 * c + p; return d < 0 ? Math.max(-0.5, Math.min(0.5, 0.5 * (m - p) / d)) : 0; };
+                const c0 = sc(best.sx, best.sy);
+                return { x: best.sx + sub(sc(best.sx - 1, best.sy), c0, sc(best.sx + 1, best.sy)), y: best.sy + sub(sc(best.sx, best.sy - 1), c0, sc(best.sx, best.sy + 1)), s: c0 };
+            };
+            const m30 = match(A, B, 7), m1 = match(A, M, 5), m2 = match(M, B, 5);
+            // trust the motion only when the two 15-minute steps agree with the 30-minute step and the echoes held together
+            const agree = m30 && m1 && m2 && m30.s > 0.35 && Math.abs(m1.x + m2.x - m30.x) <= 1.2 && Math.abs(m1.y + m2.y - m30.y) <= 1.2;
+            let vx = agree ? m30.x / 30 : 0, vy = agree ? m30.y / 30 : 0;   // cells per minute (x east, y south)
+            let moving = !!agree && Math.hypot(vx * kmX, vy * kmY) * 60 >= 5;
+            if (Math.hypot(vx * kmX, vy * kmY) * 60 > 100) { vx = 0; vy = 0; moving = false; }   // over ~60 mph: not believable for a precipitation area
             const near = (z, r) => { let m = 0; for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) m = Math.max(m, g(B, Math.round(C + z.x) + x, Math.round(C + z.y) + y)); return m; };
             // echo at the location after t minutes = echo now at (location - v*t)
             const ahead = t => near({ x: -vx * t, y: -vy * t }, 1);
@@ -1847,8 +1858,9 @@ body.no-data #sectionNav { display: none; }
                 const tz = ensembleData.timezone;
                 const when = new Date(Date.now() + rn.arrive * 60e3).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
                 const what = rn.peak >= 45 ? 'Heavy rain and possible thunderstorms' : rn.peak >= 30 ? 'Rain' : 'Light rain';
-                const mph = Math.round(rn.speedKmh * 0.621);
-                radarInfo = { msg: rn.arrive <= 5 ? `Radar: ${what.toLowerCase()} over the area now${from && mph >= 5 ? `, moving in from the ${from} near ${mph} mph` : ''}.`
+                const mph = Math.round(rn.speedKmh * 0.621 / 5) * 5;   // the motion is good to about 5 mph
+                const to = from ? dirs[(dirs.indexOf(from) + 4) % 8] : null;
+                radarInfo = { msg: rn.arrive <= 5 ? `Radar: ${what.toLowerCase()} over the area now${to && mph >= 5 ? `, moving ${to} near ${mph} mph` : ''}.`
                     : `Radar: ${what.toLowerCase()} approaching${from && mph >= 5 ? ` from the ${from} near ${mph} mph` : ''}, arriving around ${when}.` };
             }
         }
@@ -3941,6 +3953,11 @@ body.no-data #sectionNav { display: none; }
                 if (idx.length < 3) return;
                 const vals = idx.map(j => T[j]), M = Math.max(...vals), base = Math.min(...vals), H = di === 0 ? todayCurveTarget : b.bestMax;
                 if (di === 0 && todayCurveTarget == null) return;   // today: mapped only to the final blended high (raiseTodayHigh)
+                if (di === 0) {   // once the day's peak hour has passed (or the sun is down) the evening is never lifted to the high
+                    let jp = -1, pv = -Infinity;
+                    for (let j = 0; j < T.length; j++) { const t = h.time[j]; if (t.startsWith(b.date) && +t.slice(11, 13) >= 10 && +t.slice(11, 13) <= 18 && ok(baseT[j]) && baseT[j] > pv) { pv = baseT[j]; jp = j; } }
+                    if (jp < 0 || jp <= cur || !(cc.isDay === 1 || cc.isDay === true)) return;
+                }
                 if (Math.abs(M - H) < 0.15) return;
                 const delta = {};
                 idx.forEach(j => {
@@ -4060,7 +4077,9 @@ body.no-data #sectionNav { display: none; }
             const ncT = nowcastAdjust({ pp, amt: rain, snow: sn.snow, code });
             pp = ncT.pp; code = ncT.code; if (ncT.amt > rain) { sn.rain += ncT.amt - rain; rain = ncT.amt; } if ((ncT.snow || 0) > sn.snow) sn.snow = ncT.snow;
             const cond = dailyCondition({ precipProb: pp, bestPrecip: rain, bestSnow: sn.snow, weatherCode: code, cloud: cl.length ? cl.reduce((a, b) => a + b, 0) / cl.length : null }, false);
-            const rising = hi > nowT + 0.8;   // temperatures climb overnight (e.g. warm advection)
+            let jLo = -1, jHi = -1, vLo = Infinity, vHi = -Infinity;
+            for (let j = cur + 1; j <= endIdx; j++) { const t = adj && ok(adj.T[j]) ? adj.T[j] : h.temperature_2m[j]; if (!ok(t)) continue; if (t < vLo) { vLo = t; jLo = j; } if (t > vHi) { vHi = t; jHi = j; } }
+            const rising = hi > nowT + 0.8 && jHi > jLo && vHi - vLo >= 1;   // temperatures climb overnight (e.g. warm advection)
             return { early, end, low: lo, high: rising ? hi : null, pp: Math.round(pp), rain: sn.rain, snow: sn.snow, wind, gust, cond, nowcast: ncT.nowcast || null };
         }
 
