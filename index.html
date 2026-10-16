@@ -4333,7 +4333,7 @@ body.no-data #sectionNav { display: none; }
                             </div>
 
                             <div class="flex justify-between items-center text-[11px] text-slate-300 font-mono mb-2.5 px-0.5">
-                                <span>${WET_ICONS.includes(cond.icon) ? `<i class="fa-solid fa-umbrella text-blue-400 mr-1"></i>${Math.round(pv.precipProb)}%` : ''}</span>
+                                <span></span>
                                 <span><i class="fa-solid fa-wind text-slate-400 mr-1"></i>${compass(bb.windDir) ? compass(bb.windDir) + ' ' : ''}${formatSpeed(pv.bestWind)}</span>
                             </div>
                             ${ni ? periodStrip(i, 'tonight') : periodStrip(i)}
