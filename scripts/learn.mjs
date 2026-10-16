@@ -29,7 +29,7 @@ async function stationObs(id) {
   const start = new Date(Date.now() - 7 * 864e5).toISOString().replace(/\.\d+Z$/, 'Z');
   for (let a = 0; a < 3; a++) {
     try {
-      const r = await fetch(`https://api.weather.gov/stations/${id}/observations?start=${start}&limit=500`, { headers: UA });
+      const r = await fetch(`https://api.weather.gov/stations/${id}/observations?start=${start}&limit=500`, { headers: UA, signal: AbortSignal.timeout(30000) });
       if (!r.ok) throw new Error('HTTP ' + r.status);
       const j = await r.json();
       const val = q => q && ok(q.value) ? (q.unitCode && /m_s/.test(q.unitCode) ? q.value * 3.6 : q.value) : null;
