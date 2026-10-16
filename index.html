@@ -138,6 +138,12 @@ body[data-sky="clear-night"] #skyBg::before { background: radial-gradient(1px 1p
 .go-btn { height: 44px; padding: 0 20px; border-radius: 999px; background: linear-gradient(135deg, #ffb84d, #ff8a4c); color: #1a1205; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
 .unit-btn { height: 44px; padding: 0 14px; border-radius: 999px; background: rgba(255,255,255,.09); border: 1px solid var(--line); color: var(--ink); font-size: 12px; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 #myLocBtn.busy i { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
+#refreshTop { display: none !important; } @media (min-width: 768px) { #refreshTop { display: flex !important; } }
+.refresh-btn { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 11px; border-radius: 999px; font-size: 12px; color: #dbeafe; background: rgba(255,255,255,.10); border: 1px solid rgba(255,255,255,.18); }
+.refresh-btn:hover { background: rgba(255,255,255,.18); }
+.refresh-btn { margin-left: auto; }
+@media (max-width: 767px) { .refresh-btn span { display: none; } .refresh-btn { width: 30px; height: 30px; padding: 0; justify-content: center; } }
+.refreshing .fa-rotate-right { animation: spin .9s linear infinite; }
 .unit-btn span { display: none; } @media (min-width: 900px) { .unit-btn span { display: inline; } }
 .rail { display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .rail::-webkit-scrollbar { display: none; }
@@ -310,6 +316,7 @@ body.no-data #sectionNav { display: none; }
                 <div id="autocompleteResults" class="absolute w-full mt-2 bg-slate-800/95 border border-slate-700 rounded-2xl shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-700/60"></div>
             </div>
             <button onclick="searchAndFetch()" class="go-btn shrink-0"><span id="generateBtnText">Fetch</span><div id="generateLoader" class="loader hidden"></div></button>
+            <button onclick="refreshData()" id="refreshTop" class="unit-btn shrink-0" title="Refresh data" aria-label="Refresh data"><i class="fa-solid fa-rotate-right"></i><span>Refresh</span></button>
             <button onclick="toggleUnits()" id="unitToggleBtn" class="unit-btn shrink-0" title="Switch units"><i class="fa-solid fa-temperature-half"></i><span id="unitToggleLabel">°F · in · mph</span></button>
         </div>
         <div class="wrap pb-2.5 rail">
@@ -356,6 +363,7 @@ body.no-data #sectionNav { display: none; }
                         <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                             <span class="chip chip-static"><i class="fa-solid fa-satellite mr-1.5"></i><span id="currentObsSource">Current Conditions</span></span>
                             <span id="currentObsTime" class="text-xs text-slate-300/80"></span>
+                            <button onclick="refreshData()" class="refresh-btn" title="Refresh data" aria-label="Refresh data"><i class="fa-solid fa-rotate-right"></i><span>Refresh</span></button>
                         </div>
                         <div id="currentStationLine" class="text-[11px] text-slate-300/70 font-mono mt-1"></div>
                     </div>
@@ -4633,6 +4641,12 @@ body.no-data #sectionNav { display: none; }
                 } catch (e) {}
             }
             try { const s = JSON.parse(localStorage.getItem('skyline:lastLoc') || 'null'); if (s && isFinite(s.lat) && isFinite(s.lon)) currentLoc = s; } catch (e) {}
+        }
+        let refreshing = false;
+        async function refreshData() {
+            if (refreshing) return;
+            refreshing = true; document.body.classList.add('refreshing');
+            try { await fetchForecastData(); } finally { refreshing = false; document.body.classList.remove('refreshing'); }
         }
         function useMyLocation() {
             if (!navigator.geolocation) { showToast('Location is not available in this browser.'); return; }
