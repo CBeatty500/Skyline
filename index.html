@@ -971,6 +971,20 @@ body.no-data #sectionNav { display: none; }
                                 const t = await (await fetch(`https://api.weather.gov/stations/${out.obs.stationId}/observations?start=${since}&limit=500`)).json();
                                 out.obsToday = (t.features || []).map(f => f.properties);
                             } catch (e) {}
+                            try {
+                                const recent = out.obsToday.filter(o => o && o.timestamp && o.temperature && o.temperature.value != null && Date.now() - new Date(o.timestamp) < 24 * 3600e3).length;
+                                const sid = out.obs.stationId || '', st = out.state;
+                                if (recent < 8 && st && /^K[A-Z0-9]{3}$/.test(sid)) {
+                                    const day = n => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
+                                    const get = d => fetch(`https://mesonet.agron.iastate.edu/api/1/obhistory.json?station=${sid.slice(1)}&network=${st}_ASOS&date=${d}&full=1`)
+                                        .then(r => r.ok ? r.json() : { data: [] }).then(j => Array.isArray(j.data) ? j.data : []).catch(() => []);
+                                    const rows = (await Promise.all([day(2), day(1), day(0), day(-1)].map(get))).flat();
+                                    const iem = rows.map(iemToObs).filter(o => o.timestamp && o.temperature.value !== null).map(o => { delete o.intl; return o; });
+                                    const have = new Set(out.obsToday.filter(o => o && o.timestamp).map(o => Math.round(new Date(o.timestamp) / 120000)));
+                                    const add = iem.filter(o => !have.has(Math.round(new Date(o.timestamp) / 120000)));
+                                    if (add.length) out.obsToday = [...out.obsToday, ...add].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                                }
+                            } catch (e) {}
                         }
                     })().catch(() => {})
                 ]);
