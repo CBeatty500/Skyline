@@ -45,6 +45,25 @@ async function stationObs(id) {
   }
 }
 
+// ---- the airport's official daily high, low and precipitation (NOAA Regional Climate Centers, ACIS) ----
+async function airportDays(id) {
+  const F = f => (f - 32) / 1.8, num = v => v === 'M' || v == null ? null : v === 'T' ? 0 : parseFloat(v);
+  const sdate = new Date(Date.now() - 100 * 864e5).toISOString().slice(0, 10), edate = new Date().toISOString().slice(0, 10);
+  for (const sid of [id, id.replace(/^K/, '')]) {
+    try {
+      const r = await fetch('https://data.rcc-acis.org/StnData', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: AbortSignal.timeout(30000),
+        body: JSON.stringify({ sid, sdate, edate, elems: [{ name: 'maxt' }, { name: 'mint' }, { name: 'pcpn' }], meta: ['name'] }) });
+      if (!r.ok) continue;
+      const j = await r.json();
+      if (!j || !Array.isArray(j.data) || !j.data.length) continue;
+      const out = {};
+      j.data.forEach(([d, hi, lo, pr]) => { const a = num(hi), b = num(lo), c = num(pr); if (a == null && b == null && c == null) return; out[d] = { hi: a == null ? null : F(a), lo: b == null ? null : F(b), pr: c == null ? null : c * 25.4 }; });
+      return { name: j.meta && j.meta.name, days: out };
+    } catch (e) {}
+  }
+  return null;
+}
+
 // ---- running, recency-weighted error statistics (each new case multiplies the old weights by DECAY) ----
 const DECAY = 0.985;
 function addCase(cell, v, x) {
@@ -104,6 +123,13 @@ for (const loc of locs) {
   await sleep(4000);
   const L = learning.locations[k] || (learning.locations[k] = { name: loc.name, list: [] });
   try {
+    // daily checks also use the main airport when one is listed (its official climate record); else what the app measures
+    if (loc.station) {
+      const ad = await airportDays(loc.station);
+      if (ad && Object.keys(ad.days).length) { r.meas = ad.days; r.station = loc.station; L.dailySource = ad.name || loc.station; }
+      else console.log(`  ${loc.name}: no daily record for ${loc.station}; using the app's climate station`);
+    }
+    if (L.station && r.station && L.station !== r.station) L.list = [];   // a different station starts fresh
     // ---------- daily: highs, lows, rain chance and amount ----------
     const st = snaps[k] || (snaps[k] = { name: loc.name, days: {} });
     r.fc.forEach((f, i) => {
