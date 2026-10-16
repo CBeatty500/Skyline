@@ -33,3 +33,7 @@ Running log of verification reviews: what the data showed, what changed and why,
 **Diagnostics.** Regional analysis ran in 16 cities (7-15 stations; none for Honolulu), largest adjustment 1.8°C (Seattle, weak 5 mph flow), no forecast lines issued. Run 7 predates b3f1ebe, so current conditions still came from other stations in some cities (Burke from KDCA, Denver from KBJC); confirm on the next run that each city now reports from its own verification station. Honolulu current weather text was empty.
 
 **Watching next week:** same list as above, plus whether the first scheduled runs complete for all cities, and Seattle regional adjustments in light flow.
+
+## 2026-10-16: test run
+
+Test of the weekly routine. Clone, notes and data read; Action runs checked (7 runs today, run 7 successful, schedule not yet fired); `dev/restore.sh` plus build reproduces index.html byte for byte; `node --check` passes. No change to the forecast method (not enough data). This entry confirms push access.
