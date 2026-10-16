@@ -23,3 +23,13 @@ Running log of verification reviews: what the data showed, what changed and why,
 - Gust ratio: models are usually too gusty in light flow; expect gust ratios below 1.
 - Rain-chance reliability in the dry West (Phoenix, Los Angeles): over-forecast likely.
 - Run time with 3 cities at a time, and whether any city is skipped.
+
+## 2026-10-16 (evening): weekly review, run early
+
+**Action runs.** 7 runs, all manual dispatches today; the 4x-daily schedule has not fired yet (first at 01:17 UTC). Run 6 failed on a save conflict, fixed in 129d7bb; run 7 succeeded for all 17 cities, none skipped.
+
+**Verification data.** No daily cases yet (first measured day is Oct 17). Hourly: 1 case at 0-6 h in 10 cities, none in the other 7. Single-hour temperature errors -2.4 to +1.5°C, no common sign. No ts-versus-t comparison is possible yet. Not enough data for any change: the algorithm is unchanged and all learned corrections remain at zero.
+
+**Diagnostics.** Regional analysis ran in 16 cities (7-15 stations; none for Honolulu), largest adjustment 1.8°C (Seattle, weak 5 mph flow), no forecast lines issued. Run 7 predates b3f1ebe, so current conditions still came from other stations in some cities (Burke from KDCA, Denver from KBJC); confirm on the next run that each city now reports from its own verification station. Honolulu current weather text was empty.
+
+**Watching next week:** same list as above, plus whether the first scheduled runs complete for all cities, and Seattle regional adjustments in light flow.
