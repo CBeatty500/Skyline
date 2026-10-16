@@ -1185,7 +1185,9 @@ body.no-data #sectionNav { display: none; }
                 nwsAlerts = nws.alerts || [];
                 nwsThunder = nws.thunder || null;
                 try { blendNwsGrid(nws); } catch (e) {}
-                radarInfo = null; learnState = null;
+                radarInfo = null; radarNow = null; learnState = null;
+                try { snapHourlyRaw(); applyHourlyLearning(await sharedEntryFor(lat, lon)); } catch (e) { hourlyLearn = null; }
+                if (token !== fetchToken) return;
                 spcData = null;
                 historicalData = null; climLite = null; histLoading = true;
                 if (ensembleData.elevation !== undefined) currentLoc.ele = ensembleData.elevation;
@@ -1769,7 +1771,7 @@ body.no-data #sectionNav { display: none; }
         // ---------- Radar nowcast (0-3 h): NOAA/NWS national base reflectivity mosaic, sampled on a grid around the location.
         // Echo motion from the last 30 minutes (pattern matching), extrapolated to the location. Raises the hourly chance and
         // wet/thunder codes when echoes are on the way; trims the next hour when there are no echoes anywhere nearby. ----------
-        let radarInfo = null;
+        let radarInfo = null, radarNow = null;   // radarNow: reflectivity right over the location { z (dBZ), z3 (max within ~15 km), t }
         const RADAR_IS = 'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer';
         const DBZ_COLORS = [[5, [4, 233, 231]], [10, [1, 159, 244]], [15, [3, 0, 244]], [20, [2, 253, 2]], [25, [1, 197, 1]], [30, [0, 142, 0]], [35, [253, 248, 2]], [40, [229, 188, 0]], [45, [253, 149, 0]], [50, [253, 0, 0]], [55, [212, 0, 0]], [60, [188, 0, 0]], [65, [248, 0, 253]], [70, [152, 84, 198]], [75, [253, 253, 253]]];
         function rgbToDbz(v) {
@@ -1816,7 +1818,7 @@ body.no-data #sectionNav { display: none; }
             let any = 0; for (let i = 0; i < N * N; i++) if (B[i] >= 20) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 100) any++; }
             let arrive = null; for (let t = 0; t <= 180; t += 10) if (ahead(t) >= 20) { arrive = t; break; }
             const speedKmh = Math.hypot(vx * kmX, vy * kmY) * 60;
-            return { ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
+            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
         }
         function applyRadarNowcast(rn) {
             const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
@@ -1855,6 +1857,7 @@ body.no-data #sectionNav { display: none; }
             try {
                 const rn = await radarNowcast(+lat, +lon);
                 if (token !== fetchToken) return;
+                radarNow = { z: rn.here, z3: rn.here3, t: rn.t };
                 applyRadarNowcast(rn);
                 recomputeForecast();
             } catch (e) { console.warn('Radar nowcast unavailable:', e); }
@@ -1886,7 +1889,7 @@ body.no-data #sectionNav { display: none; }
                 const L = String(i);
                 if (d[L] && d[L].issued === today) { /* keep the first forecast made on each day for each lead */ }
                 if (!d[L] || d[L].issued !== today) {
-                    if (!d[L] || d[L].issued < today) d[L] = { issued: today, max: b.learnRawMax ?? b.bestMax, min: b.learnRawMin ?? b.bestMin, pp: b.learnRawPP ?? b.precipProb, pr: b.bestPrecip ?? null };
+                    if (!d[L] || d[L].issued < today) d[L] = { issued: today, max: b.learnRawMax ?? b.bestMax, min: b.learnRawMin ?? b.bestMin, pp: b.learnRawPP ?? b.precipProb, pr: b.learnRawPR ?? b.bestPrecip ?? null };
                 }
             });
             // keep 60 days
@@ -1970,12 +1973,8 @@ body.no-data #sectionNav { display: none; }
             });
             learnState = { buckets, corr, total: ver.list.length };
             try {
-                const sh = await sharedLearning();
-                if (sh && sh.locations) {
-                    let best = null;
-                    Object.values(sh.locations).forEach(e => { if (e && e.corr && e.lat != null) { const km = distKm(+currentLoc.lat, +currentLoc.lon, e.lat, e.lon); if (km <= 12 && (!best || km < best.km)) best = { ...e, km }; } });
-                    if (best && (best.total || 0) >= learnState.total) learnState = { buckets: best.buckets, corr: best.corr, total: best.total, shared: true, updated: best.updated };
-                }
+                const best = await sharedEntryFor(currentLoc.lat, currentLoc.lon);
+                if (best && best.corr && (best.total || 0) >= learnState.total) learnState = { buckets: best.buckets, corr: best.corr, total: best.total, shared: true, updated: best.updated };
             } catch (e) {}
         }
         // apply learned corrections (leads 1+ for highs; tonight's low counts as lead 0)
@@ -1983,11 +1982,12 @@ body.no-data #sectionNav { display: none; }
             if (!learnState || !bestBetResults || NOLEARN) return;
             bestBetResults.forEach((b, i) => {
                 const c = learnState.corr[leadKey(i)]; if (!c) return;
-                b.learnRawMax = b.bestMax; b.learnRawMin = b.bestMin; b.learnRawPP = b.precipProb;
+                b.learnRawMax = b.bestMax; b.learnRawMin = b.bestMin; b.learnRawPP = b.precipProb; b.learnRawPR = b.bestPrecip;
+                if (i >= 1 && b.bestPrecip != null && c.pr && c.pr !== 1) b.bestPrecip = b.bestPrecip * c.pr;
                 if (i >= 1 && b.bestMax != null) b.bestMax += c.max;
                 if (b.bestMin != null) b.bestMin += c.min;
                 if (i >= 1 && b.precipProb != null && c.pp !== 1) b.precipProb = Math.max(0, Math.min(100, Math.round(b.precipProb * c.pp)));
-                b.learned = { max: i >= 1 ? c.max : 0, min: c.min, pp: i >= 1 ? c.pp : 1 };
+                b.learned = { max: i >= 1 ? c.max : 0, min: c.min, pp: i >= 1 ? c.pp : 1, pr: i >= 1 ? (c.pr || 1) : 1 };
             });
         }
         function learningHTML() {
@@ -2001,13 +2001,83 @@ body.no-data #sectionNav { display: none; }
                     <td class="p-2">${b.nMax ? `${f(b.bMax, true)} <span class="text-slate-500">(${f(b.maeMax)})</span>` : '--'}</td>
                     <td class="p-2">${b.nMin ? `${f(b.bMin, true)} <span class="text-slate-500">(${f(b.maeMin)})</span>` : '--'}</td>
                     <td class="p-2">${b.nP ? `${Math.round(b.ppMean * 100)}% vs ${Math.round(b.wetFreq * 100)}%` : '--'}</td>
-                    <td class="p-2 text-amber-300">${(c.max || c.min || (c.pp !== 1 && L !== '0')) ? [L !== '0' && c.max ? `high ${f(c.max, true)}` : '', c.min ? `low ${f(c.min, true)}` : '', c.pp !== 1 && L !== '0' ? `rain chance ×${c.pp.toFixed(2)}` : ''].filter(Boolean).join(', ') : '<span class="text-slate-500">none yet</span>'}</td></tr>`;
+                    <td class="p-2 text-amber-300">${(c.max || c.min || (L !== '0' && (c.pp !== 1 || (c.pr && c.pr !== 1)))) ? [L !== '0' && c.max ? `high ${f(c.max, true)}` : '', c.min ? `low ${f(c.min, true)}` : '', c.pp !== 1 && L !== '0' ? `rain chance ×${c.pp.toFixed(2)}` : '', c.pr && c.pr !== 1 && L !== '0' ? `rain amount ×${c.pr.toFixed(2)}` : ''].filter(Boolean).join(', ') : '<span class="text-slate-500">none yet</span>'}</td></tr>`;
             }).join('');
             return `<div class="overflow-x-auto"><table class="w-full text-xs font-mono text-slate-300"><thead class="text-[10px] uppercase text-slate-400"><tr>
                 <th class="p-2 text-left">Lead</th><th class="p-2 text-left">Cases</th><th class="p-2 text-left">High bias (avg miss)</th><th class="p-2 text-left">Low bias (avg miss)</th><th class="p-2 text-left">Rain chance vs observed</th><th class="p-2 text-left">Correction applied</th></tr></thead><tbody>${rows}</tbody></table></div>
                 <div class="text-[11px] text-slate-400 mt-2">Bias = forecast minus measured, recent cases weighted most. Corrections grow with the number of cases and are capped at ±3°C (±5.4°F); rain chances are scaled only after 10+ scored days. ${learnState.shared ? `From the shared nightly verification (${learnState.total} scored forecasts, updated ${new Date(learnState.updated).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}).` : `Stored on this device for this location (${learnState.total} scored forecasts).`}</div>`;
         }
 
+        // ---------- Hourly learning (shared verification, run several times a day by the repository's GitHub Action) ----------
+        // Every hour of the forecast is checked against the station's observation: temperature, dewpoint, wind, gusts,
+        // cloud cover and whether it rained. Errors are kept by lead time (0-6 h, 6-24 h, 24-48 h, 48 h+) and by day / night.
+        // The corrections here are applied once per load to the hourly forecast, before the radar nowcast.
+        let hourlyLearn = null;   // { corr: {cell: {t, td, cc, ws, wg, pp}}, cells, n, updated, name }
+        const HL_LEADS = ['0-6', '6-24', '24-48', '48+'];
+        const hlLead = hrs => hrs < 6 ? '0-6' : hrs < 24 ? '6-24' : hrs < 48 ? '24-48' : '48+';
+        async function sharedEntryFor(lat, lon) {
+            const sh = await Promise.race([sharedLearning(), new Promise(r => setTimeout(() => r(null), 2500))]);
+            if (!sh || !sh.locations) return null;
+            let best = null;
+            Object.values(sh.locations).forEach(e => { if (e && e.lat != null) { const km = distKm(+lat, +lon, e.lat, e.lon); if (km <= 12 && (!best || km < best.km)) best = { ...e, km }; } });
+            return best;
+        }
+        // the forecast as made, before learned corrections and the radar nowcast (what the verification scores)
+        function snapHourlyRaw() {
+            const h = ensembleData && ensembleData.hourly; if (!h) return;
+            h._raw = {};
+            ['temperature_2m', 'dew_point_2m', 'cloud_cover', 'precipitation_probability', 'precipitation'].forEach(f => { if (h[f]) h._raw[f] = h[f].slice(); });
+            h._learnF = null;
+        }
+        function hourMs(j) { const h = ensembleData.hourly; return Date.parse(h.time[j] + ':00Z') - (ensembleData.utc_offset_seconds || 0) * 1000; }
+        function applyHourlyLearning(entry) {
+            hourlyLearn = entry && entry.hourly && entry.hourly.corr ? { ...entry.hourly, name: entry.name, km: entry.km } : null;
+            const h = ensembleData && ensembleData.hourly;
+            if (!h || !hourlyLearn || NOLEARN) return;
+            const now = Date.now(), ok = v => v !== null && v !== undefined && !isNaN(v);
+            const ws = new Array(h.time.length).fill(1), wg = new Array(h.time.length).fill(1);
+            h.time.forEach((t, j) => {
+                const ahead = (hourMs(j) - now) / 36e5;
+                if (ahead < -1) return;
+                const c = hourlyLearn.corr[hlLead(Math.max(0, ahead)) + '|' + (h.is_day && h.is_day[j] ? 'd' : 'n')];
+                if (!c) return;
+                if (h.temperature_2m && ok(h.temperature_2m[j]) && c.t) h.temperature_2m[j] += c.t;
+                if (h.dew_point_2m && ok(h.dew_point_2m[j]) && c.td) h.dew_point_2m[j] += c.td;
+                if (h.dew_point_2m && h.temperature_2m && ok(h.dew_point_2m[j]) && ok(h.temperature_2m[j])) h.dew_point_2m[j] = Math.min(h.dew_point_2m[j], h.temperature_2m[j]);
+                if (h.cloud_cover && ok(h.cloud_cover[j]) && c.cc) h.cloud_cover[j] = Math.max(0, Math.min(100, h.cloud_cover[j] + c.cc));
+                if (ahead >= 3 && h.precipitation_probability && ok(h.precipitation_probability[j]) && c.pp && c.pp !== 1) h.precipitation_probability[j] = Math.max(0, Math.min(100, Math.round(h.precipitation_probability[j] * c.pp)));
+                ws[j] = c.ws || 1; wg[j] = c.wg || 1;
+            });
+            h._learnF = { wind_speed_10m: ws, wind_gusts_10m: wg };
+        }
+        function modelWindAt(field, j) {
+            const v = _modelWindAtRaw(field, j), h = ensembleData.hourly;
+            const f = h._learnF && h._learnF[field] ? h._learnF[field][j] : 1;
+            return v === null || v === undefined || isNaN(v) ? v : v * (f || 1);
+        }
+        function hourlyLearningHTML() {
+            if (!hourlyLearn) return '<div class="text-xs text-slate-400">No hourly verification for this location yet. It is checked several times a day for the tracked cities.</div>';
+            const dU = isImperial ? 1.8 : 1, u = isImperial ? '°F' : '°C';
+            const f = x => x == null ? '--' : `${x > 0 ? '+' : x < 0 ? '−' : ''}${Math.abs(x * dU).toFixed(1)}${u}`;
+            const pct = x => x == null ? '--' : `${x > 0 ? '+' : x < 0 ? '−' : ''}${Math.abs(Math.round(x))}%`;
+            const rat = x => x == null ? '--' : `×${x.toFixed(2)}`;
+            const lbl = { '0-6': '0-6 h', '6-24': '6-24 h', '24-48': '24-48 h', '48+': '48 h+' };
+            const rows = [];
+            HL_LEADS.forEach(L => ['d', 'n'].forEach(p => {
+                const k = L + '|' + p, s = hourlyLearn.cells && hourlyLearn.cells[k], c = hourlyLearn.corr[k];
+                if (!s || !s.n) return;
+                const m = (a) => a && a.w ? a.s / a.w : null, r = a => a && a.f > 0 ? a.o / a.f : null;
+                rows.push(`<tr class="border-t border-white/5"><td class="p-2 text-slate-200">${lbl[L]} ${p === 'd' ? 'day' : 'night'}</td><td class="p-2">${s.n}</td>
+                    <td class="p-2">${f(m(s.t))}</td><td class="p-2">${f(m(s.td))}</td><td class="p-2">${rat(r(s.ws))}</td><td class="p-2">${rat(r(s.wg))}</td>
+                    <td class="p-2">${pct(m(s.cc))}</td><td class="p-2">${s.pp && s.pp.w ? `${Math.round(s.pp.p / s.pp.w * 100)}% vs ${Math.round(s.pp.o / s.pp.w * 100)}%` : '--'}</td>
+                    <td class="p-2 text-amber-300">${[c.t ? `temp ${f(c.t)}` : '', c.td ? `dew ${f(c.td)}` : '', c.ws !== 1 ? `wind ${rat(c.ws)}` : '', c.wg !== 1 ? `gust ${rat(c.wg)}` : '', c.cc ? `cloud ${pct(c.cc)}` : '', c.pp !== 1 ? `rain chance ${rat(c.pp)}` : ''].filter(Boolean).join(', ') || '<span class="text-slate-500">none yet</span>'}</td></tr>`);
+            }));
+            return `<div class="overflow-x-auto"><table class="w-full text-xs font-mono text-slate-300"><thead class="text-[10px] uppercase text-slate-400"><tr>
+                <th class="p-2 text-left">Lead</th><th class="p-2 text-left">Hours</th><th class="p-2 text-left">Temp bias</th><th class="p-2 text-left">Dew bias</th><th class="p-2 text-left">Wind obs/fcst</th><th class="p-2 text-left">Gust obs/fcst</th><th class="p-2 text-left">Cloud bias</th><th class="p-2 text-left">Rain chance vs observed</th><th class="p-2 text-left">Correction applied</th></tr></thead>
+                <tbody>${rows.join('') || '<tr><td class="p-2 text-slate-400" colspan="9">Collecting</td></tr>'}</tbody></table></div>
+                <div class="text-[11px] text-slate-400 mt-2">Every forecast hour checked against ${esc(hourlyLearn.station || 'the station')} (${hourlyLearn.n} hours, updated ${new Date(hourlyLearn.updated).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}). Bias = forecast minus observed. Corrections grow with the number of cases: temperature and dewpoint up to ±3°C (±5.4°F), cloud ±20%, wind and gusts ×0.75 to ×1.25, rain chance ×0.75 to ×1.25 (not in the first 3 hours, where radar leads). Station cloud reports stop at 12,000 ft, so a clear report only counts against forecasts of mostly cloudy skies.</div>`;
+        }
+        try { sharedLearning(); } catch (e) {}   // start fetching the shared corrections as the page loads
         function setHourlyDaylight(d) {
             const h = d && d.hourly, dl = d && d.daily;
             if (!h || !h.time || !dl || !dl.sunrise || !dl.sunset) return;
@@ -3737,7 +3807,7 @@ body.no-data #sectionNav { display: none; }
         }
         // model consensus (median of the individual models) for an hourly wind field at ensemble hour index j
         let _windIdx = null;
-        function modelWindAt(field, j) {
+        function _modelWindAtRaw(field, j) {
             const h = ensembleData.hourly, mh = modelDataRaw && modelDataRaw.hourly;
             const own = h[field] ? h[field][j] : null;
             if (!mh || !mh.time) return own;
@@ -4383,7 +4453,20 @@ body.no-data #sectionNav { display: none; }
                 r.sourceLabel = `Observed at ${o.stationId}`;
                 r.timeLabel = `As of ${new Date(o.timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZone: ensembleData.timezone })} ${tzA}`;
             }
+            radarWeather(r);
             return r;
+        }
+        // light / moderate / heavy by reflectivity over the location (within the last 20 minutes)
+        function radarWeather(r) {
+            if (!radarNow || Date.now() - radarNow.t > 20 * 60e3) return;
+            const wetTxt = /rain|shower|drizzle|snow|sleet|thunder|storm|freezing|ice pellets|flurr/i;
+            const z = Math.max(radarNow.z || 0, (radarNow.z3 || 0) >= 30 ? radarNow.z3 - 10 : 0);
+            if (z < 20 || (r.text && wetTxt.test(r.text))) return;
+            const snow = r.temp !== null && r.temp !== undefined && r.temp <= 0.5;
+            const kind = snow ? 'Snow' : 'Rain';
+            r.text = z >= 45 ? (snow ? 'Heavy Snow' : 'Heavy Rain') : z >= 30 ? kind : 'Light ' + kind;
+            r.code = snow ? (z >= 30 ? 73 : 71) : (z >= 45 ? 65 : z >= 30 ? 63 : 61);
+            r.radarWx = true;
         }
 
         function conditionFromText(t, isDay) {
@@ -4865,8 +4948,12 @@ body.no-data #sectionNav { display: none; }
                     <ul class="text-xs text-slate-300 space-y-1.5 leading-relaxed list-disc pl-4">${facts.map(f => `<li>${f}</li>`).join('')}</ul>
                 </div>
                 <div>
-                    <div class="text-xs font-semibold text-slate-300 mb-2">Learning from past forecasts</div>
+                    <div class="text-xs font-semibold text-slate-300 mb-2">Learning from past forecasts: daily highs, lows and rain</div>
                     ${typeof learningHTML === 'function' ? learningHTML() : ''}
+                </div>
+                <div>
+                    <div class="text-xs font-semibold text-slate-300 mb-2">Hour by hour: temperature, dewpoint, wind, cloud and rain</div>
+                    ${typeof hourlyLearningHTML === 'function' ? hourlyLearningHTML() : ''}
                 </div>`;
         }
 
