@@ -273,6 +273,9 @@ body.no-data #sectionNav { display: none; }
 .hero-tsf .ho-name { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #fde68a; }
 .hero-tsf #todaySoFarGrid > div { background: rgba(8,16,34,.34) !important; border-color: rgba(255,255,255,.1); }
 #heroAlertSlot:empty, #topAlertSlot:empty { display: none; }
+@media (min-width: 1024px) { .hero-main { flex-wrap: nowrap !important; align-items: flex-start !important; } .hero-main > .flex-1 { flex: 0 1 auto !important; } .hero-alerts { flex: 1 1 0; min-width: 0; margin-left: auto; max-width: 640px; } }
+.rec-btn { background: none; border: 0; padding: 0; cursor: pointer; }
+.rec-pop { position: fixed; z-index: 80; max-width: 280px; padding: 8px 11px; border-radius: 10px; background: #1e293b; border: 1px solid rgba(251,191,36,.55); color: #fde68a; font: 500 12px/1.45 'Outfit', system-ui, sans-serif; box-shadow: 0 12px 30px -10px rgba(0,0,0,.7); }
 #heroAlertSlot #alertsContainer { background: rgba(8,16,34,.3); border-color: rgba(255,255,255,.14); box-shadow: none; }
 
 /* search suggestions: solid, readable panel */
@@ -389,7 +392,6 @@ body.no-data #sectionNav { display: none; }
             </div>
 
             <div class="flex"><section id="sec-now" class="hero flex-1">
-                    <div id="heroAlertSlot"></div>
                     <div>
                         <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                             <span class="chip chip-static"><i class="fa-solid fa-satellite mr-1.5"></i><span id="currentObsSource">Current Conditions</span></span>
@@ -411,6 +413,7 @@ body.no-data #sectionNav { display: none; }
                                 <span class="hl hl-lo"><i class="fa-solid fa-arrow-down"></i><b id="heroLo">--</b><small id="heroLoLbl">Overnight low</small></span>
                             </div>
                         </div>
+                        <div id="heroAlertSlot" class="hero-alerts"></div>
                     </div>
                     <div class="metric-strip">
                         <div><div class="mlabel"><i class="fa-solid fa-droplet text-teal-300"></i> Dewpoint</div><div class="mval"><span id="currentDewPoint">--</span> <span id="currentDewPointCategory" class="text-[10px] font-medium text-teal-300/90"></span></div><div class="text-[10px] text-slate-300/70">Humidity <span id="currentHumidity" class="font-semibold">--</span></div></div>
@@ -454,17 +457,6 @@ body.no-data #sectionNav { display: none; }
                 </div>
             </div>
 </div>
-            <div id="sec-forecast">            <!-- 5-Day Best Bet Operational Grid -->
-            <div>
-                <h3 class="text-lg font-bold text-slate-200 mb-3 flex items-center justify-between">
-                    <span class="flex items-center gap-2"><i class="fa-solid fa-calendar-days text-blue-400"></i> 12-Day Forecast</span>
-                    <span class="flex items-center gap-2 flex-wrap justify-end"><span id="bestBetConfidenceBadge" class="text-xs bg-slate-500/20 text-slate-300 border border-slate-500/40 px-2.5 py-1 rounded font-medium">--</span></span>
-                </h3>
-                <div class="fc-wrap"><div id="forecastGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    <!-- Forecast cards injected dynamically -->
-                </div><div id="fcSlider" class="fc-slider" role="slider" tabindex="0" aria-label="Scroll forecast days"><div class="fc-track"><div id="fcThumb" class="fc-thumb"></div></div></div></div>
-            </div>
-</div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
                 <div class="lg:col-span-2 flex flex-col min-w-0 temp-col"><!-- Hourly Temp Multi-Model Chart -->
                     <div class="glass-panel rounded-2xl p-5 border border-slate-800">
@@ -498,6 +490,17 @@ body.no-data #sectionNav { display: none; }
                         </div>
                     </div></div>
             </div>
+            <div id="sec-forecast">            <!-- 5-Day Best Bet Operational Grid -->
+            <div>
+                <h3 class="text-lg font-bold text-slate-200 mb-3 flex items-center justify-between">
+                    <span class="flex items-center gap-2"><i class="fa-solid fa-calendar-days text-blue-400"></i> 12-Day Forecast</span>
+                    <span class="flex items-center gap-2 flex-wrap justify-end"><span id="bestBetConfidenceBadge" class="text-xs bg-slate-500/20 text-slate-300 border border-slate-500/40 px-2.5 py-1 rounded font-medium">--</span></span>
+                </h3>
+                <div class="fc-wrap"><div id="forecastGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    <!-- Forecast cards injected dynamically -->
+                </div><div id="fcSlider" class="fc-slider" role="slider" tabindex="0" aria-label="Scroll forecast days"><div class="fc-track"><div id="fcThumb" class="fc-thumb"></div></div></div></div>
+            </div>
+</div>
                         <!-- NWS Area Forecast Discussion (US locations) -->
             <div id="afdPanel" class="glass-panel rounded-2xl overflow-hidden border border-slate-800 hidden">
                 <button id="afdToggle" onclick="toggleAFD()" class="w-full flex items-center justify-between gap-3 px-6 py-4 text-left hover:bg-slate-800/50 transition-colors">
@@ -1340,6 +1343,21 @@ body.no-data #sectionNav { display: none; }
         }
         placeAlerts();
         try { window.matchMedia('(min-width: 1024px)').addEventListener('change', placeAlerts); } catch (e) { window.addEventListener('resize', placeAlerts); }
+        // record trophy: click to see what the record is
+        function recPop(btn, ev) {
+            if (ev) ev.stopPropagation();
+            const old = document.querySelector('.rec-pop'), same = old && old._for === btn;
+            if (old) old.remove();
+            if (same) return;
+            const d = document.createElement('div');
+            d.className = 'rec-pop'; d.textContent = btn.dataset.info || ''; d._for = btn;
+            document.body.appendChild(d);
+            const r = btn.getBoundingClientRect(), w = d.offsetWidth, h = d.offsetHeight;
+            d.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px';
+            d.style.top = (r.top - h - 8 > 8 ? r.top - h - 8 : r.bottom + 8) + 'px';
+        }
+        document.addEventListener('click', () => { const o = document.querySelector('.rec-pop'); if (o) o.remove(); });
+        window.addEventListener('scroll', () => { const o = document.querySelector('.rec-pop'); if (o) o.remove(); }, { passive: true });
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -4593,7 +4611,9 @@ body.no-data #sectionNav { display: none; }
                 const { n, disp, dep, recCell, dShift, dLabel } = dcHelpers();
                 const C = f => (f - 32) / 1.8;
                 const yrsOf = x => (Array.isArray(x) ? x : String(x ?? '').split(/[^0-9]+/)).map(String).filter(z => /^\d{4}$/.test(z));
-                const trophy = tie => `<i class="fa-solid fa-trophy rec" title="${tie ? 'Tied' : 'Set'} the daily record"></i>`;
+                const trophy = (tie, info) => `<button type="button" class="rec-btn" onclick="recPop(this, event)" data-info="${esc(info || ((tie ? 'Tied' : 'Set') + ' the daily record'))}" aria-label="Record details"><i class="fa-solid fa-trophy rec"></i></button>`;
+                const stnName = (cliTotals && cliTotals.station) || '';
+                const recInfo = (what, tie, val, prior) => `${what} ${tie ? 'tied' : 'set'}: ${val}${stnName ? ' at ' + stnName : ''}.${prior ? ` Previous record year ${prior}.` : ''}`;
                 const pFmt = (inch, trace) => (trace && !(inch > 0)) ? 'T' : formatPrecip(inch * 25.4);
                 const recent = [];
                 // daily normals (°F / inches) from the climate reports, else the station's 1991-2020 averages
@@ -4644,9 +4664,9 @@ body.no-data #sectionNav { display: none; }
                     const yrShow = (ys, rec, fb) => rec ? yy : (ys.slice(-1)[0] || fb || '');
                     out.push(`<tr>
                         <td class="text-slate-200 font-bold">${dLabel(ds)}</td>
-                        <td><span class="text-rose-200 font-semibold">${hi ? formatTemp(C(hi.v)) : '--'}</span>${hi && N.hn !== null ? dep(C(hi.v), C(N.hn)) : ''}${hiRec ? trophy(hi.v === recHiF) : ''}</td>
-                        <td><span class="text-sky-200 font-semibold">${lo ? formatTemp(C(lo.v)) : '--'}</span>${lo && N.ln !== null ? dep(C(lo.v), C(N.ln)) : ''}${loRec ? trophy(lo.v === recLoF) : ''}</td>
-                        <td>${p ? `<span class="${p.v > 0 || p.t ? 'text-blue-200 font-semibold' : 'text-slate-400'}">${pFmt(p.v, p.t)}</span>${pRec ? trophy(p.v === pr.v) : ''}` : '--'}</td>
+                        <td><span class="text-rose-200 font-semibold">${hi ? formatTemp(C(hi.v)) : '--'}</span>${hi && N.hn !== null ? dep(C(hi.v), C(N.hn)) : ''}${hiRec ? trophy(hi.v === recHiF, recInfo('Record high', hi.v === recHiF, formatTemp(C(hi.v)), prior(hy))) : ''}</td>
+                        <td><span class="text-sky-200 font-semibold">${lo ? formatTemp(C(lo.v)) : '--'}</span>${lo && N.ln !== null ? dep(C(lo.v), C(N.ln)) : ''}${loRec ? trophy(lo.v === recLoF, recInfo('Record low', lo.v === recLoF, formatTemp(C(lo.v)), prior(ly))) : ''}</td>
+                        <td>${p ? `<span class="${p.v > 0 || p.t ? 'text-blue-200 font-semibold' : 'text-slate-400'}">${pFmt(p.v, p.t)}</span>${pRec ? trophy(p.v === pr.v, recInfo('Record rainfall', p.v === pr.v, pFmt(p.v), prior(py))) : ''}` : '--'}</td>
                         ${snowTd(o)}
                         <td class="text-teal-300">${N.hn !== null && N.ln !== null ? `${formatTemp(C(N.hn))} / ${formatTemp(C(N.ln))}` : '--'}</td>
                         <td>${recHiF !== null ? recCell(C(recHiF), yrShow(hy, hiRec, recHiY), 'text-rose-300') : '--'}</td>
@@ -4660,9 +4680,9 @@ body.no-data #sectionNav { display: none; }
                     const rh = recsT.find(r => r.kind === 'high'), rl = recsT.find(r => r.kind === 'low'), rp = recsT.find(r => r.kind === 'precip');
                     todayRow = `<tr class="today">
                         <td class="text-slate-200 font-bold">${dLabel(today)} <span class="text-[10px] text-sky-300 font-normal ml-1">so far</span></td>
-                        <td><span class="text-rose-200 font-semibold">${n(so.hi) ? formatTemp(so.hi) : '--'}</span>${Nt.hn !== null && n(so.hi) ? dep(so.hi, C(Nt.hn)) : ''}${rh ? trophy(rh.tie) : ''}</td>
-                        <td><span class="text-sky-200 font-semibold">${n(so.lo) ? formatTemp(so.lo) : '--'}</span>${Nt.ln !== null && n(so.lo) ? dep(so.lo, C(Nt.ln)) : ''}${rl ? trophy(rl.tie) : ''}</td>
-                        <td>${n(so.precip) ? `<span class="${so.precip > 0 ? 'text-blue-200 font-semibold' : 'text-slate-400'}">${formatPrecip(so.precip)}</span>${rp ? trophy(rp.tie) : ''}` : '--'}</td>
+                        <td><span class="text-rose-200 font-semibold">${n(so.hi) ? formatTemp(so.hi) : '--'}</span>${Nt.hn !== null && n(so.hi) ? dep(so.hi, C(Nt.hn)) : ''}${rh ? trophy(rh.tie, `Record high ${rh.tie ? 'tied' : 'set'} today: ${rh.valF}°F, previous record ${rh.recF}°F${rh.yr ? ' (' + rh.yr + ')' : ''}. Preliminary.`) : ''}</td>
+                        <td><span class="text-sky-200 font-semibold">${n(so.lo) ? formatTemp(so.lo) : '--'}</span>${Nt.ln !== null && n(so.lo) ? dep(so.lo, C(Nt.ln)) : ''}${rl ? trophy(rl.tie, `Record low ${rl.tie ? 'tied' : 'set'} today: ${rl.valF}°F, previous record ${rl.recF}°F${rl.yr ? ' (' + rl.yr + ')' : ''}. Preliminary.`) : ''}</td>
+                        <td>${n(so.precip) ? `<span class="${so.precip > 0 ? 'text-blue-200 font-semibold' : 'text-slate-400'}">${formatPrecip(so.precip)}</span>${rp ? trophy(rp.tie, `Record rainfall ${rp.tie ? 'tied' : 'set'} today: ${rp.valIn != null ? rp.valIn.toFixed(2) + '"' : ''}, previous record ${rp.recIn != null ? rp.recIn.toFixed(2) + '"' : ''}${rp.yr ? ' (' + rp.yr + ')' : ''}. Preliminary.`) : ''}` : '--'}</td>
                         ${anySnow ? '<td class="text-slate-500">—</td>' : ''}
                         <td class="text-teal-300">${Nt.hn !== null && Nt.ln !== null ? `${formatTemp(C(Nt.hn))} / ${formatTemp(C(Nt.ln))}` : '--'}</td>
                         <td>${stT ? recCell(stT.recHigh, stT.recHighYr, 'text-rose-300') : '--'}</td>
@@ -4693,7 +4713,7 @@ body.no-data #sectionNav { display: none; }
                     if (anySnow || S.sn > 0.05) tiles.push(tile('Snowfall', (S.sT && S.s < 0.05) ? 'T' : formatSnow(S.s * 2.54), S.sn > 0.05 ? `<span class="text-slate-400">normal ${formatSnow(S.sn * 2.54)}</span>` : ''));
                     const extra = [S.hot ? `${S.hot} day${S.hot === 1 ? '' : 's'} ≥ 90°F` : '', S.frz ? `${S.frz} night${S.frz === 1 ? '' : 's'} ≤ 32°F` : '', S.pnOk && S.pn > 0 ? `${S.wet} day${S.wet === 1 ? '' : 's'} with precipitation` : ''].filter(Boolean).join(', ');
                     const label = new Date(Date.UTC(y, m - 1, 15)).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-                    sumEl.innerHTML = rowsDesc.some(Boolean) ? `<div class="text-xs text-slate-400 mb-2">${label}${cur ? ' to date' : ''}, ${S.hi.length} day${S.hi.length === 1 ? '' : 's'} reported${extra ? ', ' + extra : ''}</div><div class="dcs-grid">${tiles.join('')}</div>` : '';
+                    sumEl.innerHTML = rowsDesc.some(Boolean) ? `<div class="flex flex-wrap items-baseline justify-between gap-2 mb-2"><span class="text-xs font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-calendar-check text-amber-400 mr-1.5"></i>${label}${cur ? ' to date' : ''}</span><span class="text-[11px] text-slate-400 font-mono">${S.hi.length} day${S.hi.length === 1 ? '' : 's'} reported${extra ? ', ' + extra : ''}</span></div><div class="dcs-grid">${tiles.join('')}</div>` : '';
                 }
 
                 // recent records (current month view)
@@ -4706,7 +4726,7 @@ body.no-data #sectionNav { display: none; }
                         const what = r.kind === 'rainfall' ? 'Record rainfall' : `Record ${r.kind}`;
                         return `<div class="yrec"><i class="fa-solid fa-trophy"></i><div><div class="text-sm font-bold text-amber-100">${what} ${r.tie ? 'tied' : 'set'} ${when}</div><div class="text-xs text-slate-300 mt-0.5"><b class="font-mono">${r.val}</b> ${r.tie ? 'tied' : 'set'} the daily record${stn ? ' at ' + esc(stn) : ''}${r.prior ? ` (previous ${r.prior})` : ''}.</div></div></div>`;
                     }).join('');
-                    yEl.classList.toggle('hidden', !recent.length);
+                    yEl.innerHTML = ''; yEl.classList.add('hidden');
                 }
             }
         }
