@@ -1193,6 +1193,7 @@ body.no-data #sectionNav { display: none; }
                 applyContinuity();
                 floorTodayHigh();
                 try { annotateThunder(); } catch (e) {}
+                try { raiseTodayHigh(); } catch (e) {}
                 renderDashboard();
                 renderDiscussion();
 
@@ -1714,6 +1715,17 @@ body.no-data #sectionNav { display: none; }
         }
         function tstmTag(p, cls) { return p != null && p >= 15 ? `<span class="tstm ${cls || ''}" title="${Math.round(p)}% chance of thunderstorms (NWS)"><i class="fa-solid fa-bolt"></i> ${Math.round(p)}%</span>` : ''; }
 
+        // today's high: when the observation-corrected hourly curve (latest obs + measured warming trend) peaks above the
+        // model blend, the curve is the better guide, so the high follows it
+        function raiseTodayHigh() {
+            const b = bestBetResults && bestBetResults[0];
+            if (!b || b.bestMax == null) return;
+            const a = obsAdjustedHourly(), h = ensembleData && ensembleData.hourly;
+            if (!a || !h) return;
+            let M = null;
+            for (let j = a.cur; j < a.T.length; j++) { const t = h.time[j]; if (!t || !t.startsWith(b.date)) continue; const hr = +t.slice(11, 13); if (hr < 6 || hr > 21 || a.T[j] == null) continue; if (M === null || a.T[j] > M) M = a.T[j]; }
+            if (M !== null && M > b.bestMax) { b.bestMax = M; _adjCache = null; }
+        }
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -3529,14 +3541,14 @@ body.no-data #sectionNav { display: none; }
                     for (let j = cur + 1; j < D.length; j++) if (D[j] !== null && T[j] !== null) D[j] = Math.min(D[j], T[j]);
                 }
             }
-            // today: never above the forecast high; the next two days: the daytime peak equals the forecast high
+            // the next two days: the daytime peak equals the forecast high
             (bestBetResults || []).slice(0, 3).forEach((b, di) => {
                 if (!b || !ok(b.bestMax)) return;
                 const idx = [];
                 for (let j = Math.max(cur + 1, 0); j < T.length; j++) { const t = h.time[j]; if (t.startsWith(b.date) && +t.slice(11, 13) >= 6 && +t.slice(11, 13) <= 21 && T[j] !== null) idx.push(j); }
                 if (idx.length < 3) return;
                 const vals = idx.map(j => T[j]), M = Math.max(...vals), base = Math.min(...vals), H = b.bestMax;
-                if (di === 0 && M <= H) return;
+                if (di === 0) return;   // today: the observation-driven curve leads; the high is raised to it instead (raiseTodayHigh)
                 if (Math.abs(M - H) < 0.15) return;
                 const delta = {};
                 idx.forEach(j => {
