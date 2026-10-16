@@ -1,10 +1,20 @@
 [
-  { "name": "Ashburn, VA", "lat": 39.0437, "lon": -77.4875 },
-  { "name": "Burke, VA", "lat": 38.8015, "lon": -77.2664 },
-  { "name": "Washington DC", "lat": 38.8951, "lon": -77.0364 },
-  { "name": "New York", "lat": 40.7143, "lon": -74.006 },
-  { "name": "Denver", "lat": 39.7392, "lon": -104.9903 },
-  { "name": "Chicago", "lat": 41.85, "lon": -87.65 },
-  { "name": "Seattle", "lat": 47.6062, "lon": -122.3321 },
-  { "name": "Mammoth Lakes, CA", "lat": 37.6485, "lon": -118.9721 }
+  {"name": "Ashburn, VA", "lat": 39.0437, "lon": -77.4875},
+  {"name": "Burke, VA", "lat": 38.8015, "lon": -77.2664},
+  {"name": "Washington DC", "lat": 38.8951, "lon": -77.0364},
+  {"name": "New York", "lat": 40.7143, "lon": -74.006},
+  {"name": "Denver", "lat": 39.7392, "lon": -104.9903},
+  {"name": "Chicago", "lat": 41.85, "lon": -87.65},
+  {"name": "Seattle", "lat": 47.6062, "lon": -122.3321},
+  {"name": "Mammoth Lakes, CA", "lat": 37.6485, "lon": -118.9721},
+  {"name": "Brambleton, VA", "lat": 38.9846, "lon": -77.5397},
+  {"name": "Anchorage, AK", "lat": 61.2181, "lon": -149.9003},
+  {"name": "Miami, FL", "lat": 25.7617, "lon": -80.1918},
+  {"name": "Los Angeles, CA", "lat": 34.0522, "lon": -118.2437},
+  {"name": "Phoenix, AZ", "lat": 33.4484, "lon": -112.074},
+  {"name": "St. Louis, MO", "lat": 38.627, "lon": -90.1994},
+  {"name": "Honolulu, HI", "lat": 21.3069, "lon": -157.8583},
+  {"name": "Boston, MA", "lat": 42.3601, "lon": -71.0589},
+  {"name": "Dallas, TX", "lat": 32.7767, "lon": -96.797},
+  {"name": "Minneapolis, MN", "lat": 44.9778, "lon": -93.265}
 ]
