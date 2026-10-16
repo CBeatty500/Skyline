@@ -597,10 +597,6 @@ body.no-data #sectionNav { display: none; }
                 <div id="dailyClimatePanel" class="glass-panel rounded-2xl p-5 md:p-6">
                     <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
                         <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2"><i class="fa-solid fa-calendar-days text-amber-400"></i> Observed Climate</h3>
-                        <div class="flex items-center gap-2">
-                            <select id="dcMonth" class="dc-pick" aria-label="Month" onchange="dcSelect()"></select>
-                            <select id="dcYear" class="dc-pick" aria-label="Year" onchange="dcSelect()"></select>
-                        </div>
                     </div>
                     <div id="recordsRange" class="text-[11px] text-slate-400 font-mono -mt-1 mb-3"></div>
                     <div class="dc-prec mb-4">
@@ -609,6 +605,15 @@ body.no-data #sectionNav { display: none; }
                             <span id="precipTotalsSource" class="text-[11px] text-slate-400 font-mono"></span>
                         </div>
                         <div id="precipTotalsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-amber-400"></i>
+                            <select id="dcMonth" class="dc-pick" aria-label="Month" onchange="dcSelect()"></select>
+                            <select id="dcYear" class="dc-pick" aria-label="Year" onchange="dcSelect()"></select>
+                            <span id="dcToDate" class="text-xs font-bold text-slate-200 uppercase tracking-wider"></span>
+                        </div>
+                        <span id="dcMeta" class="text-[11px] text-slate-400 font-mono"></span>
                     </div>
                     <div id="dcSummary" class="mb-4"></div>
                     <div id="climateYesterday" class="hidden grid gap-2 md:grid-cols-2 mb-4"></div>
@@ -4881,7 +4886,10 @@ body.no-data #sectionNav { display: none; }
                     if (anySnow || S.sn > 0.05) tiles.push(tile('Snowfall', (S.sT && S.s < 0.05) ? 'T' : formatSnow(S.s * 2.54), S.sn > 0.05 ? `<span class="text-slate-400">normal ${formatSnow(S.sn * 2.54)}</span>` : ''));
                     const extra = [S.hot ? `${S.hot} day${S.hot === 1 ? '' : 's'} ≥ 90°F` : '', S.frz ? `${S.frz} night${S.frz === 1 ? '' : 's'} ≤ 32°F` : '', S.pnOk && S.pn > 0 ? `${S.wet} day${S.wet === 1 ? '' : 's'} with precipitation` : ''].filter(Boolean).join(', ');
                     const label = new Date(Date.UTC(y, m - 1, 15)).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-                    sumEl.innerHTML = rowsDesc.some(Boolean) ? `<div class="flex flex-wrap items-baseline justify-between gap-2 mb-2"><span class="text-xs font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-calendar-check text-amber-400 mr-1.5"></i>${label}${cur ? ' to date' : ''}</span><span class="text-[11px] text-slate-400 font-mono">${S.hi.length} day${S.hi.length === 1 ? '' : 's'} reported${extra ? ', ' + extra : ''}</span></div><div class="dcs-grid">${tiles.join('')}</div>` : '';
+                    sumEl.innerHTML = rowsDesc.some(Boolean) ? `<div class="dcs-grid">${tiles.join('')}</div>` : '';
+                    const mEl = document.getElementById('dcMeta'), tEl = document.getElementById('dcToDate');
+                    if (mEl) mEl.innerText = rowsDesc.some(Boolean) ? `${S.hi.length} day${S.hi.length === 1 ? '' : 's'} reported${extra ? ', ' + extra : ''}` : '';
+                    if (tEl) tEl.innerText = cur ? 'to date' : '';
                 }
 
                 // recent records (current month view)
