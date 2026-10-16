@@ -342,6 +342,7 @@ body.no-data #sectionNav { display: none; }
 .al-links a:hover, .al-links button:hover { color: #fff; }
 .al-more { margin-top: 6px; } .al-more > summary { cursor: pointer; font-size: 11.5px; font-weight: 600; color: #e2e8f0; opacity: .85; }
 .al-full { margin-top: 6px; white-space: pre-wrap; font-size: 11.5px; line-height: 1.5; color: #e2e8f0; max-height: 18rem; overflow-y: auto; }
+.tstm { display: inline-flex; align-items: center; gap: 3px; font: 700 10px/1.4 ui-monospace, Menlo, monospace; color: #fcd34d; background: rgba(245,158,11,.14); border: 1px solid rgba(251,191,36,.45); border-radius: 999px; padding: 1px 7px; margin-top: 2px; }
 .rec-btn { background: none; border: 0; padding: 0; cursor: pointer; }
 .rec-pop { position: fixed; z-index: 80; max-width: 280px; padding: 8px 11px; border-radius: 10px; background: #1e293b; border: 1px solid rgba(251,191,36,.55); color: #fde68a; font: 500 12px/1.45 'Outfit', system-ui, sans-serif; box-shadow: 0 12px 30px -10px rgba(0,0,0,.7); }
 #heroAlertSlot #alertsContainer { background: rgba(8,16,34,.3); border-color: rgba(255,255,255,.14); box-shadow: none; }
@@ -975,6 +976,7 @@ body.no-data #sectionNav { display: none; }
                 out.city = (props.relativeLocation && props.relativeLocation.properties && props.relativeLocation.properties.city) || null;
                 await Promise.all([
                     fetch(props.forecast).then(r => r.ok ? r.json() : null).then(j => { out.forecast = j; }).catch(() => {}),
+                    (props.forecastGridData ? fetch(props.forecastGridData).then(r => r.ok ? r.json() : null).then(j => { out.thunder = parseNwsSeries(j && j.properties && j.properties.probabilityOfThunder); }).catch(() => {}) : Promise.resolve()),
                     fetch(`https://api.weather.gov/alerts/active?point=${lat},${lon}`).then(r => r.ok ? r.json() : null)
                         .then(j => { if (j && j.features) out.alerts = j.features.map(f => f.properties); }).catch(() => {}),
                     (async () => {
@@ -1175,6 +1177,7 @@ body.no-data #sectionNav { display: none; }
                 cliTotals = cl;
                 precipNormals = null;
                 nwsAlerts = nws.alerts || [];
+                nwsThunder = nws.thunder || null;
                 spcData = null;
                 historicalData = null; climLite = null; histLoading = true;
                 if (ensembleData.elevation !== undefined) currentLoc.ele = ensembleData.elevation;
@@ -1189,6 +1192,7 @@ body.no-data #sectionNav { display: none; }
                 applyRemainingToday();
                 applyContinuity();
                 floorTodayHigh();
+                try { annotateThunder(); } catch (e) {}
                 renderDashboard();
                 renderDiscussion();
 
@@ -1331,10 +1335,12 @@ body.no-data #sectionNav { display: none; }
             const hp = h.precipitation_probability && h.precipitation_probability[j] != null ? h.precipitation_probability[j] : 0;
             const ha = h.precipitation && h.precipitation[j] != null ? h.precipitation[j] : 0, hc = h.weather_code ? h.weather_code[j] || 0 : 0;
             const wetCode = hc >= 51 && hc <= 99;
+            const th = thunderAt(j);
+            if (th != null && th >= 40) return 95;
             if (!((wetCode && (hp >= 30 || (ha >= 0.1 && hp >= 20))) || hp >= 40)) return 0;
             const tC = h.temperature_2m ? h.temperature_2m[j] : null, snowy = (h.snowfall && h.snowfall[j] > 0) || (tC != null && tC <= 0.5);
             let code = wetCode ? hc : snowy ? 85 : 80;
-            if (code < 95 && !snowy && (code >= 80 || !wetCode) && spcThunderAt(new Date(h.time[j]).getTime())) code = 95;
+            if (code < 95 && !snowy && (code >= 80 || !wetCode) && (th != null ? th >= 20 : spcThunderAt(new Date(h.time[j]).getTime()))) code = 95;
             return code;
         }
         // ---------- Text forecast for the next periods (tonight / tomorrow / tomorrow night / next day) ----------
@@ -1675,6 +1681,39 @@ body.no-data #sectionNav { display: none; }
             }
             return null;
         }
+        // ---------- Thunderstorm probability: NWS gridded forecast (probabilityOfThunder), US only ----------
+        let nwsThunder = null;
+        function parseNwsSeries(series) {
+            if (!series || !Array.isArray(series.values)) return null;
+            const m = new Map();
+            series.values.forEach(v => {
+                const [t0, dur] = String(v.validTime || '').split('/');
+                const start = Date.parse(t0); if (isNaN(start) || v.value == null) return;
+                const mt = String(dur || 'PT1H').match(/P(?:(\d+)D)?(?:T(?:(\d+)H)?)?/);
+                const hrs = mt ? (+(mt[1] || 0) * 24 + +(mt[2] || 0)) || 1 : 1;
+                for (let k = 0; k < hrs; k++) m.set(start + k * 36e5, v.value);
+            });
+            return m.size ? m : null;
+        }
+        function thunderAt(j) {
+            if (!nwsThunder || !ensembleData || !ensembleData.hourly) return null;
+            const k = ensembleData.hourly.time[j]; if (!k) return null;
+            const ms = Date.parse(k + ':00Z') - (ensembleData.utc_offset_seconds || 0) * 1000;
+            const v = nwsThunder.get(ms);
+            return v == null ? null : v;
+        }
+        // highest thunderstorm chance per forecast day (today: hours still ahead)
+        function annotateThunder() {
+            if (!bestBetResults || !ensembleData || !ensembleData.hourly) return;
+            const h = ensembleData.hourly, cur = hourlyStart();
+            bestBetResults.forEach((b, i) => {
+                let mx = null;
+                h.time.forEach((t, j) => { if (!t.startsWith(b.date) || (i === 0 && j < cur)) return; const v = thunderAt(j); if (v != null && (mx === null || v > mx)) mx = v; });
+                b.thunder = mx;
+            });
+        }
+        function tstmTag(p, cls) { return p != null && p >= 15 ? `<span class="tstm ${cls || ''}" title="${Math.round(p)}% chance of thunderstorms (NWS)"><i class="fa-solid fa-bolt"></i> ${Math.round(p)}%</span>` : ''; }
+
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -1725,6 +1764,7 @@ body.no-data #sectionNav { display: none; }
         function dailyCondition(bb, isDay = true) {
             const p = bb.precipProb || 0, amt = bb.bestPrecip || 0, snow = bb.bestSnow || 0, code = bb.weatherCode;
             const c = bb.cloud;
+            if ((bb.thunder || 0) >= 40 && snow < 0.5) return { text: 'Thunderstorms', icon: 'fa-cloud-bolt', color: 'text-amber-400' };
             const likely = precipExpected(p, amt); // the chance must be high; model amounts alone never trigger a wet icon
             if (likely) {
                 if (code >= 95 && p >= 40) return { text: 'Thunderstorms', icon: 'fa-bolt', color: 'text-amber-400' };
@@ -4240,7 +4280,7 @@ body.no-data #sectionNav { display: none; }
                             </div>
                             
                             <div class="my-3 flex items-center justify-between">
-                                <div class="flex flex-col items-center gap-1.5 max-w-[110px] text-center">${iconHtml(cond, pv.precipProb, 'text-3xl')}<span class="text-[10px] leading-tight text-slate-400 mt-0.5">${cond.text}</span></div>
+                                <div class="flex flex-col items-center gap-1.5 max-w-[110px] text-center">${iconHtml(cond, pv.precipProb, 'text-3xl')}<span class="text-[10px] leading-tight text-slate-400 mt-0.5">${cond.text}</span>${ni ? '' : tstmTag(bb.thunder)}</div>
                                 <div class="text-right">
                                     ${ni ? `<div class="text-[10px] text-sky-300 font-semibold uppercase tracking-wider font-mono">Low tonight</div>
                                     <div class="text-xl font-black text-white">${formatTemp(ni.low)}</div>
@@ -4311,6 +4351,7 @@ body.no-data #sectionNav { display: none; }
                         <i class="fa-solid ${cond.icon} text-xl my-2 ${cond.color}"></i>
                         <span class="text-xs font-bold text-white font-mono">${formatTemp(j === s ? (ccH && ccH.temp !== null ? ccH.temp : h.temperature_2m[j]) : (adjH && adjH.T[j] !== null ? adjH.T[j] : h.temperature_2m[j]))}</span>
                         <span class="text-[10px] font-mono mt-1 ${pp >= 10 ? 'text-blue-300' : 'text-transparent'}"><i class="fa-solid fa-droplet"></i> ${pp !== null ? pp : 0}%</span>
+                        ${(t => t != null && t >= 15 ? `<span class="text-[10px] font-mono text-amber-300"><i class="fa-solid fa-bolt"></i> ${Math.round(t)}%</span>` : '')(thunderAt(j))}
                     </div>`;
             }
             container.innerHTML = html;
