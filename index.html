@@ -317,6 +317,12 @@ body.no-data #sectionNav { display: none; }
 .dc-tt { width: 100%; display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; background: rgba(8,16,34,.34); border: 1px solid rgba(255,255,255,.1); text-align: left; cursor: pointer; }
 .dc-tt:hover { border-color: rgba(125,211,252,.4); }
 .dc-tt .dc-tt-chev { transition: transform .2s; } .dc-tt.open .dc-tt-chev { transform: rotate(180deg); }
+.dc-near { font-size: 11px; color: #7dd3fc; border: 1px solid rgba(125,211,252,.35); border-radius: 999px; padding: 2px 10px; background: rgba(125,211,252,.08); }
+.dc-near:hover { background: rgba(125,211,252,.16); }
+.dc-stns { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+.dc-stns.hidden { display: none; }
+.dc-stn { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 10px 12px; border-radius: 12px; background: rgba(8,16,34,.34); border: 1px solid rgba(255,255,255,.1); font-size: 13px; }
+.dc-stn:hover { border-color: rgba(125,211,252,.45); } .dc-stn.on { border-color: rgba(125,211,252,.8); box-shadow: 0 0 0 1px rgba(125,211,252,.4); }
 .rec-btn { background: none; border: 0; padding: 0; cursor: pointer; }
 .rec-pop { position: fixed; z-index: 80; max-width: 280px; padding: 8px 11px; border-radius: 10px; background: #1e293b; border: 1px solid rgba(251,191,36,.55); color: #fde68a; font: 500 12px/1.45 'Outfit', system-ui, sans-serif; box-shadow: 0 12px 30px -10px rgba(0,0,0,.7); }
 #heroAlertSlot #alertsContainer { background: rgba(8,16,34,.3); border-color: rgba(255,255,255,.14); box-shadow: none; }
@@ -602,7 +608,8 @@ body.no-data #sectionNav { display: none; }
                     <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
                         <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2"><i class="fa-solid fa-calendar-days text-amber-400"></i> Observed Climate</h3>
                     </div>
-                    <div id="recordsRange" class="text-[11px] text-slate-400 font-mono -mt-1 mb-3"></div>
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 -mt-1 mb-3"><span id="recordsRange" class="text-[11px] text-slate-400 font-mono"></span><button type="button" onclick="findClimStations()" class="dc-near"><i class="fa-solid fa-location-dot mr-1"></i>Nearby stations with records</button></div>
+                    <div id="dcStations" class="hidden dc-stns mb-3"></div>
                     <div class="dc-prec mb-4">
                         <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
                             <span class="text-xs font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-cloud-showers-water text-blue-400 mr-1.5"></i>Precipitation totals</span>
@@ -1536,6 +1543,76 @@ body.no-data #sectionNav { display: none; }
             b.setAttribute('aria-expanded', String(open)); b.classList.toggle('open', open);
             document.getElementById('dcTableHint').innerText = open ? 'Hide table' : 'Show table';
         }
+        // ---------- Climate station choice: automatic, or a nearby long-record station the user picks ----------
+        function climOverrideKey(lat, lon) { return `skyline:climstn:${(+lat).toFixed(2)},${(+lon).toFixed(2)}`; }
+        function climOverride(lat, lon) { try { const v = localStorage.getItem(climOverrideKey(lat, lon)); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+        // normals and records are shown only when they come from real station history (NWS climate reports or a station's own record);
+        // outside the US the reanalysis normals stay (there is no station network to use instead)
+        function climTrusted() {
+            if (cliTotals && cliTotals.byMD) return true;
+            if (stationClim && (stationClim.rec || stationClim.norm)) return true;
+            return !nwsOffice;
+        }
+        async function findClimStations() {
+            const box = document.getElementById('dcStations');
+            if (!box) return;
+            if (!box.classList.contains('hidden') && box.dataset.loaded) { box.classList.add('hidden'); return; }
+            box.classList.remove('hidden');
+            box.innerHTML = '<div class="text-xs text-slate-400 italic p-2">Searching nearby stations with long records…</div>';
+            const lat = +currentLoc.lat, lon = +currentLoc.lon;
+            const yNow = new Date().getUTCFullYear(), recent = new Date(Date.now() - 60 * 864e5).toISOString().slice(0, 10);
+            let locE = null; try { locE = (await ptElev([[lat, lon]]))[0]; } catch (e) {}
+            let list = [];
+            for (const half of [0.5, 1.0]) {
+                try {
+                    const bb = [lon - half, lat - half, lon + half, lat + half].map(v => v.toFixed(3)).join(',');
+                    const r = await fetch(`${ACIS}/StnMeta?bbox=${bb}&elems=maxt&meta=name,sids,state,ll,elev,valid_daterange&output=json`);
+                    if (!r.ok) continue;
+                    const j = await r.json();
+                    list = (j.meta || []).map(m => {
+                        const p = parseAcisMeta(m), vr = Array.isArray(m.valid_daterange) && m.valid_daterange[0] ? m.valid_daterange[0] : null;
+                        const start = vr && vr[0] ? +String(vr[0]).slice(0, 4) : null, end = vr && vr[1] ? String(vr[1]) : null;
+                        const elevM = m.elev != null && isFinite(+m.elev) ? +m.elev * 0.3048 : null;
+                        return { ...p, elevM, start, end, km: p.lat != null ? distKm(lat, lon, p.lat, p.lon) : null };
+                    }).filter(s => s.km != null && s.start && s.end && yNow - s.start >= 20 && s.end >= recent && (s.ghcn || s.faa || s.icao))
+                      .sort((a, b) => a.km - b.km).slice(0, 8);
+                    if (list.length >= 3) break;
+                } catch (e) {}
+            }
+            box.dataset.loaded = '1';
+            const ov = climOverride(lat, lon);
+            const ft = m => m == null ? '' : `${Math.round(m * 3.28084).toLocaleString()} ft`;
+            const dist = km => isImperial ? `${Math.round(km * 0.621)} mi` : `${Math.round(km)} km`;
+            const dE = s => (locE == null || s.elevM == null) ? '' : (() => { const d = Math.round((s.elevM - locE) * 3.28084); return `${d >= 0 ? '+' : '−'}${Math.abs(d).toLocaleString()} ft vs here`; })();
+            window._climCands = list;
+            box.innerHTML = (list.length ? list.map((s, i) => `<button type="button" class="dc-stn${ov && ov.ids && ov.ids[0] === (s.faa ? s.faa + 'thr' : s.ghcn) ? ' on' : ''}" onclick="useClimStation(${i})">
+                    <span class="font-semibold text-slate-100">${esc(String(s.name || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()))}</span>
+                    <span class="text-[11px] text-slate-400 font-mono">${dist(s.km)} away, ${ft(s.elevM)}${dE(s) ? ' (' + dE(s) + ')' : ''}, records since ${s.start}</span></button>`).join('')
+                : '<div class="text-xs text-slate-400 p-2">No nearby stations with 20+ years of records were found.</div>')
+                + (ov ? `<button type="button" class="dc-stn" onclick="useClimStation(-1)"><span class="font-semibold text-slate-100">Automatic choice</span><span class="text-[11px] text-slate-400 font-mono">Let Skyline pick the station again</span></button>` : '');
+        }
+        async function useClimStation(i) {
+            const lat = +currentLoc.lat, lon = +currentLoc.lon, k = climOverrideKey(lat, lon);
+            if (i < 0) { try { localStorage.removeItem(k); } catch (e) {} }
+            else {
+                const s = (window._climCands || [])[i]; if (!s) return;
+                const ids = []; if (s.faa) ids.push(s.faa + 'thr', s.faa); if (s.ghcn) ids.push(s.ghcn); if (s.icao) ids.push(s.icao);
+                const v = { ids: [...new Set(ids)], ghcn: s.ghcn, label: s.icao || s.faa || s.ghcn, name: String(s.name || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()), km: s.km, override: true };
+                try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {}
+            }
+            const box = document.getElementById('dcStations'); if (box) { box.classList.add('hidden'); delete box.dataset.loaded; }
+            for (const key in climStnPromises) delete climStnPromises[key];
+            for (const key in dcMonthCache) delete dcMonthCache[key];
+            stationClim = null; cliTotals = null; precipNormals = null;
+            renderDashboard();
+            try { renderDailyRecordsTable(); } catch (e) {}
+            const token = fetchToken, nws = { obs: nwsObs, state: nwsState };
+            await Promise.all([loadStationClimate(token, nws, lat, lon), retryPrecipTotals()].map(p => Promise.resolve(p).catch(() => {})));
+            try { loadPrecipNormals(token, lat, lon, nws, null); } catch (e) {}
+            renderDashboard();
+            try { renderDailyRecordsTable(); renderPrecipTotals(); } catch (e) {}
+        }
+
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -2570,6 +2647,7 @@ body.no-data #sectionNav { display: none; }
         function resolveClimateStation(lat, lon, nws) {
             const obsIcao = nws && nws.obs && nws.obs.stationId;
             const k = `${obsIcao || ''}:${(+lat).toFixed(2)}:${(+lon).toFixed(2)}`;
+            { const ov = climOverride(lat, lon); if (ov) return Promise.resolve(ov); }
             if (!climStnPromises[k]) climStnPromises[k] = (async () => {
                 const site = await nearestCliSite(lat, lon, obsIcao);
                 const icao = site ? site.id : obsIcao;   // no representative climate-report site: use the observing station shown at the top
@@ -2893,6 +2971,7 @@ body.no-data #sectionNav { display: none; }
         }
 
         async function fetchCLI(nws, today, lat, lon) {
+            if (lat != null && climOverride(lat, lon)) return null;   // the user picked a station: its own record is used
             const site = (lat != null) ? await nearestCliSite(lat, lon, nws && nws.obs && nws.obs.stationId) : null;
             const icao = site ? site.id : (nws && nws.obs && nws.obs.stationId);
             if (!icao) return null;
@@ -4417,7 +4496,8 @@ body.no-data #sectionNav { display: none; }
         }
         async function fetchStationClimate(nws, lat, lon) {
             const icao = (nws && nws.obs && nws.obs.stationId) || `${(+lat).toFixed(2)},${(+lon).toFixed(2)}`;
-            const key = `stnclim3:${icao}`;
+            const ovS = climOverride(lat, lon);
+            const key = `stnclim4:${icao}:${ovS ? ovS.ids[0] : 'auto'}`;
             const c = await idb.get(key);
             if (c && Date.now() - c.t < 7 * 864e5) return c;
             const out = { t: Date.now(), icao, rec: null, norm: null, recStart: null, name: icao };
@@ -4504,6 +4584,7 @@ body.no-data #sectionNav { display: none; }
         function getHistoricalStatsForDate(targetDateStr) {
             const st = rawHistoricalStatsForDate(targetDateStr);
             if (!st) return st;
+            if (!climTrusted()) return Object.assign({}, st, { normMax: null, normMin: null, recHigh: null, recHighYr: '', recLow: null, recLowYr: '' });
             const key = targetDateStr.substring(5, 10);
             const cr = cliTotals && cliTotals.byMD && cliTotals.byMD[key];
             const sr = stationClim && stationClim.rec && stationClim.rec[key];
@@ -4833,7 +4914,8 @@ body.no-data #sectionNav { display: none; }
             const rr = document.getElementById('recordsRange');
             const hasCli = !!(cliTotals && cliTotals.rows);
             const today = bestBetResults[0].date;
-            if (rr) rr.innerText = (cliTotals && cliTotals.byMD) ? `${cliTotals.station}, NWS climate reports` : (stationClim && stationClim.rec) ? `${stationClim.icao}, records ${stationClim.recStart}–present` : (nwsObs && nwsObs.stationId) ? `${nwsObs.stationId}, station reports` : '';
+            const ovR = climOverride(currentLoc.lat, currentLoc.lon);
+            if (rr) rr.innerText = ovR ? `${ovR.name} (${ovR.label}), your chosen station` : (cliTotals && cliTotals.byMD) ? `${cliTotals.station}, NWS climate reports` : (stationClim && stationClim.rec) ? `${stationClim.icao}, records ${stationClim.recStart}–present` : (nwsObs && nwsObs.stationId) ? `${nwsObs.stationId}, station reports` : '';
             dcFillPickers(today);
             const cur = !dcSel, y = cur ? +today.slice(0, 4) : dcSel.y, m = cur ? +today.slice(5, 7) : dcSel.m;
             const mm = String(m).padStart(2, '0');
