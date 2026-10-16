@@ -2650,6 +2650,15 @@ body.no-data #sectionNav { display: none; }
                 }
                 if (stn && yest < yStart) return { daily: {}, yStart, errors: [], sources: ['rain gauge'], failed: false, gauge: { label: `${stn.label}, ${stn.name}`, km: stn.km, filled: 0 } };
             } catch (e) {}
+            // the observing airport's own daily precipitation (IEM summaries of its reports)
+            try {
+                const sid = nws && nws.obs && nws.obs.stationId, st = nws && nws.state;
+                const rows = await iemDailyObs(+today.slice(0, 4), null, sid, st);
+                const daily = {};
+                (rows || []).forEach(o => { if (o.valid >= yStart && o.valid <= yest && o.precip !== 'M') daily[o.valid] = o.precip === 'T' ? 0 : parseFloat(o.precip) * 25.4; });
+                const n = Object.keys(daily).length, need = Math.round((new Date(yest) - new Date(yStart)) / 864e5) + 1;
+                if (n >= Math.max(1, need * 0.8)) return { daily, yStart, errors: [], sources: ['station'], failed: false, gauge: { label: sid, name: (nws.obs && nws.obs.stationName) || sid, km: null, filled: 0 } };
+            } catch (e) {}
             const est = await fetchPrecipEstimates(lat, lon, today);
             est.estimate = true;
             return est;
@@ -4776,12 +4785,12 @@ body.no-data #sectionNav { display: none; }
             ys.value = String(y); ms.value = String(m);
         }
         async function dcFetchMonth(y, m) {
-            const stn = await resolveClimateStation(currentLoc.lat, currentLoc.lon, { obs: nwsObs });
-            if (!stn || !stn.ids || !stn.ids.length) return null;
+            const stn = await resolveClimateStation(currentLoc.lat, currentLoc.lon, { obs: nwsObs }).catch(() => null);
+            const ids = (stn && stn.ids) || [];
             const mm = String(m).padStart(2, '0'), last = new Date(Date.UTC(y, m, 0)).getUTCDate();
-            const key = `${stn.ids[0]}:${y}-${mm}`;
+            const key = `${ids[0] || (nwsObs && nwsObs.stationId) || 'x'}:${y}-${mm}`;
             if (dcMonthCache[key]) return dcMonthCache[key];
-            for (const sid of stn.ids) {
+            for (const sid of ids) {
                 try {
                     const r = await fetch(`${ACIS}/StnData?sid=${encodeURIComponent(sid)}&sdate=${y}-${mm}-01&edate=${y}-${mm}-${String(last).padStart(2, '0')}&elems=maxt,mint,pcpn,snow,snwd&output=json`);
                     if (!r.ok) continue;
@@ -4791,7 +4800,30 @@ body.no-data #sectionNav { display: none; }
                     if (rows.some(o => isFinite(parseFloat(o.high)))) { dcMonthCache[key] = rows; return rows; }
                 } catch (e) {}
             }
+            // the observing airport itself (IEM daily summaries computed from its own reports)
+            try {
+                const rows = (await iemDailyObs(y, m)) || [];
+                if (rows.some(o => isFinite(parseFloat(o.high)))) { dcMonthCache[key] = rows; return rows; }
+            } catch (e) {}
             return null;
+        }
+
+        // Daily max/min/precip for the observing ASOS/AWOS station from the Iowa Environmental Mesonet (measured, from the station's reports)
+        const iemDailyCache = {};
+        async function iemDailyObs(y, m, sid0, st0) {
+            const sid = sid0 || (nwsObs && nwsObs.stationId), st = st0 || nwsState;
+            if (!sid || !st || !/^K[A-Z0-9]{3}$/.test(sid)) return null;
+            const k = `${sid}:${y}`;
+            if (!iemDailyCache[k]) iemDailyCache[k] = fetch(`https://mesonet.agron.iastate.edu/api/1/daily.json?station=${sid.slice(1)}&network=${st}_ASOS&year=${y}`)
+                .then(r => r.ok ? r.json() : { data: [] }).then(j => (Array.isArray(j.data) ? j.data : []).map(d => {
+                    const p = d.precip == null ? null : +d.precip;
+                    return { valid: String(d.date || d.day || '').slice(0, 10), high: d.max_tmpf ?? null, low: d.min_tmpf ?? null,
+                             precip: p == null ? 'M' : (p > 0 && p < 0.005) ? 'T' : p.toFixed(2), snow: d.snow ?? 'M', snowdepth: d.snowd ?? 'M' };
+                }).filter(o => o.valid)).catch(() => []);
+            const rows = await iemDailyCache[k];
+            if (!m) return rows;
+            const pre = `${y}-${String(m).padStart(2, '0')}`;
+            return rows.filter(o => o.valid.startsWith(pre));
         }
 
         function renderDailyRecordsTable() {
@@ -4801,7 +4833,7 @@ body.no-data #sectionNav { display: none; }
             const rr = document.getElementById('recordsRange');
             const hasCli = !!(cliTotals && cliTotals.rows);
             const today = bestBetResults[0].date;
-            if (rr) rr.innerText = (cliTotals && cliTotals.byMD) ? `${cliTotals.station}, NWS climate reports` : (stationClim && stationClim.rec) ? `${stationClim.icao}, records ${stationClim.recStart}–present` : '';
+            if (rr) rr.innerText = (cliTotals && cliTotals.byMD) ? `${cliTotals.station}, NWS climate reports` : (stationClim && stationClim.rec) ? `${stationClim.icao}, records ${stationClim.recStart}–present` : (nwsObs && nwsObs.stationId) ? `${nwsObs.stationId}, station reports` : '';
             dcFillPickers(today);
             const cur = !dcSel, y = cur ? +today.slice(0, 4) : dcSel.y, m = cur ? +today.slice(5, 7) : dcSel.m;
             const mm = String(m).padStart(2, '0');
@@ -4810,7 +4842,7 @@ body.no-data #sectionNav { display: none; }
             const lastDay = cur ? +today.slice(8, 10) - 1 : new Date(Date.UTC(y, m, 0)).getUTCDate();
             const dates = []; for (let d = lastDay; d >= 1; d--) dates.push(`${y}-${mm}-${String(d).padStart(2, '0')}`);
             const allCli = dates.every(ds => cliBy[ds]);
-            if (allCli || (!stationClim && !(cliTotals && cliTotals.byMD))) { drawMonth(dates.map(ds => cliBy[ds] || null)); return; }
+            if (allCli) { drawMonth(dates.map(ds => cliBy[ds] || null)); return; }
             tbody.innerHTML = `<tr><td colspan="7" class="p-3 text-slate-400 italic">Loading ${new Date(Date.UTC(y, m - 1, 15)).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })}…</td></tr>`;
             const want = `${y}-${mm}`;
             dcFetchMonth(y, m).then(rows => {
