@@ -608,7 +608,7 @@ body.no-data #sectionNav { display: none; }
                     <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
                         <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2"><i class="fa-solid fa-calendar-days text-amber-400"></i> Observed Climate</h3>
                     </div>
-                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 -mt-1 mb-3"><span id="recordsRange" class="text-[11px] text-slate-400 font-mono"></span><button type="button" onclick="findClimStations()" class="dc-near"><i class="fa-solid fa-location-dot mr-1"></i>Nearby stations with records</button></div>
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 -mt-1 mb-3"><span id="recordsRange" class="text-[11px] text-slate-400 font-mono"></span><button type="button" onclick="findClimStations()" class="dc-near"><i class="fa-solid fa-location-dot mr-1"></i>Nearby stations</button></div>
                     <div id="dcStations" class="hidden dc-stns mb-3"></div>
                     <div class="dc-prec mb-4">
                         <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
@@ -1459,7 +1459,7 @@ body.no-data #sectionNav { display: none; }
             { key: 'forecast', panel: () => document.querySelector('#sec-forecast > div'), title: p => p.querySelector('h3 > span') },
             { key: 'afd', panel: () => document.getElementById('afdPanel'), head: () => document.getElementById('afdToggle'), title: h => h.querySelector('span'), closed: true,
               onOpen: () => { afdOpen = true; loadAFD(); }, onClose: () => { afdOpen = false; } },
-            { key: 'quick', panel: () => document.getElementById('sec-quick'), head: () => document.getElementById('quickToggle'), title: h => h.querySelector('h3'), closed: true },
+            { key: 'quick2', panel: () => document.getElementById('sec-quick'), head: () => document.getElementById('quickToggle'), title: h => h.querySelector('h3') },
             { key: 'climate', panel: () => document.getElementById('dailyClimatePanel'), title: p => p.querySelector('h3') },
             { key: 'trend', panel: () => { const h = [...document.querySelectorAll('#sec-climate h3')].find(x => /Long-Term Climate Trend/.test(x.textContent)); return h && h.closest('.glass-panel'); },
               title: p => [...p.querySelectorAll('h3')].find(x => /Long-Term/.test(x.textContent)), closed: true },
@@ -1514,7 +1514,7 @@ body.no-data #sectionNav { display: none; }
             });
         }
         function toggleAFD() { const c = SECTIONS.find(s => s.key === 'afd'); if (c && c._panel) setSecOpen(c, c._panel.classList.contains('collapsed'), true); }
-        function toggleQuickView() { const c = SECTIONS.find(s => s.key === 'quick'); if (c && c._panel) setSecOpen(c, c._panel.classList.contains('collapsed'), true); }
+        function toggleQuickView() { const c = SECTIONS.find(s => s.key === 'quick2'); if (c && c._panel) setSecOpen(c, c._panel.classList.contains('collapsed'), true); }
         function toggleModelAnalysis() { const c = SECTIONS.find(s => s.key === 'models'); if (c && c._panel) setSecOpen(c, c._panel.classList.contains('collapsed'), true); }
         initSections();
 
@@ -1558,25 +1558,26 @@ body.no-data #sectionNav { display: none; }
             if (!box) return;
             if (!box.classList.contains('hidden') && box.dataset.loaded) { box.classList.add('hidden'); return; }
             box.classList.remove('hidden');
-            box.innerHTML = '<div class="text-xs text-slate-400 italic p-2">Searching nearby stations with long records…</div>';
+            box.innerHTML = '<div class="text-xs text-slate-400 italic p-2">Searching nearby stations…</div>';
             const lat = +currentLoc.lat, lon = +currentLoc.lon;
             const yNow = new Date().getUTCFullYear(), recent = new Date(Date.now() - 60 * 864e5).toISOString().slice(0, 10);
             let locE = null; try { locE = (await ptElev([[lat, lon]]))[0]; } catch (e) {}
             let list = [];
-            for (const half of [0.5, 1.0]) {
+            for (const half of [0.35, 0.8]) {
                 try {
                     const bb = [lon - half, lat - half, lon + half, lat + half].map(v => v.toFixed(3)).join(',');
-                    const r = await fetch(`${ACIS}/StnMeta?bbox=${bb}&elems=maxt&meta=name,sids,state,ll,elev,valid_daterange&output=json`);
+                    const r = await fetch(`${ACIS}/StnMeta?bbox=${bb}&elems=maxt,pcpn&meta=name,sids,state,ll,elev,valid_daterange&output=json`);
                     if (!r.ok) continue;
                     const j = await r.json();
+                    const rng = x => (Array.isArray(x) && x[0] && x[1]) ? { s: +String(x[0]).slice(0, 4), e: String(x[1]) } : null;
                     list = (j.meta || []).map(m => {
-                        const p = parseAcisMeta(m), vr = Array.isArray(m.valid_daterange) && m.valid_daterange[0] ? m.valid_daterange[0] : null;
-                        const start = vr && vr[0] ? +String(vr[0]).slice(0, 4) : null, end = vr && vr[1] ? String(vr[1]) : null;
+                        const p = parseAcisMeta(m), vr = Array.isArray(m.valid_daterange) ? m.valid_daterange : [];
+                        const t = rng(vr[0]), pr = rng(vr[1]);
                         const elevM = m.elev != null && isFinite(+m.elev) ? +m.elev * 0.3048 : null;
-                        return { ...p, elevM, start, end, km: p.lat != null ? distKm(lat, lon, p.lat, p.lon) : null };
-                    }).filter(s => s.km != null && s.start && s.end && yNow - s.start >= 20 && s.end >= recent && (s.ghcn || s.faa || s.icao))
-                      .sort((a, b) => a.km - b.km).slice(0, 8);
-                    if (list.length >= 3) break;
+                        return { ...p, elevM, t, pr, start: t ? t.s : pr ? pr.s : null, end: [t && t.e, pr && pr.e].filter(Boolean).sort().pop() || null, km: p.lat != null ? distKm(lat, lon, p.lat, p.lon) : null };
+                    }).filter(s => s.km != null && (s.t || s.pr) && (s.ghcn || s.faa || s.icao))
+                      .sort((a, b) => a.km - b.km).slice(0, 12);
+                    if (list.length >= 5) break;
                 } catch (e) {}
             }
             box.dataset.loaded = '1';
@@ -1587,8 +1588,9 @@ body.no-data #sectionNav { display: none; }
             window._climCands = list;
             box.innerHTML = (list.length ? list.map((s, i) => `<button type="button" class="dc-stn${ov && ov.ids && ov.ids[0] === (s.faa ? s.faa + 'thr' : s.ghcn) ? ' on' : ''}" onclick="useClimStation(${i})">
                     <span class="font-semibold text-slate-100">${esc(String(s.name || '').toLowerCase().replace(/\b[a-z]/g, c => c.toUpperCase()))}</span>
-                    <span class="text-[11px] text-slate-400 font-mono">${dist(s.km)} away, ${ft(s.elevM)}${dE(s) ? ' (' + dE(s) + ')' : ''}, records since ${s.start}</span></button>`).join('')
-                : '<div class="text-xs text-slate-400 p-2">No nearby stations with 20+ years of records were found.</div>')
+                    <span class="text-[11px] text-slate-400 font-mono">${dist(s.km)} away, ${ft(s.elevM)}${dE(s) ? ' (' + dE(s) + ')' : ''}</span>
+                    <span class="text-[11px] text-slate-400 font-mono">${s.t ? 'Temps ' + s.t.s + (s.t.e < recent ? '–' + s.t.e.slice(0, 4) : '–now') : 'No temps'}, ${s.pr ? 'precip ' + s.pr.s + (s.pr.e < recent ? '–' + s.pr.e.slice(0, 4) : '–now') : 'no precip'}</span></button>`).join('')
+                : '<div class="text-xs text-slate-400 p-2">No nearby stations were found.</div>')
                 + (ov ? `<button type="button" class="dc-stn" onclick="useClimStation(-1)"><span class="font-semibold text-slate-100">Automatic choice</span><span class="text-[11px] text-slate-400 font-mono">Let Skyline pick the station again</span></button>` : '');
         }
         async function useClimStation(i) {
