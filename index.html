@@ -468,7 +468,7 @@ body.no-data #sectionNav { display: none; }
                         </div>
                         <div class="flex-1 min-w-[230px]">
                             <div class="flex items-center gap-2.5"><i id="currentWeatherIcon2" class="hero-ic2"></i><div id="currentWeatherConditionText" class="font-display text-3xl md:text-4xl leading-tight">--</div></div>
-                            <div class="text-sm text-slate-300 mt-1">Feels like <span id="currentApparentTemp" class="font-semibold text-white">--</span></div>
+                            <div id="feelsLine" class="text-sm text-slate-300 mt-1"><span id="feelsLbl">Feels like</span> <span id="currentApparentTemp" class="font-semibold text-white">--</span></div>
                             <div class="flex flex-wrap items-center gap-x-6 gap-y-1 mt-3">
                                 <span id="heroHiWrap" class="hl hl-hi"><i class="fa-solid fa-arrow-up"></i><b id="heroHi">--</b><small id="heroHiLbl">High</small></span>
                                 <span class="hl hl-lo"><i class="fa-solid fa-arrow-down"></i><b id="heroLo">--</b><small id="heroLoLbl">Overnight low</small></span>
@@ -1615,6 +1615,29 @@ body.no-data #sectionNav { display: none; }
             try { renderDailyRecordsTable(); renderPrecipTotals(); } catch (e) {}
         }
 
+        // NWS formulas. Heat index: Rothfusz regression with the NWS adjustments (simple Steadman form when the result is below 80 F),
+        // reported when the temperature is 80 F or higher. Wind chill: 2001 NWS formula, temperature 50 F or lower and wind above 3 mph.
+        function nwsFeels(tC, rh, windKmh) {
+            if (tC == null || isNaN(tC)) return null;
+            const T = tC * 9 / 5 + 32;
+            if (T >= 80 && rh != null && !isNaN(rh)) {
+                const R = rh;
+                let hi = 0.5 * (T + 61 + (T - 68) * 1.2 + R * 0.094);
+                if ((hi + T) / 2 >= 80) {
+                    hi = -42.379 + 2.04901523 * T + 10.14333127 * R - 0.22475541 * T * R - 0.00683783 * T * T - 0.05481717 * R * R
+                        + 0.00122874 * T * T * R + 0.00085282 * T * R * R - 0.00000199 * T * T * R * R;
+                    if (R < 13 && T >= 80 && T <= 112) hi -= ((13 - R) / 4) * Math.sqrt((17 - Math.abs(T - 95)) / 17);
+                    else if (R > 85 && T >= 80 && T <= 87) hi += ((R - 85) / 10) * ((87 - T) / 5);
+                }
+                return { kind: 'Heat index', c: (hi - 32) * 5 / 9 };
+            }
+            const V = windKmh != null && !isNaN(windKmh) ? windKmh * 0.621371 : null;
+            if (T <= 50 && V != null && V > 3) {
+                const wc = 35.74 + 0.6215 * T - 35.75 * Math.pow(V, 0.16) + 0.4275 * T * Math.pow(V, 0.16);
+                return { kind: 'Wind chill', c: (Math.min(wc, T) - 32) * 5 / 9 };
+            }
+            return null;
+        }
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -1734,7 +1757,7 @@ body.no-data #sectionNav { display: none; }
             const uvv = hh && hh.uv_index ? hh.uv_index[hourlyStart()] : null;
 
             const tiles = [
-                ['fa-temperature-half', 'text-rose-400', 'Temperature', formatTemp(cc.temp, 1), `Feels like ${formatTemp(cc.apparent, 1)}`],
+                ['fa-temperature-half', 'text-rose-400', 'Temperature', formatTemp(cc.temp, 1), (fx => fx ? `${fx.kind} ${formatTemp(fx.c, 1)}` : '')(nwsFeels(cc.temp, cc.rh, cc.wind))],
                 ['fa-droplet', 'text-teal-400', 'Dewpoint', `${formatTemp(cc.dew, 1)}${n(cc.rh) ? ` <span class="text-xs font-semibold text-sky-200/90 ml-1">RH ${Math.round(cc.rh)}%</span>` : ''}`, ''],
                 pressureMode === 'stn'
                     ? ['fa-arrows-down-to-line', 'text-indigo-300', 'Station Pressure', n(cc.stnP) ? `${cc.stnP.toFixed(1)} mb` : '--', `${n(cc.stnP) ? inHg(cc.stnP) + ', ' : 'Not reported, '}tap for sea-level`, true]
@@ -4058,7 +4081,9 @@ body.no-data #sectionNav { display: none; }
             if (cc) {
                 const $ = id => document.getElementById(id);
                 $('currentTempDisplay').innerText = formatTemp(cc.temp);
-                $('currentApparentTemp').innerText = formatTemp(cc.apparent);
+                { const fx = nwsFeels(cc.temp, cc.rh, cc.wind);
+                  $('feelsLine').style.display = fx ? '' : 'none';
+                  if (fx) { $('feelsLbl').innerText = fx.kind; $('currentApparentTemp').innerText = formatTemp(fx.c); } }
                 $('currentDewPoint').innerText = formatTemp(cc.dew);
                 $('currentDewPointCategory').innerText = '';
                 $('currentHumidity').innerText = (cc.rh !== null && cc.rh !== undefined) ? `${Math.round(cc.rh)}%` : '--';
