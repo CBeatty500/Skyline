@@ -4963,7 +4963,7 @@ body.no-data #sectionNav { display: none; }
                             gr.addColorStop(0, `rgba(${rgb},0)`); gr.addColorStop(f, `rgba(${rgb},${al})`); gr.addColorStop(1 - f, `rgba(${rgb},${al})`); gr.addColorStop(1, `rgba(${rgb},0)`);
                             g.fillStyle = gr; g.fillRect(x0, top, w, bottom - top);
                         };
-                        const DAY = ['191,219,254', .17], NIGHT = ['2,6,23', .32];
+                        const DAY = ['190,220,255', .23], NIGHT = ['56,72,112', .30];
                         srs.forEach((sr, j) => {
                             const ss = sss[j]; if (!ss) return;
                             band(xAt(sr), xAt(ss), ...DAY);
