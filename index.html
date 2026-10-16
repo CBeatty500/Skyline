@@ -976,7 +976,7 @@ body.no-data #sectionNav { display: none; }
                 out.city = (props.relativeLocation && props.relativeLocation.properties && props.relativeLocation.properties.city) || null;
                 await Promise.all([
                     fetch(props.forecast).then(r => r.ok ? r.json() : null).then(j => { out.forecast = j; }).catch(() => {}),
-                    (props.forecastGridData ? fetch(props.forecastGridData).then(r => r.ok ? r.json() : null).then(j => { out.thunder = parseNwsSeries(j && j.properties && j.properties.probabilityOfThunder); }).catch(() => {}) : Promise.resolve()),
+                    (props.forecastGridData ? fetch(props.forecastGridData).then(r => r.ok ? r.json() : null).then(j => { const P = j && j.properties; out.thunder = parseNwsSeries(P && P.probabilityOfThunder); out.pop = parseNwsSeries(P && P.probabilityOfPrecipitation); out.sky = parseNwsSeries(P && P.skyCover); }).catch(() => {}) : Promise.resolve()),
                     fetch(`https://api.weather.gov/alerts/active?point=${lat},${lon}`).then(r => r.ok ? r.json() : null)
                         .then(j => { if (j && j.features) out.alerts = j.features.map(f => f.properties); }).catch(() => {}),
                     (async () => {
@@ -1178,6 +1178,8 @@ body.no-data #sectionNav { display: none; }
                 precipNormals = null;
                 nwsAlerts = nws.alerts || [];
                 nwsThunder = nws.thunder || null;
+                try { blendNwsGrid(nws); } catch (e) {}
+                radarInfo = null;
                 spcData = null;
                 historicalData = null; climLite = null; histLoading = true;
                 if (ensembleData.elevation !== undefined) currentLoc.ele = ensembleData.elevation;
@@ -1211,6 +1213,7 @@ body.no-data #sectionNav { display: none; }
                 loadPrecipNormals(token, lat, lon, nws, histDone);
                 loadStationClimate(token, nws, lat, lon);
                 if (nwsOffice) loadSPC(token, lat, lon);
+                if (nwsOffice) loadRadar(token, lat, lon);
             } catch (err) {
                 console.error("Fetch operational data failed:", err);
                 if (token === fetchToken) showToast(/429/.test(String(err && err.message)) ? "The free forecast service (Open-Meteo) has hit its request limit for now. Try again in a few minutes." : `Error retrieving forecast data for this location (${esc(String((err && err.message) || 'unknown error'))}). Please try again.`);
@@ -1745,6 +1748,118 @@ body.no-data #sectionNav { display: none; }
             for (const [re, w] of pairs) if (re.test(s)) return w;
             return t.replace(day ? /\bfair\b/i : /\bsunny\b/i, day ? 'Sunny' : 'Clear');
         }
+        // ---------- NWS gridded hourly PoP and sky cover, blended 50/50 with the model ensemble (US) ----------
+        function blendNwsGrid(nws) {
+            const h = ensembleData && ensembleData.hourly;
+            if (!h || !nws) return;
+            const off = (ensembleData.utc_offset_seconds || 0) * 1000;
+            const at = (m, j) => m ? m.get(Date.parse(h.time[j] + ':00Z') - off) : undefined;
+            if (nws.pop && h.precipitation_probability) h.precipitation_probability = h.precipitation_probability.map((v, j) => { const n = at(nws.pop, j); return n == null ? v : (v == null ? n : Math.round(0.5 * v + 0.5 * n)); });
+            if (nws.sky && h.cloud_cover) h.cloud_cover = h.cloud_cover.map((v, j) => { const n = at(nws.sky, j); return n == null ? v : (v == null ? n : 0.5 * v + 0.5 * n); });
+        }
+
+        // ---------- Radar nowcast (0-3 h): NOAA/NWS national base reflectivity mosaic, sampled on a grid around the location.
+        // Echo motion from the last 30 minutes (pattern matching), extrapolated to the location. Raises the hourly chance and
+        // wet/thunder codes when echoes are on the way; trims the next hour when there are no echoes anywhere nearby. ----------
+        let radarInfo = null;
+        const RADAR_IS = 'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer';
+        const DBZ_COLORS = [[5, [4, 233, 231]], [10, [1, 159, 244]], [15, [3, 0, 244]], [20, [2, 253, 2]], [25, [1, 197, 1]], [30, [0, 142, 0]], [35, [253, 248, 2]], [40, [229, 188, 0]], [45, [253, 149, 0]], [50, [253, 0, 0]], [55, [212, 0, 0]], [60, [188, 0, 0]], [65, [248, 0, 253]], [70, [152, 84, 198]], [75, [253, 253, 253]]];
+        function rgbToDbz(v) {
+            const p = String(v || '').trim().split(/[\s,]+/).map(Number);
+            if (p.length < 3 || (p.length >= 4 && p[3] === 0) || (p[0] + p[1] + p[2] === 0)) return 0;
+            let best = 0, bd = Infinity;
+            DBZ_COLORS.forEach(([z, c]) => { const d = (p[0] - c[0]) ** 2 + (p[1] - c[1]) ** 2 + (p[2] - c[2]) ** 2; if (d < bd) { bd = d; best = z; } });
+            return bd < 90 * 90 ? best : 0;
+        }
+        async function radarFrame(pts, t) {
+            const body = new URLSearchParams({ geometry: JSON.stringify({ points: pts, spatialReference: { wkid: 4326 } }), geometryType: 'esriGeometryMultipoint', returnFirstValueOnly: 'true', interpolation: 'RSP_NearestNeighbor', f: 'json' });
+            if (t) body.set('time', String(t));
+            const r = await fetch(`${RADAR_IS}/getSamples`, { method: 'POST', body });
+            if (!r.ok) throw new Error('radar HTTP ' + r.status);
+            const j = await r.json();
+            if (!j || !Array.isArray(j.samples)) throw new Error('radar samples');
+            const out = new Array(pts.length).fill(0);
+            j.samples.forEach(s => { const i = s.locationId != null ? s.locationId : null; if (i != null && i < out.length) out[i] = rgbToDbz(s.value); });
+            return out;
+        }
+        async function radarNowcast(lat, lon) {
+            const N = 25, C = 12, dLat = 1.5, dLon = 1.5 / Math.cos(lat * Math.PI / 180);
+            const pts = [];
+            for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) pts.push([+(lon - dLon + 2 * dLon * x / (N - 1)).toFixed(4), +(lat + dLat - 2 * dLat * y / (N - 1)).toFixed(4)]);
+            const kmX = 2 * dLon * 111.32 * Math.cos(lat * Math.PI / 180) / (N - 1), kmY = 2 * dLat * 111.32 / (N - 1);
+            const info = await (await fetch(`${RADAR_IS}?f=json`)).json();
+            const tEnd = info && info.timeInfo && info.timeInfo.timeExtent ? info.timeInfo.timeExtent[1] : null;
+            if (!tEnd || Date.now() - tEnd > 45 * 60e3) throw new Error('radar not current');
+            const [B, A] = await Promise.all([radarFrame(pts, tEnd), radarFrame(pts, tEnd - 30 * 60e3)]);
+            const g = (arr, x, y) => (x < 0 || y < 0 || x >= N || y >= N) ? 0 : arr[y * N + x];
+            // motion: best overlap of the 30-minute-old echoes shifted onto the latest ones
+            const w = z => Math.max(0, z - 15);
+            let best = { sx: 0, sy: 0, s: -1 }, nA = 0, nB = 0;
+            for (let i = 0; i < N * N; i++) { nA += w(A[i]) ** 2; nB += w(B[i]) ** 2; }
+            if (nA > 0 && nB > 0) for (let sy = -4; sy <= 4; sy++) for (let sx = -4; sx <= 4; sx++) {
+                let s = 0; for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) s += w(g(A, x, y)) * w(g(B, x + sx, y + sy));
+                s /= Math.sqrt(nA * nB); if (s > best.s + 1e-9 || (Math.abs(s - best.s) < 1e-9 && Math.abs(sx) + Math.abs(sy) < Math.abs(best.sx) + Math.abs(best.sy))) best = { sx, sy, s };
+            }
+            const moving = best.s > 0.25;
+            const vx = moving ? best.sx / 30 : 0, vy = moving ? best.sy / 30 : 0;   // cells per minute (x east, y south)
+            const near = (z, r) => { let m = 0; for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) m = Math.max(m, g(B, Math.round(C + z.x) + x, Math.round(C + z.y) + y)); return m; };
+            // echo at the location after t minutes = echo now at (location - v*t)
+            const ahead = t => near({ x: -vx * t, y: -vy * t }, 1);
+            let any = 0; for (let i = 0; i < N * N; i++) if (B[i] >= 20) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 100) any++; }
+            let arrive = null; for (let t = 0; t <= 180; t += 10) if (ahead(t) >= 20) { arrive = t; break; }
+            const speedKmh = Math.hypot(vx * kmX, vy * kmY) * 60;
+            return { ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
+        }
+        function applyRadarNowcast(rn) {
+            const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
+            const cur = hourlyStart(), ct = ensembleData.current && ensembleData.current.time;
+            const mm = ct ? (parseInt(ct.slice(14, 16)) || 0) : 0;
+            const P = [90, 80, 65, 50];
+            for (let k = 0; k <= 3; k++) {
+                const j = cur + k; if (j >= h.time.length) break;
+                const t0 = Math.max(0, k * 60 - mm), t1 = k * 60 - mm + 60;
+                let z = 0; for (let t = t0; t <= t1; t += 10) z = Math.max(z, rn.ahead(t));
+                const pp = h.precipitation_probability[j] || 0;
+                if (z >= 20) {
+                    h.precipitation_probability[j] = Math.max(pp, z >= 30 ? P[k] : P[k] - 15);
+                    const wc = h.weather_code[j] || 0;
+                    if (z >= 45) h.weather_code[j] = Math.max(wc, 95);
+                    else if (!(wc >= 51 && wc <= 99)) h.weather_code[j] = 80;
+                } else if (rn.any === 0 && k <= 1) {
+                    h.precipitation_probability[j] = Math.min(pp, 15);
+                }
+            }
+            // one line for the forecast text
+            radarInfo = null;
+            if (rn.arrive !== null) {
+                const dirs = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
+                const from = rn.moving ? dirs[Math.round(((Math.atan2(-rn.vx * rn.kmX, rn.vy * rn.kmY) * 180 / Math.PI) + 360) % 360 / 45) % 8] : null;
+                const tz = ensembleData.timezone;
+                const when = new Date(Date.now() + rn.arrive * 60e3).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
+                const what = rn.peak >= 45 ? 'Heavy rain and possible thunderstorms' : rn.peak >= 30 ? 'Rain' : 'Light rain';
+                const mph = Math.round(rn.speedKmh * 0.621);
+                radarInfo = { msg: rn.arrive <= 5 ? `Radar: ${what.toLowerCase()} over the area now${from && mph >= 5 ? `, moving in from the ${from} near ${mph} mph` : ''}.`
+                    : `Radar: ${what.toLowerCase()} approaching${from && mph >= 5 ? ` from the ${from} near ${mph} mph` : ''}, arriving around ${when}.` };
+            }
+        }
+        async function loadRadar(token, lat, lon) {
+            if (!nwsOffice || !spcInConus(lat, lon)) { radarInfo = null; return; }
+            try {
+                const rn = await radarNowcast(+lat, +lon);
+                if (token !== fetchToken) return;
+                applyRadarNowcast(rn);
+                recomputeForecast();
+            } catch (e) { console.warn('Radar nowcast unavailable:', e); }
+        }
+        function recomputeForecast() {
+            try {
+                computeBestBetPredictions(); applyOvernightLows(); applyRemainingToday(); applyContinuity(); floorTodayHigh();
+                annotateThunder(); raiseTodayHigh();
+                _adjCache = null;
+                renderDashboard(); renderDiscussion();
+            } catch (e) { console.warn(e); }
+        }
+
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -5608,6 +5723,7 @@ body.no-data #sectionNav { display: none; }
                 else if (ni.pp >= 20) parts.push(`A ${ni.pp}% chance of a passing shower.`);
                 if (ni.gust >= 40) parts.push(`Gusts to ${formatSpeed(ni.gust)}.`);
                 if (rf.high && rf.high.type === 'set') parts.push(rf.high.tie ? 'Today tied the daily record high.' : 'Today set a new daily record high.');
+                if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.msg);
                 $h('heroNarrative').innerText = parts.join(' ');
                 $h('heroNarrLbl').innerText = 'Tonight';
                 return;
@@ -5631,6 +5747,7 @@ body.no-data #sectionNav { display: none; }
             parts.push(`Overnight low near ${formatTemp(bb.bestMin)}.`);
             if (rf.high && rf.high.type === 'set') parts.push(rf.high.tie ? 'The daily record high has been tied.' : 'A new daily record high has been set.');
             else if (rf.high && rf.high.type === 'record') parts.push('Record high territory.');
+            if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.msg);
             $h('heroNarrative').innerText = parts.join(' ');
             $h('heroNarrLbl').innerText = 'Today';
         }
