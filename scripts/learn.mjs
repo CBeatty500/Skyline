@@ -94,11 +94,12 @@ async function loadPage(browser, loc) {
       await page.waitForTimeout(12000);   // station climate, climate reports
       return await page.evaluate(async () => {
         const h = ensembleData.hourly, raw = h._raw || h, cur = hourlyStart(), off = (ensembleData.utc_offset_seconds || 0) * 1000;
+        const shown = (typeof obsAdjustedHourly === 'function' && obsAdjustedHourly()) || null;   // the forecast as displayed (observations, regional, trend)
         const hrs = [];
         for (let j = cur; j < Math.min(h.time.length, cur + 73); j++) {
           const g = (f) => raw[f] && raw[f][j] != null ? +(+raw[f][j]).toFixed(2) : null;
           const w = f => { const v = _modelWindAtRaw(f, j); return v == null || isNaN(v) ? null : +v.toFixed(1); };
-          hrs.push({ ms: Date.parse(h.time[j] + ':00Z') - off, d: h.is_day && h.is_day[j] ? 1 : 0, t: g('temperature_2m'), td: g('dew_point_2m'), cc: g('cloud_cover'), pp: g('precipitation_probability'), ws: w('wind_speed_10m'), wg: w('wind_gusts_10m') });
+          hrs.push({ ms: Date.parse(h.time[j] + ':00Z') - off, d: h.is_day && h.is_day[j] ? 1 : 0, t: g('temperature_2m'), td: g('dew_point_2m'), cc: g('cloud_cover'), pp: g('precipitation_probability'), ws: w('wind_speed_10m'), wg: w('wind_gusts_10m'), ts: shown && shown.T[j] != null ? +shown.T[j].toFixed(2) : null });
         }
         return {
           today: ensembleData.daily.time[0],
@@ -116,11 +117,10 @@ async function loadPage(browser, loc) {
 }
 
 const browser = await chromium.launch();
-for (const loc of locs) {
+async function doLocation(loc) {
   const k = key(loc);
   let r;
-  try { r = await loadPage(browser, loc); } catch (e) { console.log(`${loc.name}: skipped (${e.message})`); continue; }
-  await sleep(4000);
+  try { r = await loadPage(browser, loc); } catch (e) { console.log(`${loc.name}: skipped (${e.message})`); return; }
   const L = learning.locations[k] || (learning.locations[k] = { name: loc.name, list: [] });
   try {
     // daily checks also use the main airport when one is listed (its official climate record); else what the app measures
@@ -182,7 +182,7 @@ for (const loc of locs) {
     r.hrs.forEach(x => {
       const lead = hlLead(Math.max(0, (x.ms - now) / 36e5));
       const slot = hs.hrs[x.ms] || (hs.hrs[x.ms] = {});
-      if (!slot[lead]) slot[lead] = { d: x.d, t: x.t, td: x.td, cc: x.cc, pp: x.pp, ws: x.ws, wg: x.wg };   // first forecast per hour and lead
+      if (!slot[lead]) slot[lead] = { d: x.d, t: x.t, td: x.td, cc: x.cc, pp: x.pp, ws: x.ws, wg: x.wg, ts: x.ts };   // first forecast per hour and lead
     });
     // hourly checks use the location's main airport when one is listed, else the app's observing station
     const obsId = loc.obs || loc.station || r.obsStation;
@@ -201,6 +201,7 @@ for (const loc of locs) {
           cell.n++; scored++;
           if (ok(f.t) && ok(o.t)) addCase(cell, 't', { e: f.t - o.t });
           if (ok(f.td) && ok(o.td)) addCase(cell, 'td', { e: f.td - o.td });
+          if (ok(f.ts) && ok(o.t)) addCase(cell, 'ts', { e: f.ts - o.t });   // displayed temperature: measures the observation / regional adjustments (not corrected)
           if (ok(f.ws) && ok(o.ws) && f.ws >= 8) addCase(cell, 'ws', { obs: o.ws, fc: f.ws });
           // gusts are only reported when they are 10 kt above the wind; with none reported the gust was at most wind + 10 kt
           if (ok(f.wg) && f.wg >= 15) { if (ok(o.wg)) addCase(cell, 'wg', { obs: o.wg, fc: f.wg }); else if (ok(o.ws) && f.wg > o.ws + 18.5) addCase(cell, 'wg', { obs: o.ws + 18.5, fc: f.wg }); }
@@ -218,6 +219,9 @@ for (const loc of locs) {
     console.log(`${loc.name}: scoring failed (${e.message})`);
   }
 }
+// three cities at a time
+const queue = locs.slice();
+await Promise.all([0, 1, 2].map(async w => { await sleep(w * 3000); while (queue.length) await doLocation(queue.shift()); }));
 await browser.close();
 learning.updated = new Date().toISOString();
 fs.writeFileSync(path.join(root, 'data/snapshots.json'), JSON.stringify(snaps));
