@@ -3120,10 +3120,34 @@ body.no-data #sectionNav { display: none; }
             }).catch(() => null);
         }
 
+        // climate-report sites near a point, best first: the observing station's own site, then the nearest ones within 40 km,
+        // each within 300 m of the location's elevation
+        async function cliCandidates(lat, lon, obsIcao) {
+            try {
+                await _nearestCliSite(lat, lon, obsIcao);   // loads and caches the site list
+                const list = await cliNetPromise;
+                const live = list.filter(s => !s.end || s.end >= new Date(Date.now() - 60 * 864e5).toISOString().slice(0, 10));
+                const out = [];
+                const own = live.find(s => s.id === obsIcao);
+                if (own && distKm(+lat, +lon, own.lat, own.lon) <= 60) out.push({ ...own, km: distKm(+lat, +lon, own.lat, own.lon) });
+                live.filter(s => s !== own).map(s => ({ ...s, km: distKm(+lat, +lon, s.lat, s.lon) })).filter(s => s.km <= 40).sort((a, b) => a.km - b.km).forEach(s => out.push(s));
+                const ok = [];
+                for (const s of out.slice(0, 4)) if (await representative(lat, lon, s.lat, s.lon)) ok.push(s);
+                return ok;
+            } catch (e) { return []; }
+        }
         async function fetchCLI(nws, today, lat, lon) {
             if (lat != null && climOverride(lat, lon)) return null;   // the user picked a station: its own record is used
-            const site = (lat != null) ? await nearestCliSite(lat, lon, nws && nws.obs && nws.obs.stationId) : null;
-            const icao = site ? site.id : (nws && nws.obs && nws.obs.stationId);
+            const obsId = nws && nws.obs && nws.obs.stationId;
+            const cands = lat != null ? await cliCandidates(lat, lon, obsId) : [];
+            const ids = cands.length ? cands.map(s => s.id) : (obsId ? [obsId] : []);
+            for (const icao of ids.slice(0, 3)) {
+                const r = await fetchCLIFor(icao, today).catch(() => null);
+                if (r && ((r.rows && r.rows.length) || (r.prevRows && r.prevRows.length))) return r;
+            }
+            return null;
+        }
+        async function fetchCLIFor(icao, today) {
             if (!icao) return null;
             const y = +today.slice(0, 4);
             const get = async yr => {
@@ -4697,8 +4721,10 @@ body.no-data #sectionNav { display: none; }
             const stnR = await resolveClimateStation(lat, lon, nws);
             for (const sid of (stnR ? stnR.ids : [])) {
                 try {
-                    const r = await fetch(`https://data.rcc-acis.org/StnData?sid=${encodeURIComponent(sid)}&sdate=por&edate=${yest}&elems=maxt,mint,pcpn,snow&meta=name&output=json`);
-                    if (!r.ok) continue;
+                    const u = `https://data.rcc-acis.org/StnData?sid=${encodeURIComponent(sid)}&sdate=por&edate=${yest}&elems=maxt,mint,pcpn,snow&meta=name&output=json`;
+                    let r = await fetch(u).catch(() => null);
+                    if (!r || !r.ok) { await new Promise(res => setTimeout(res, 1500)); r = await fetch(u).catch(() => null); }
+                    if (!r || !r.ok) continue;
                     const j = await r.json();
                     if (!j || j.error || !Array.isArray(j.data) || j.data.length < 3650) continue;
                     const rec = {}, acc = {};
