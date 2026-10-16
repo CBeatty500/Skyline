@@ -2573,7 +2573,7 @@ body.no-data #sectionNav { display: none; }
             if (!climStnPromises[k]) climStnPromises[k] = (async () => {
                 const site = await nearestCliSite(lat, lon, obsIcao);
                 const icao = site ? site.id : obsIcao;
-                const key = `climstn2:${k}`;
+                const key = `climstn3:${k}`;
                 const c = await idb.get(key);
                 if (c && Date.now() - c.t < 30 * 864e5) return c.v;
                 const pretty = n => String(n || '').toLowerCase().replace(/\b[a-z]/g, ch => ch.toUpperCase()).replace(/\bIntl\b/g, 'Intl').replace(/\bAp\b/g, 'Airport');
@@ -2590,10 +2590,12 @@ body.no-data #sectionNav { display: none; }
                     for (const half of [0.3, 0.7, 1.2]) {
                         try {
                             const bb = [+lon - half, +lat - half, +lon + half, +lat + half].map(v => v.toFixed(3)).join(',');
-                            const r = await fetch(`${ACIS}/StnMeta?bbox=${bb}&elems=pcpn&sdate=${sd}&edate=${e}&meta=name,sids,state,ll&output=json`);
+                            const r = await fetch(`${ACIS}/StnMeta?bbox=${bb}&elems=pcpn&sdate=${sd}&edate=${e}&meta=name,sids,state,ll,elev&output=json`);
                             if (!r.ok) continue;
                             const j = await r.json();
-                            const cands = (j.meta || []).map(parseAcisMeta).filter(m => m.ghcn && m.lat != null)
+                            let locE = null; try { locE = (await ptElev([[lat, lon]]))[0]; } catch (e2) {}
+                            const cands = (j.meta || []).map(m => ({ ...parseAcisMeta(m), elevM: m.elev != null && isFinite(+m.elev) ? +m.elev * 0.3048 : null }))
+                                .filter(m => m.ghcn && m.lat != null && (locE == null || m.elevM == null || Math.abs(m.elevM - locE) <= 300))
                                 .map(m => ({ ...m, km: distKm(+lat, +lon, m.lat, m.lon), pri: m.faa ? 0 : /^USW/.test(m.ghcn) ? 0 : /^USC/.test(m.ghcn) ? 1 : 2 }))
                                 .filter(m => m.km <= 80)
                                 .sort((a, b) => (a.km + a.pri * 8) - (b.km + b.pri * 8));
@@ -2836,7 +2838,27 @@ body.no-data #sectionNav { display: none; }
 // Nearest official NWS climate site (sites that publish daily CLI reports). The observation station can be a
         // smaller airport that doesn't measure snow (e.g. Merrill Field in Anchorage), so climate data uses this site.
         let cliNetPromise = null;
+        // terrain elevation (m) for points, from Open-Meteo's 90 m DEM; cached per point
+        async function ptElev(pts) {
+            const keys = pts.map(([a, b]) => `elev1:${(+a).toFixed(3)},${(+b).toFixed(3)}`);
+            const out = await Promise.all(keys.map(k => idb.get(k).catch(() => null)));
+            const miss = pts.map((p, i) => out[i] == null ? i : -1).filter(i => i >= 0);
+            if (miss.length) {
+                const r = await fetch(`https://api.open-meteo.com/v1/elevation?latitude=${miss.map(i => (+pts[i][0]).toFixed(4)).join(',')}&longitude=${miss.map(i => (+pts[i][1]).toFixed(4)).join(',')}`);
+                if (!r.ok) throw new Error('elevation HTTP ' + r.status);
+                const j = await r.json();
+                miss.forEach((i, n) => { const v = j.elevation && j.elevation[n]; if (v != null && isFinite(v)) { out[i] = v; idb.set(keys[i], v).catch(() => {}); } });
+            }
+            return out;
+        }
+        async function representative(lat, lon, sLat, sLon) {
+            try { const [a, b] = await ptElev([[lat, lon], [sLat, sLon]]); return a == null || b == null || Math.abs(a - b) <= 300; }
+            catch (e) { return true; }
+        }
         function nearestCliSite(lat, lon, obsIcao) {
+            return _nearestCliSite(lat, lon, obsIcao).then(async s => (s && !(await representative(lat, lon, s.lat, s.lon))) ? null : s);
+        }
+        function _nearestCliSite(lat, lon, obsIcao) {
             if (!cliNetPromise) cliNetPromise = (async () => {
                 const c = await idb.get('clinet1');
                 if (c && Date.now() - c.t < 30 * 864e5) return c.v;
