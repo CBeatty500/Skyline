@@ -326,6 +326,17 @@ body.no-data #sectionNav { display: none; }
 .dc-stns.hidden { display: none; }
 .dc-stn { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 10px 12px; border-radius: 12px; background: rgba(8,16,34,.34); border: 1px solid rgba(255,255,255,.1); font-size: 13px; }
 .dc-stn:hover { border-color: rgba(125,211,252,.45); } .dc-stn.on { border-color: rgba(125,211,252,.8); box-shadow: 0 0 0 1px rgba(125,211,252,.4); }
+#alertsContainer .al-head { cursor: pointer; user-select: none; flex-wrap: wrap; gap: 6px 10px; }
+#alertsContainer:not(.al-open) .al-head { border-bottom: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; }
+#alertsContainer:not(.al-open) #alertsList { display: none !important; }
+#alertsContainer:not(.al-open) { padding-top: 12px !important; padding-bottom: 12px !important; }
+.al-chips { display: flex; flex-wrap: wrap; gap: 6px; flex: 1 1 auto; min-width: 0; }
+.al-chip { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 999px; white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.al-chip.al-d { background: rgba(244,63,94,.18); border: 1px solid rgba(251,113,133,.55); color: #fecdd3; }
+.al-chip.al-w { background: rgba(245,158,11,.15); border: 1px solid rgba(251,191,36,.5); color: #fde68a; }
+.al-chev { color: #94a3b8; font-size: 12px; transition: transform .2s; } .al-open .al-chev { transform: rotate(180deg); }
+#alertsList > :last-child:nth-child(odd) { }
+@media (min-width: 1024px) { .hero-grid.al-many #alertsList > :last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 4px); } }
 .rec-btn { background: none; border: 0; padding: 0; cursor: pointer; }
 .rec-pop { position: fixed; z-index: 80; max-width: 280px; padding: 8px 11px; border-radius: 10px; background: #1e293b; border: 1px solid rgba(251,191,36,.55); color: #fde68a; font: 500 12px/1.45 'Outfit', system-ui, sans-serif; box-shadow: 0 12px 30px -10px rgba(0,0,0,.7); }
 #heroAlertSlot #alertsContainer { background: rgba(8,16,34,.3); border-color: rgba(255,255,255,.14); box-shadow: none; }
@@ -1523,7 +1534,26 @@ body.no-data #sectionNav { display: none; }
         // none: a small 'no alerts' pill, conditions and today-so-far sit beside the temperature (3 columns on wide screens)
         // few:  alerts fill the space beside the temperature
         // many: alerts get a full-width row above (cards two across), the rest sits below in one row
-        let heroAlertCount = 0;
+        let heroAlertCount = 0, heroAlertItems = [], alertsOpen = false;
+        function alertBar() {
+            const box = document.getElementById('alertsContainer'), head = document.getElementById('alertsHeader');
+            if (!box || !head) return;
+            box.classList.toggle('al-open', alertsOpen);
+            if (!head._bar) {
+                head._bar = true;
+                head.classList.add('al-head');
+                head.setAttribute('role', 'button'); head.tabIndex = 0;
+                const chips = document.createElement('div'); chips.id = 'alertChips'; chips.className = 'al-chips';
+                head.insertBefore(chips, head.lastElementChild);
+                const chev = document.createElement('i'); chev.className = 'fa-solid fa-chevron-down al-chev'; head.appendChild(chev);
+                const tg = () => { alertsOpen = !alertsOpen; alertBar(); try { layoutHeroAlerts(); } catch (e) {} };
+                head.addEventListener('click', tg);
+                head.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tg(); } });
+            }
+            const chips = document.getElementById('alertChips');
+            if (chips) chips.innerHTML = alertsOpen ? '' : heroAlertItems.map(a => `<span class="al-chip ${a.type === 'danger' ? 'al-d' : 'al-w'}">${esc(a.title)}</span>`).join('');
+            head.setAttribute('aria-expanded', String(alertsOpen));
+        }
         function layoutHeroAlerts() {
             const g = document.querySelector('.hero-grid'), box = document.getElementById('alertsContainer'), pill = document.getElementById('alertPill');
             if (!g || !box) return;
@@ -1535,7 +1565,7 @@ body.no-data #sectionNav { display: none; }
             if (!wide) { g.classList.add('al-few'); return; }
             g.classList.add('al-few');
             const main = g.querySelector('.hero-main');
-            const tooTall = n >= 3 || (main && box.scrollHeight > main.offsetHeight + 90);
+            const tooTall = !alertsOpen || n >= 3 || (main && box.scrollHeight > main.offsetHeight + 90);
             if (tooTall) { g.classList.remove('al-few'); g.classList.add('al-many'); }
         }
         window.addEventListener('resize', () => { try { layoutHeroAlerts(); } catch (e) {} });
@@ -4470,6 +4500,8 @@ body.no-data #sectionNav { display: none; }
                         <p class="leading-relaxed opacity-90">${esc(a.text.slice(0, 320))}</p>
                     </div>`).join('');
             heroAlertCount = alerts.length;
+            heroAlertItems = alerts.map(a => ({ type: a.type, title: a.title }));
+            try { alertBar(); } catch (e) {}
             try { layoutHeroAlerts(); } catch (e) {}
         }
 
