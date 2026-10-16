@@ -302,9 +302,9 @@ body.no-data #sectionNav { display: none; }
 .sec-title > i:first-child { color: #7dd3fc !important; width: 18px; text-align: center; }
 .sec-chev { margin-left: auto; color: #94a3b8; font-size: 13px; transition: transform .2s; }
 .sec-card:not(.collapsed) > .sec-head .sec-chev { transform: rotate(180deg); }
-.sec-card.collapsed > :not(.sec-head) { display: none !important; }
+.sec-card.collapsed > :not(.sec-head):not(#_) { display: none !important; }
 .sec-card.collapsed > .sec-head { margin-bottom: 0 !important; }
-.sec-card.collapsed .sec-x { display: none !important; }
+.sec-card.collapsed .sec-x:not(#_) { display: none !important; }
 .sec-card > #afdBody, .sec-card > #maBody { padding: 14px 0 0 !important; border-top: 1px solid rgba(255,255,255,.08) !important; }
 .sec-card > #quickBody { margin-top: 0 !important; }
 .metric-strip > .rec-hi { border-color: rgba(251,113,133,.7); box-shadow: 0 0 0 1px rgba(251,113,133,.35); }
@@ -335,7 +335,8 @@ body.no-data #sectionNav { display: none; }
   .hero-main .hl b { font-size: 21px; } .hero-main .hl small { font-size: 10px; letter-spacing: .06em; } .hero-main .hl { gap: 5px; } }
 .hero .metric-strip { margin-top: 2px; }
 .hero-text { border-top: 1px solid rgba(255,255,255,.14); padding-top: 14px; }
-.hero-text .ho-name { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #fde68a; margin-bottom: 3px; }
+.hero-text .ho-per, .hero-outlook .ho-name { font-size: 11px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #e2e8f0; margin-bottom: 3px; }
+.hero-text .hg-head .ho-name { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #fde68a; margin-bottom: 3px; }
 
 /* desktop alignment: columns in a row end on the same line */
 @media (min-width: 1280px) {
@@ -468,7 +469,8 @@ body.no-data #sectionNav { display: none; }
                     </div>
                     <div id="heroSun" class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 -mt-1 text-xs text-slate-200/90"></div>
                     <div class="hero-text">
-                        <div id="heroNarrLbl" class="ho-name">Today</div>
+                        <div class="hg-head"><span class="ho-name"><i class="fa-solid fa-calendar-week mr-1.5"></i>Forecast</span></div>
+                        <div id="heroNarrLbl" class="ho-per">Today</div>
                         <p id="heroNarrative" class="text-sm text-slate-200/90 leading-relaxed max-w-3xl"></p>
                         <div id="heroOutlook" class="hero-outlook"></div>
                     </div>
@@ -495,8 +497,10 @@ body.no-data #sectionNav { display: none; }
                 </div>
             </div>
 </div>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
-                <div class="lg:col-span-2 flex flex-col min-w-0 temp-col"><!-- Hourly Temp Multi-Model Chart -->
+            <div id="sec-graphs" class="glass-panel rounded-2xl p-5">
+                <div class="graphs-head"><h3 class="flex items-center gap-2"><i class="fa-solid fa-chart-area"></i> Hourly Graphs</h3></div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
+                    <div class="lg:col-span-2 flex flex-col min-w-0 temp-col"><!-- Hourly Temp Multi-Model Chart -->
                     <div class="glass-panel rounded-2xl p-5 border border-slate-800">
                         <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2 mb-2">
                             <i class="fa-solid fa-chart-line text-blue-400"></i> Temperature &amp; Dewpoint
@@ -517,7 +521,7 @@ body.no-data #sectionNav { display: none; }
                             <span><i class="inline-block w-4 h-0.5 align-middle mr-1" style="border-top:2px dashed #2dd4bf"></i>Forecast dewpoint</span>
                         </div>
                     </div></div>
-                <div class="flex flex-col gap-5 chart-precip min-w-0"><!-- Precip Probabilities Chart -->
+                    <div class="flex flex-col gap-5 chart-precip min-w-0"><!-- Precip Probabilities Chart -->
                     <div class="glass-panel rounded-2xl p-5 border border-slate-800">
                         <h3 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
                             <i class="fa-solid fa-cloud-showers-heavy text-indigo-400"></i> Hourly Precipitation Chance
@@ -527,6 +531,7 @@ body.no-data #sectionNav { display: none; }
                             <canvas id="precipChart"></canvas>
                         </div>
                     </div></div>
+                </div>
             </div>
             <div id="sec-forecast">            <!-- 5-Day Best Bet Operational Grid -->
             <div>
@@ -553,7 +558,7 @@ body.no-data #sectionNav { display: none; }
 
             <div id="sec-quick" class="glass-panel rounded-2xl p-5 md:p-6">
                 <button type="button" onclick="toggleQuickView()" class="w-full flex flex-wrap items-center justify-between gap-2 text-left" aria-expanded="false" id="quickToggle">
-                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-table-cells text-amber-400"></i> Quick View Forecast &amp; Climate</h3>
+                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-table-cells text-amber-400"></i> Quick Glance at the Week Ahead</h3>
                     <span class="flex items-center gap-3"><span id="quickViewSource" class="text-[11px] text-slate-400 font-mono hidden sm:inline"></span><i id="quickChevron" class="fa-solid fa-chevron-down text-slate-400 transition-transform"></i></span>
                 </button>
                 <div id="quickBody" class="hidden overflow-x-auto -mx-1 px-1 mt-3">
@@ -1400,8 +1405,7 @@ body.no-data #sectionNav { display: none; }
         const SECTIONS = [
             { key: 'details', panel: () => document.querySelector('#sec-details > .glass-panel'), title: p => p.querySelector('h3') },
             { key: 'hourly', panel: () => document.querySelector('#sec-hourly > .glass-panel'), title: p => p.querySelector('h3 > span') },
-            { key: 'temp', panel: () => document.querySelector('.temp-col > .glass-panel'), title: p => p.querySelector('h3'), onOpen: () => { try { renderCharts(); } catch (e) {} } },
-            { key: 'precip', panel: () => document.querySelector('.chart-precip > .glass-panel'), title: p => p.querySelector('h3'), onOpen: () => { try { renderCharts(); } catch (e) {} } },
+            { key: 'graphs', panel: () => document.getElementById('sec-graphs'), title: p => p.querySelector('.graphs-head h3'), onOpen: () => { try { renderCharts(); } catch (e) {} } },
             { key: 'forecast', panel: () => document.querySelector('#sec-forecast > div'), title: p => p.querySelector('h3 > span') },
             { key: 'afd', panel: () => document.getElementById('afdPanel'), head: () => document.getElementById('afdToggle'), title: h => h.querySelector('span'), closed: true,
               onOpen: () => { afdOpen = true; loadAFD(); }, onClose: () => { afdOpen = false; } },
