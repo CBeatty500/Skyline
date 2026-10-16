@@ -1532,3 +1532,34 @@ _r("""                                out.obsToday = (t.features || []).map(f =>
                                     const have = new Set(out.obsToday.filter(o => o && o.timestamp).map(o => Math.round(new Date(o.timestamp) / 120000)));
                                     out.obsToday = [...out.obsToday, ...nwsRows.filter(o => o && o.timestamp && !have.has(Math.round(new Date(o.timestamp) / 120000)))].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                                 } else out.obsToday = nwsRows;""")
+# ---- current conditions use the same station the verification uses for each tracked city ----
+_r("""        function preferredStation(lat, lon) {
+            if (Math.abs(Number(lat) - 39.0437) < 0.2 && Math.abs(Number(lon) + 77.4875) < 0.2)
+                return { id: 'KIAD', name: 'Washington/Dulles International Airport', elev: 95, lat: 38.9348, lon: -77.4473 };
+            return null;
+        }""", """        // tracked cities (data/locations.json): the station their forecasts are verified against; elevation comes from the report
+        const VERIFY_STATIONS = [
+            [39.0437, -77.4875, 'KIAD', 'Washington Dulles International Airport', 38.9348, -77.4473],
+            [38.9846, -77.5397, 'KIAD', 'Washington Dulles International Airport', 38.9348, -77.4473],
+            [38.8015, -77.2664, 'KDAA', 'Davison Army Airfield', 38.7150, -77.1810],
+            [38.8951, -77.0364, 'KDCA', 'Washington Reagan National Airport', 38.8483, -77.0342],
+            [40.7143, -74.0060, 'KLGA', 'New York LaGuardia Airport', 40.7769, -73.8740],
+            [39.7392, -104.9903, 'KDEN', 'Denver International Airport', 39.8466, -104.6562],
+            [41.8500, -87.6500, 'KMDW', 'Chicago Midway Airport', 41.7861, -87.7524],
+            [47.6062, -122.3321, 'KSEA', 'Seattle-Tacoma International Airport', 47.4447, -122.3144],
+            [37.6485, -118.9721, 'KMMH', 'Mammoth Yosemite Airport', 37.6241, -118.8378],
+            [61.2181, -149.9003, 'PANC', 'Anchorage Ted Stevens International Airport', 61.1744, -149.9964],
+            [25.7617, -80.1918, 'KMIA', 'Miami International Airport', 25.7881, -80.3169],
+            [34.0522, -118.2437, 'KCQT', 'Los Angeles Downtown/USC', 34.0236, -118.2911],
+            [33.4484, -112.0740, 'KPHX', 'Phoenix Sky Harbor International Airport', 33.4278, -112.0037],
+            [38.6270, -90.1994, 'KSTL', 'St. Louis Lambert International Airport', 38.7525, -90.3734],
+            [21.3069, -157.8583, 'PHNL', 'Honolulu International Airport', 21.3245, -157.9251],
+            [42.3601, -71.0589, 'KBOS', 'Boston Logan International Airport', 42.3606, -71.0097],
+            [32.7767, -96.7970, 'KDAL', 'Dallas Love Field', 32.8471, -96.8518],
+            [44.9778, -93.2650, 'KMSP', 'Minneapolis-St. Paul International Airport', 44.8831, -93.2289]
+        ];
+        function preferredStation(lat, lon) {
+            let best = null;
+            VERIFY_STATIONS.forEach(([la, lo, id, name, sla, slo]) => { const km = distKm(+lat, +lon, la, lo); if (km <= 12 && (!best || km < best.km)) best = { km, id, name, lat: sla, lon: slo, elev: null }; });
+            return best;
+        }""")
