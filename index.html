@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyline · Weather</title>
+    <title>Skyline Weather</title>
     <meta name="description" content="Skyline: a meteorologist's weather dashboard with live station observations, an observation-corrected multi-model forecast, and official climate records.">
     <meta name="theme-color" content="#0b2f63">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb84d'/%3E%3Cstop offset='1' stop-color='%23ff7a59'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Ccircle cx='26' cy='26' r='10' fill='%231a1205'/%3E%3Cpath d='M22 48h22a9 9 0 0 0 0-18 12 12 0 0 0-22 4 7 7 0 0 0 0 14z' fill='%23fff7ec'/%3E%3C/svg%3E">
@@ -317,7 +317,7 @@ body.no-data #sectionNav { display: none; }
             </div>
             <button onclick="searchAndFetch()" class="go-btn shrink-0"><span id="generateBtnText">Fetch</span><div id="generateLoader" class="loader hidden"></div></button>
             <button onclick="refreshData()" id="refreshTop" class="unit-btn shrink-0" title="Refresh data" aria-label="Refresh data"><i class="fa-solid fa-rotate-right"></i><span>Refresh</span></button>
-            <button onclick="toggleUnits()" id="unitToggleBtn" class="unit-btn shrink-0" title="Switch units"><i class="fa-solid fa-temperature-half"></i><span id="unitToggleLabel">°F · in · mph</span></button>
+            <button onclick="toggleUnits()" id="unitToggleBtn" class="unit-btn shrink-0" title="Switch units"><i class="fa-solid fa-temperature-half"></i><span id="unitToggleLabel">°F, in, mph</span></button>
         </div>
         <div class="wrap pb-2.5 rail">
             <span class="rail-label">Places</span><button onclick="useMyLocation()" id="myLocBtn" class="chip" title="Use my location"><i class="fa-solid fa-location-crosshairs mr-1.5 text-sky-300"></i>My location</button><button onclick="quickSelect('Ashburn, VA', 39.0437, -77.4875)" class="chip">Ashburn</button><button onclick="quickSelect('Washington DC', 38.8951, -77.0364)" class="chip">DC</button><button onclick="quickSelect('New York', 40.7143, -74.006)" class="chip">New York</button><button onclick="quickSelect('Denver', 39.7392, -104.9903)" class="chip">Denver</button><button onclick="quickSelect('Chicago', 41.85, -87.65)" class="chip">Chicago</button><button onclick="quickSelect('Seattle', 47.6062, -122.3321)" class="chip">Seattle</button><button onclick="quickSelect('London', 51.5085, -0.1257)" class="chip">London</button><button onclick="quickSelect('Tokyo', 35.6895, 139.6917)" class="chip">Tokyo</button>
@@ -648,7 +648,7 @@ body.no-data #sectionNav { display: none; }
                 <div id="maBody" class="hidden border-t border-white/10 p-5 space-y-6"></div>
             </div>
 
-            <footer class="text-center text-xs text-slate-400 py-8 border-t border-white/10">Skyline &bull; NOAA NWS, Open-Meteo multi-model ensemble, NASA POWER, NOAA GHCN normals, Iowa Environmental Mesonet climate reports.</footer>
+            <footer class="text-center text-xs text-slate-400 py-8 border-t border-white/10">Skyline: NOAA NWS, Open-Meteo multi-model ensemble, NASA POWER, NOAA GHCN normals, Iowa Environmental Mesonet climate reports.</footer>
         </div>
     </main>
 
@@ -742,7 +742,7 @@ body.no-data #sectionNav { display: none; }
 
         function toggleUnits() {
             isImperial = !isImperial;
-            document.getElementById('unitToggleLabel').innerText = isImperial ? "°F · in · mph" : "°C · mm · km/h";
+            document.getElementById('unitToggleLabel').innerText = isImperial ? "°F, in, mph" : "°C, mm, km/h";
             if (ensembleData) { renderDashboard(); renderDiscussion(); }
         }
 
@@ -1288,7 +1288,7 @@ body.no-data #sectionNav { display: none; }
             const tend = pressureTendency();
             const spread = n(cc.temp) && n(cc.dew) ? (cc.temp - cc.dew) * (isImperial ? 1.8 : 1) : null;
             const layers = Array.isArray(cc.layers) ? cc.layers : null;
-            const layerTxt = layers && layers.length ? layers.map(l => `${l.amount}${l.base && l.base.value != null ? ' ' + (Math.round(l.base.value * 3.28084 / 100) * 100).toLocaleString() + ' ft' : ''}`).join(' · ') : null;
+            const layerTxt = layers && layers.length ? layers.map(l => `${l.amount}${l.base && l.base.value != null ? ' ' + (Math.round(l.base.value * 3.28084 / 100) * 100).toLocaleString() + ' ft' : ''}`).join(', ') : null;
             const ceilL = layers ? layers.find(l => ['BKN', 'OVC', 'VV'].includes(l.amount) && l.base && l.base.value != null) : null;
             const hh = ensembleData.hourly;
             const uvv = hh && hh.uv_index ? hh.uv_index[hourlyStart()] : null;
@@ -1297,8 +1297,8 @@ body.no-data #sectionNav { display: none; }
                 ['fa-temperature-half', 'text-rose-400', 'Temperature', formatTemp(cc.temp, 1), `Feels like ${formatTemp(cc.apparent, 1)}`],
                 ['fa-droplet', 'text-teal-400', 'Dewpoint', `${formatTemp(cc.dew, 1)}${n(cc.rh) ? ` <span class="text-xs font-semibold text-sky-200/90 ml-1">RH ${Math.round(cc.rh)}%</span>` : ''}`, ''],
                 pressureMode === 'stn'
-                    ? ['fa-arrows-down-to-line', 'text-indigo-300', 'Station Pressure', n(cc.stnP) ? `${cc.stnP.toFixed(1)} mb` : '--', `${n(cc.stnP) ? inHg(cc.stnP) + ' · ' : 'Not reported · '}tap for sea-level`, true]
-                    : ['fa-gauge-high', 'text-indigo-400', 'Sea-Level Pressure', n(cc.pressure) ? `${cc.pressure.toFixed(1)} mb` : '--', `${inHg(cc.pressure)}${tend ? ` · ${tend.text} (${tend.d > 0 ? '+' : ''}${tend.d.toFixed(1)} mb/3h)` : ''} · tap for station`, true],
+                    ? ['fa-arrows-down-to-line', 'text-indigo-300', 'Station Pressure', n(cc.stnP) ? `${cc.stnP.toFixed(1)} mb` : '--', `${n(cc.stnP) ? inHg(cc.stnP) + ', ' : 'Not reported, '}tap for sea-level`, true]
+                    : ['fa-gauge-high', 'text-indigo-400', 'Sea-Level Pressure', n(cc.pressure) ? `${cc.pressure.toFixed(1)} mb` : '--', `${inHg(cc.pressure)}${tend ? `, ${tend.text} (${tend.d > 0 ? '+' : ''}${tend.d.toFixed(1)} mb/3h)` : ''}, tap for station`, true],
                 ['fa-wind', 'text-teal-400', 'Wind (from)', windMain, windSub],
                 ['fa-eye', 'text-sky-300', 'Visibility', fmtVis(cc.vis), cc.sourceLabel.startsWith('Observed') ? 'Reported' : 'Model'],
                 ['fa-cloud', 'text-slate-300', 'Cloud Cover', n(cc.cloud) ? `${Math.round(cc.cloud)}%` : '--', layerTxt || 'Model analysis'],
@@ -1315,7 +1315,7 @@ body.no-data #sectionNav { display: none; }
                     <div class="text-base font-bold text-slate-100 mt-0.5 font-mono">${val}</div>
                     <div class="text-[10px] text-slate-400 font-mono mt-0.5 leading-snug">${sub || '&nbsp;'}</div>
                 </div>`).join('');
-            document.getElementById('obsDetailSource').innerText = `${cc.sourceLabel} · ${cc.timeLabel}`;
+            document.getElementById('obsDetailSource').innerText = `${cc.sourceLabel}, ${cc.timeLabel}`;
             document.getElementById('obsMetar').innerHTML = cc.metar
                 ? `<div class="mt-3 text-[11px] font-mono text-slate-300 bg-slate-950/60 border border-slate-800 rounded-lg p-2 break-all"><span class="text-slate-500 mr-1">METAR</span>${esc(cc.metar)}</div>` : '';
         }
@@ -1371,7 +1371,7 @@ body.no-data #sectionNav { display: none; }
             const col = hot ? 'rose' : cold ? 'sky' : 'indigo';
             const what = hot ? 'record high' : cold ? 'record low' : r.kind === 'snow' ? 'record snowfall' : 'record rainfall';
             const prev = r.recF != null ? `${r.recF}°F` : r.recIn != null ? `${r.recIn.toFixed(2)}"` : '';
-            const txt = `${r.tie ? 'Ties' : 'New'} ${what}${prev ? ` · previous ${prev}${r.yr ? ` (${r.yr})` : ''}` : ''}`;
+            const txt = `${r.tie ? 'Ties' : 'New'} ${what}${prev ? `, previous ${prev}${r.yr ? ` (${r.yr})` : ''}` : ''}`;
             return `<div class="mt-2 inline-flex items-center gap-1.5 text-[11px] font-bold rounded-full px-2.5 py-1 bg-${col}-500/20 border border-${col}-400/60 text-${col}-200"><i class="fa-solid fa-trophy text-amber-300"></i>${esc(txt)}</div>`;
         }
 
@@ -1382,8 +1382,8 @@ body.no-data #sectionNav { display: none; }
             const so = getTodaySoFar();
             const dp = (so.hiApprox || so.loApprox) ? 0 : 1; // high and low share the same precision
             const tiles = [
-                ['fa-arrow-trend-up', 'text-rose-400', 'High So Far', n(so.hi) ? formatTemp(so.hi, dp) : '--', `${so.hiT ? (so.hiT.startsWith('in ') ? so.hiT.slice(3) : 'at ' + so.hiT) + ' · ' : ''}${so.src}`],
-                ['fa-arrow-trend-down', 'text-sky-400', 'Low So Far', n(so.lo) ? formatTemp(so.lo, dp) : '--', `${so.loT ? (so.loT.startsWith('in ') ? so.loT.slice(3) : 'at ' + so.loT) + ' · ' : ''}${so.src}`],
+                ['fa-arrow-trend-up', 'text-rose-400', 'High So Far', n(so.hi) ? formatTemp(so.hi, dp) : '--', `${so.hiT ? (so.hiT.startsWith('in ') ? so.hiT.slice(3) : 'at ' + so.hiT) + ', ' : ''}${so.src}`],
+                ['fa-arrow-trend-down', 'text-sky-400', 'Low So Far', n(so.lo) ? formatTemp(so.lo, dp) : '--', `${so.loT ? (so.loT.startsWith('in ') ? so.loT.slice(3) : 'at ' + so.loT) + ', ' : ''}${so.src}`],
                 ['fa-umbrella', 'text-blue-400', 'Precipitation So Far', n(so.precip) ? formatPrecip(so.precip) : '--', so.precipSrc || 'No data']
             ];
             const recs = recordsToday(), recFor = k => recs.find(r => r.kind === k);
@@ -1401,7 +1401,7 @@ body.no-data #sectionNav { display: none; }
             }).join('');
             const tz = ensembleData.timezone_abbreviation || '';
             const d = new Date(ensembleData.daily.time[0] + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
-            document.getElementById('todaySoFarSource').innerText = `${d} · midnight to now (${tz})`;
+            document.getElementById('todaySoFarSource').innerText = `${d}, midnight to now (${tz})`;
         }
 
         // High / low and precipitation accumulated so far today (location-local calendar day)
@@ -1667,7 +1667,7 @@ body.no-data #sectionNav { display: none; }
             if (a.ozone != null) parts.push(`O₃ ${Math.round(a.ozone)} µg/m³`);
             return [['fa-lungs', 'text-slate-300', 'Air Quality (US AQI)',
                 `<span style="color:${hex}">${v}</span> <span class="text-xs font-semibold" style="color:${hex}">${name}</span>`,
-                `${dom && v > 0 ? 'Main pollutant: ' + dom + ' · ' : ''}${parts.join(' · ')}${parts.length ? ' · ' : ''}model estimate`,
+                `${dom && v > 0 ? 'Main pollutant: ' + dom + ', ' : ''}${parts.join(', ')}${parts.length ? ', ' : ''}model estimate`,
                 false, `background:${hex}22;border-color:${hex}99;`]];
         }
 
@@ -1677,7 +1677,7 @@ body.no-data #sectionNav { display: none; }
             if (!p) return;
             if (!nwsOffice) { p.classList.add('hidden'); return; }
             p.classList.remove('hidden');
-            document.getElementById('afdOffice').innerText = `· NWS ${nwsOffice}`;
+            document.getElementById('afdOffice').innerText = `NWS ${nwsOffice}`;
             document.getElementById('afdIssued').innerText = '';
             if (afdOpen) loadAFD(); else document.getElementById('afdText').innerHTML = '';
         }
@@ -1891,7 +1891,7 @@ body.no-data #sectionNav { display: none; }
             }
             const o = nws.obs;
             const km = (o.stationLat != null && o.stationLon != null) ? distKm(currentLoc.lat, currentLoc.lon, o.stationLat, o.stationLon) : null;
-            return { daily, yStart, errors: [], sources: ['rain gauge'], failed: false, gauge: { label: `${id} · ${o.stationName || 'airport gauge'}`, km, filled: 0 } };
+            return { daily, yStart, errors: [], sources: ['rain gauge'], failed: false, gauge: { label: `${id}, ${o.stationName || 'airport gauge'}`, km, filled: 0 } };
         }
 
 // ---------- Climate station resolver (ACIS, the database behind NWS climate reports) ----------
@@ -1983,9 +1983,9 @@ body.no-data #sectionNav { display: none; }
                 const stn = await resolveClimateStation(lat, lon, nws);
                 if (stn && yest >= yStart) {
                     const g = await acisDaily(stn, 'pcpn', yStart, yest, v => v * 25.4);
-                    if (g) return { daily: g.daily, yStart, errors: [], sources: ['rain gauge'], failed: false, gauge: { label: `${stn.label} · ${stn.name}`, km: stn.km, filled: 0 } };
+                    if (g) return { daily: g.daily, yStart, errors: [], sources: ['rain gauge'], failed: false, gauge: { label: `${stn.label}, ${stn.name}`, km: stn.km, filled: 0 } };
                 }
-                if (stn && yest < yStart) return { daily: {}, yStart, errors: [], sources: ['rain gauge'], failed: false, gauge: { label: `${stn.label} · ${stn.name}`, km: stn.km, filled: 0 } };
+                if (stn && yest < yStart) return { daily: {}, yStart, errors: [], sources: ['rain gauge'], failed: false, gauge: { label: `${stn.label}, ${stn.name}`, km: stn.km, filled: 0 } };
             } catch (e) {}
             const est = await fetchPrecipEstimates(lat, lon, today);
             est.estimate = true;
@@ -2266,8 +2266,8 @@ body.no-data #sectionNav { display: none; }
             const todayIn = (so.precip !== null && so.precip !== undefined) ? so.precip / IN2MM : 0;
             const dayNorm = cliVal(last.precip_normal);
             const todayNormIn = dayNorm ? dayNorm.v * frac : 0;
-            srcEl.innerText = `${c.station} · NWS climate report · through ${fmtD(last.valid)}`;
-            const sep = '<span class="inline-block mx-2.5 opacity-50">·</span>';
+            srcEl.innerText = `${c.station}, NWS climate report, through ${fmtD(last.valid)}`;
+            const sep = '<span>, </span>';
             const avgLine = (avgIn, totIn, fmt) => {
                 if (avgIn === null) return '';
                 if (avgIn < 0.005 && totIn < 0.005) return `Average to date: <b class="font-mono">${fmt(0)}</b>`;
@@ -2276,7 +2276,7 @@ body.no-data #sectionNav { display: none; }
             };
             const pIn = v => formatPrecip(v * IN2MM), sIn = v => formatSnow(v * IN2CM);
             const show = (x, extra, f) => (x && x.t && x.v + extra < 0.005) ? 'T' : f(x ? x.v + extra : extra);
-            const note = `Measured · through ${fmtD(last.valid)} + today so far`;
+            const note = `Measured, through ${fmtD(last.valid)} + today so far`;
 
             // RAINFALL ONLY. Official precipitation is liquid equivalent and includes melted snow and sleet, so on days
             // with snowfall the snow's water content (snowfall / snow-to-liquid ratio for that day's temperatures) is removed.
@@ -2322,7 +2322,7 @@ body.no-data #sectionNav { display: none; }
             const rmN = pmN ? Math.max(0, pmN.v + todayNormIn - (smN0 ? smN0.v / 10 : 0)) : null;
             const ryN = pyN ? Math.max(0, pyN.v + todayNormIn - ySnowNormIn / 10) : null;
             const rShow = (v, t, miss) => (t && v < 0.005) ? 'T' : `${miss ? '≥ ' : ''}${pIn(v)}`;
-            const rNote = miss => `Through ${fmtD(last.valid)} + today${miss ? ` · ${miss} day(s) missing` : ''}`;
+            const rNote = miss => `Through ${fmtD(last.valid)} + today${miss ? `, ${miss} day(s) missing` : ''}`;
             let html = '';
             if (seenM || seenY || todayRain > 0) {
                 html += tile(`${monthName} Rainfall`, rShow(rm + todayRain, rmT, missM), rNote(missM), (rmN !== null && !missM) ? avgLine(rmN, rm + todayRain, pIn) : '');
@@ -2358,8 +2358,8 @@ body.no-data #sectionNav { display: none; }
                 let first = null, latest = null;
                 c.rows.forEach(o => { if (o.valid >= sStart) { const v = cliVal(o.snow); if (v && (v.v > 0 || v.t)) { first = first || o.valid; latest = o.valid; } } });
                 const late = +today.slice(5, 7) >= 4 && +today.slice(5, 7) <= 6;
-                const sNote = (first ? `First snow ${fmtD(first)}${latest !== first ? `${sep}${late ? 'last' : 'latest'} ${fmtD(latest)}` : ''}` : 'No snow yet this season') + ` · through ${fmtD(last.valid)}`;
-                const snowNote = `Measured snow + sleet depth · through ${fmtD(last.valid)}`;
+                const sNote = (first ? `First snow ${fmtD(first)}${latest !== first ? `${sep}${late ? 'last' : 'latest'} ${fmtD(latest)}` : ''}` : 'No snow yet this season') + `, through ${fmtD(last.valid)}`;
+                const snowNote = `Measured snow + sleet depth, through ${fmtD(last.valid)}`;
                 const sy0 = +sStart.slice(0, 4);
                 if (showMonth) html += tile(`${monthName} Snow & Sleet`, sm ? show(sm, 0, sIn) : '--', snowNote, sm && smN ? avgLine(smN.v, sm.v, sIn) : '');
                 html += tile(`${sy0}–${String(sy0 + 1).slice(2)} Season Snow & Sleet`, ss ? show(ss, 0, sIn) : '--', sNote, ss && ssN ? avgLine(ssN.v, ss.v, sIn) : '');
@@ -2394,10 +2394,10 @@ body.no-data #sectionNav { display: none; }
             const dist = km => isImperial ? `${Math.round(km * 0.621)} mi` : `${Math.round(km)} km`;
             let prefix = '';
             if (pt.estimate) {
-                srcEl.innerText = 'Estimate · no rain gauge nearby';
+                srcEl.innerText = 'Estimate, no rain gauge nearby';
                 prefix = 'Estimated, no rain gauge nearby. ';
             } else {
-                srcEl.innerText = `Rain gauge · ${pt.gauge.label || pretty(pt.gauge.name)}${pt.gauge.km != null ? ' · ' + dist(pt.gauge.km) + ' away' : ''}`;
+                srcEl.innerText = `Rain gauge, ${pt.gauge.label || pretty(pt.gauge.name)}${pt.gauge.km != null ? ', ' + dist(pt.gauge.km) + ' away' : ''}`;
             }
             // today's portion: station-measured when available, otherwise the model's hourly total so far
             const so = getTodaySoFar();
@@ -2433,13 +2433,13 @@ body.no-data #sectionNav { display: none; }
                 if (!nrm && !gn) return precipNormals && precipNormals.error ? `Average unavailable (${esc(precipNormals.error)}). <a href="#" onclick="retryPrecipNormals(); return false;" class="text-blue-400 underline">Retry</a>` : 'Average to date: loading…';
                 const pct = avg > 0.05 ? Math.round(100 * total / avg) : null;
                 const diff = total - avg;
-                return `Average to date: <b class="font-mono">${formatPrecip(avg)}</b>${hasMiss || pct === null ? '' : `<div class="mt-0.5">${diff >= 0 ? '+' : '−'}${formatPrecip(Math.abs(diff))} vs. normal<span class="inline-block mx-2.5 opacity-50">·</span>${pct}% of average</div>`}`;
+                return `Average to date: <b class="font-mono">${formatPrecip(avg)}</b>${hasMiss || pct === null ? '' : `<div class="mt-0.5">${diff >= 0 ? '+' : '−'}${formatPrecip(Math.abs(diff))} vs. normal<span>, </span>${pct}% of average</div>`}`;
             };
             const extras = [];
             if (!pt.estimate && pt.gauge.filled) extras.push(`${pt.gauge.filled} day(s) filled from nearby gauges`);
             if (obsFilled) extras.push(`${obsFilled} recent day(s) from station reports`);
             const fmt = (mm, miss) => `${miss > 0 ? '≥ ' : ''}${formatPrecip(mm + todayMm)}`;
-            const note = (miss, d) => `${prefix}${miss > 0 ? `${miss} of ${d} past days unavailable · ` : `${d} past days · `}${extras.length ? extras.join(' · ') + ' · ' : ''}${todayNote}.${(miss > 0 || pt.estimate) ? retry : ''}`;
+            const note = (miss, d) => `${prefix}${miss > 0 ? `${miss} of ${d} past days unavailable, ` : `${d} past days, `}${extras.length ? extras.join(', ') + ', ' : ''}${todayNote}.${(miss > 0 || pt.estimate) ? retry : ''}`;
             grid.innerHTML = tile(`${monthName} Rainfall`, fmt(mtd, missM), note(missM, daysM), avgLine(avgM, mtd + todayMm, missM > 0)) + tile(`${today.slice(0, 4)} Rainfall`, fmt(ytd, missY), note(missY, daysY), avgLine(avgY, ytd + todayMm, missY > 0));
 
             // Snowfall in inches of snow (not liquid water): shown when there is snow this month/year or a snowy average
@@ -2459,17 +2459,17 @@ body.no-data #sectionNav { display: none; }
                 const sumSn = (from, to) => { let t = 0; for (let dt = new Date(from + 'T00:00:00Z'); dt.toISOString().slice(0, 10) < to; dt.setUTCDate(dt.getUTCDate() + 1)) t += sno[dt.toISOString().slice(5, 10)] || 0; return t; };
                 const avgS = (gn && gn.mtdSnowT != null && gn.mtdSnowY != null) ? gn.mtdSnowY + (gn.mtdSnowT - gn.mtdSnowY) * frac
                     : sno ? sumSn(mStart, today) + (sno[today.slice(5)] || 0) * frac : null;
-                const sAvg = avgS === null ? '' : `Average to date: <b class="font-mono">${formatSnow(avgS)}</b>${avgS > 0.5 ? `<div class="mt-0.5">${sm - avgS >= 0 ? '+' : '−'}${formatSnow(Math.abs(sm - avgS))} vs. normal<span class="inline-block mx-2.5 opacity-50">·</span>${Math.round(100 * sm / avgS)}% of average</div>` : ''}`;
+                const sAvg = avgS === null ? '' : `Average to date: <b class="font-mono">${formatSnow(avgS)}</b>${avgS > 0.5 ? `<div class="mt-0.5">${sm - avgS >= 0 ? '+' : '−'}${formatSnow(Math.abs(sm - avgS))} vs. normal<span>, </span>${Math.round(100 * sm / avgS)}% of average</div>` : ''}`;
                 const thru = new Date(sn.through + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                const note2 = `${sn.station} recorded · through ${thru}`;
+                const note2 = `${sn.station} recorded, through ${thru}`;
                 const fS = (cm, tr) => (cm < 0.05 && tr) ? 'T' : formatSnow(cm);
                 const fmtD = d => new Date(d + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 const sy0 = +sn.sStart.slice(0, 4);
                 const seasonLabel = `${sy0}–${String(sy0 + 1).slice(2)} Season Snowfall`;
                 const inSpringTail = +today.slice(5, 7) >= 4 && +today.slice(5, 7) <= 6; // after the usual last snow, the season is effectively over
                 const seasonNote = firstSnow
-                    ? `First snow ${fmtD(firstSnow)}${lastSnow && lastSnow !== firstSnow ? ` · ${inSpringTail ? 'last' : 'latest'} snow ${fmtD(lastSnow)}` : ''} · ${note2}`
-                    : `No snow yet this season · ${note2}`;
+                    ? `First snow ${fmtD(firstSnow)}${lastSnow && lastSnow !== firstSnow ? `, ${inSpringTail ? 'last' : 'latest'} snow ${fmtD(lastSnow)}` : ''}, ${note2}`
+                    : `No snow yet this season, ${note2}`;
                 const mNext = (() => { const d = new Date(mStart + 'T00:00:00Z'); d.setUTCMonth(d.getUTCMonth() + 1); return d.toISOString().slice(0, 10); })();
                 const monthNorm = gn && gn.monthSnowNorm != null ? gn.monthSnowNorm : sno ? sumSn(mStart, mNext) : null;
                 // snow is "usual" this month when the station's 1991-2020 normal is at least 0.1 in; with no normal available, only when snow has actually fallen
@@ -3013,7 +3013,7 @@ body.no-data #sectionNav { display: none; }
             if (ps && Array.isArray(only)) ps = ps.filter(p => only.includes(p.label));
             if (ps) ps = ps.filter(p => !p.past);   // periods that are over drop off
             if (!ps || !ps.length) return '';
-            return `<div class="pstrip">${ps.map(p => `<div class="pcell${p.past ? ' past' : ''}" title="${esc(p.cond.text)}${p.pp >= 15 ? ' · ' + Math.round(p.pp) + '% chance of precipitation' : ''}"><span class="plabel">${p.label}</span>${iconHtml(p.cond, p.pp, 'text-lg')}</div>`).join('')}</div>`;
+            return `<div class="pstrip">${ps.map(p => `<div class="pcell${p.past ? ' past' : ''}" title="${esc(p.cond.text)}${p.pp >= 15 ? ', ' + Math.round(p.pp) + '% chance of precipitation' : ''}"><span class="plabel">${p.label}</span>${iconHtml(p.cond, p.pp, 'text-lg')}</div>`).join('')}</div>`;
         }
 
         // Recorded snowfall only: the station's measured daily snowfall (ACIS, threaded record). No model estimates.
@@ -3059,7 +3059,7 @@ body.no-data #sectionNav { display: none; }
             const amt = () => `<span class="text-blue-200">${formatPrecip(p.rain)}</span>${p.snow >= 0.05 ? ` <span class="text-cyan-200">+ ${formatSnow(p.snow)} snow</span>` : ''} <span class="text-slate-400">${p.pp}%</span>`;
             if (i === 0 && p.soFar !== null) {
                 const sf = `<span class="${p.soFar > 0 ? 'text-blue-200 font-semibold' : 'text-slate-400'}">${formatPrecip(p.soFar)}</span>`;
-                return p.expected ? `${sf} <span class="text-slate-500">·</span> ${amt().replace('<span class="text-blue-200">', '<span class="text-blue-200">+')}` : sf;
+                return p.expected ? `${sf} <span class="text-slate-500">,</span> ${amt().replace('<span class="text-blue-200">', '<span class="text-blue-200">+')}` : sf;
             }
             return p.expected ? amt() : '<span class="text-slate-500">—</span>';
         }
@@ -3129,7 +3129,7 @@ body.no-data #sectionNav { display: none; }
                 r.metar = o.rawMessage || null;
                 r.layers = Array.isArray(o.cloudLayers) ? o.cloudLayers : null;
                 r.wx = Array.isArray(o.presentWeather) ? o.presentWeather.map(w => w.rawString).filter(Boolean) : null;
-                r.sourceLabel = `Observed · ${o.stationId}`;
+                r.sourceLabel = `Observed at ${o.stationId}`;
                 r.timeLabel = `As of ${new Date(o.timestamp).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', timeZone: ensembleData.timezone })} ${tzA}`;
             }
             return r;
@@ -3184,7 +3184,7 @@ body.no-data #sectionNav { display: none; }
             const sp = Math.max(bb.spreadHi, bb.spreadLo ?? 0);
             const [t, c] = sp < 1.5 ? ['High', 'text-emerald-300/80'] : sp < 3 ? ['Moderate', 'text-amber-300/80'] : ['Low', 'text-rose-300/80'];
             const f = v => (v === null || v === undefined) ? '--' : `${(isImperial ? v * 1.8 : v).toFixed(1)}°`;
-            return `<span>Consensus <span class="${c} font-semibold">${t}</span></span><span>spread H ${f(bb.spreadHi)} · L ${f(bb.spreadLo)}</span>`;
+            return `<span>Consensus <span class="${c} font-semibold">${t}</span></span><span>spread H ${f(bb.spreadHi)}, L ${f(bb.spreadLo)}</span>`;
         }
 
         function updateConfidenceBadge() {
@@ -3192,7 +3192,7 @@ body.no-data #sectionNav { display: none; }
             const sp = modelSpread();
             if (sp === null) { el.innerText = 'Single-Model Data'; el.className = 'text-xs bg-slate-500/20 text-slate-300 border border-slate-500/40 px-2.5 py-1 rounded font-medium'; return; }
             const [t, c] = sp < 1.5 ? ['High Model Consensus', 'emerald'] : sp < 3 ? ['Moderate Consensus', 'amber'] : ['Low Consensus', 'rose'];
-            el.innerText = `${t} · ${(isImperial ? sp * 1.8 : sp).toFixed(1)}° spread`;
+            el.innerText = `${t}, ${(isImperial ? sp * 1.8 : sp).toFixed(1)}° spread`;
             el.className = `text-xs bg-${c}-500/20 text-${c}-300 border border-${c}-500/40 px-2.5 py-1 rounded font-medium`;
         }
 
@@ -3269,7 +3269,7 @@ body.no-data #sectionNav { display: none; }
 
             // Location Meta Header
             document.getElementById('displayLocationName').innerText = currentLoc.name;
-            document.getElementById('displayLocationMeta').innerText = `Lat: ${currentLoc.lat.toFixed(4)}° · Lon: ${currentLoc.lon.toFixed(4)}° · Elev: ${Math.round((currentLoc.ele || 0) * 3.28084).toLocaleString()} ft (${Math.round(currentLoc.ele || 0)} m)`;
+            document.getElementById('displayLocationMeta').innerText = `Lat: ${currentLoc.lat.toFixed(4)}°, Lon: ${currentLoc.lon.toFixed(4)}°, Elev: ${Math.round((currentLoc.ele || 0) * 3.28084).toLocaleString()} ft (${Math.round(currentLoc.ele || 0)} m)`;
 
             const nwsBadgeText = document.getElementById('nwsStatusText');
             if (nwsForecastData) {
@@ -3296,7 +3296,7 @@ body.no-data #sectionNav { display: none; }
                 const hh = ensembleData.hourly;
                 if (hh && hh.uv_index) {
                     const v = hh.uv_index[hourlyStart()];
-                    if (v !== null && v !== undefined) uv = `${v.toFixed(1)} · ${v < 3 ? 'Low' : v < 6 ? 'Moderate' : v < 8 ? 'High' : v < 11 ? 'Very High' : 'Extreme'}`;
+                    if (v !== null && v !== undefined) uv = `${v.toFixed(1)}, ${v < 3 ? 'Low' : v < 6 ? 'Moderate' : v < 8 ? 'High' : v < 11 ? 'Very High' : 'Extreme'}`;
                 }
                 if ($('currentUV')) $('currentUV').innerText = uv;
                 if ($('currentAQI')) {
@@ -3307,8 +3307,8 @@ body.no-data #sectionNav { display: none; }
                 $('currentObsTime').innerText = cc.timeLabel;
                 const ft = m => (m === null || m === undefined || isNaN(m)) ? '--' : `${Math.round(m * 3.28084).toLocaleString()} ft`;
                 $('currentStationLine').innerHTML = nwsObs
-                    ? `<i class="fa-solid fa-tower-broadcast text-blue-400 mr-1"></i>${esc(nwsObs.stationId)} · ${esc(nwsObs.stationName || 'NWS station')} · Station elev. ${ft(nwsObs.stationElevM)}`
-                    : `<i class="fa-solid fa-location-crosshairs text-blue-400 mr-1"></i>Open-Meteo model grid point (${esc(ensembleData.latitude.toFixed(2))}°, ${esc(ensembleData.longitude.toFixed(2))}°) · Grid elev. ${ft(ensembleData.elevation)}`;
+                    ? `<i class="fa-solid fa-tower-broadcast text-blue-400 mr-1"></i>${esc(nwsObs.stationId)}, ${esc(nwsObs.stationName || 'NWS station')}, Station elev. ${ft(nwsObs.stationElevM)}`
+                    : `<i class="fa-solid fa-location-crosshairs text-blue-400 mr-1"></i>Open-Meteo model grid point (${esc(ensembleData.latitude.toFixed(2))}°, ${esc(ensembleData.longitude.toFixed(2))}°), Grid elev. ${ft(ensembleData.elevation)}`;
 
                 const cond = (cc.text && conditionFromText(cc.text, cc.isDay)) || getWeatherCondition(cc.code, cc.isDay);
                 $('currentWeatherConditionText').innerText = cc.text || cond.text;
@@ -3367,7 +3367,7 @@ body.no-data #sectionNav { display: none; }
                     if (!f) return '';
                     const hi = kind === 'high', rec = f.type === 'record' || f.type === 'set';
                     const col = hi ? 'rose' : 'sky';
-                    const label = f.type === 'set' ? `${f.tie ? 'RECORD HIGH TIED TODAY' : 'NEW RECORD HIGH TODAY'} · ${formatTemp(f.val, 0)}` : rec ? (hi ? 'RECORD HIGH FORECAST' : `RECORD LOW FORECAST · ${f.on} AM`) : (hi ? 'Near record high' : `Near record low · ${f.on} AM`);
+                    const label = f.type === 'set' ? `${f.tie ? 'RECORD HIGH TIED TODAY' : 'NEW RECORD HIGH TODAY'}, ${formatTemp(f.val, 0)}` : rec ? (hi ? 'RECORD HIGH FORECAST' : `RECORD LOW FORECAST, ${f.on} AM`) : (hi ? 'Near record high' : `Near record low, ${f.on} AM`);
                     return `<div class="mt-2 text-[10px] font-mono leading-snug rounded-lg px-2 py-1.5 border ${rec ? `bg-${col}-950/60 border-${col}-500/60 text-${col}-200 font-bold` : `bg-slate-950/60 border-${col}-500/30 text-${col}-300/90`}"><i class="fa-solid ${hi ? 'fa-fire' : 'fa-snowflake'} mr-1 text-${col}-400"></i>${label}<div class="font-normal text-slate-400">prior record ${formatTemp(f.rec)} (${f.yr})</div></div>`;
                 };
 
@@ -3474,7 +3474,7 @@ body.no-data #sectionNav { display: none; }
                         <span class="font-bold text-blue-300">${names[m]}</span>
                         <span class="font-mono text-amber-400 font-bold">${Math.round(tw[m] * 100)}%${sk ? `<span class="text-slate-500 font-normal text-[10px] ml-1">(base ${Math.round(w[m] * 100)}%)</span>` : ''}</span>
                     </div>
-                    ${r ? `<div class="text-[10px] text-slate-400 font-mono mt-0.5">Today vs obs: ±${(r.rmse * dU).toFixed(1)}${u} typical error · running ${r.bias >= 0 ? '+' : '−'}${Math.abs(r.bias * dU).toFixed(1)}${u} ${r.bias >= 0 ? 'warm' : 'cool'} · ${r.n} h</div>` : ''}
+                    ${r ? `<div class="text-[10px] text-slate-400 font-mono mt-0.5">Today vs obs: ±${(r.rmse * dU).toFixed(1)}${u} typical error, running ${r.bias >= 0 ? '+' : '−'}${Math.abs(r.bias * dU).toFixed(1)}${u} ${r.bias >= 0 ? 'warm' : 'cool'}, ${r.n} h</div>` : ''}
                 </div>`;
             }).join('') + (sk ? `<div class="text-[10px] text-slate-400 mt-1">Today's weights favor the models that are matching ${esc(nwsObs ? nwsObs.stationId : 'station')} observations best (${Math.round(sk.conf * 100)}% skill-driven).</div>` : '');
         }
@@ -3597,13 +3597,13 @@ body.no-data #sectionNav { display: none; }
 
             el.innerHTML = `
                 <div>
-                    <div class="text-xs font-semibold text-slate-300 mb-2">Today · each model, its weight, and its error against ${esc(stn || 'observations')}</div>
+                    <div class="text-xs font-semibold text-slate-300 mb-2">Today: each model, its weight, and its error against ${esc(stn || 'observations')}</div>
                     <div class="overflow-x-auto -mx-1 px-1"><table class="w-full text-xs font-mono text-slate-300">
                         <thead><tr>${th('Model')}${th('Weight now / base')}${th('Typical error')}${th('Running bias')}${th('High')}${th('Low')}${th('Rain')}${th('Snow')}${th('Wind')}${th('Gust')}</tr></thead>
                         <tbody>${rows}${bbRow}</tbody></table></div>
                 </div>
                 <div>
-                    <div class="text-xs font-semibold text-slate-300 mb-2">Next 12 days · model highs / lows (${u}) and spread</div>
+                    <div class="text-xs font-semibold text-slate-300 mb-2">Next 12 days: model highs / lows (${u}) and spread</div>
                     <div class="overflow-x-auto -mx-1 px-1"><table class="w-full text-xs font-mono text-slate-300">
                         <thead><tr>${th('Day')}${models.map(m => th(MODEL_NAMES[m] || m)).join('')}${th('Best Bet')}${th('Spread H / L')}${th('Models')}</tr></thead>
                         <tbody>${dayRows}</tbody></table></div>
@@ -3692,7 +3692,7 @@ body.no-data #sectionNav { display: none; }
             const conf = sp === null ? 'Only one model source was available.' : `Model highs for today differ by ${(isImperial ? sp * 1.8 : sp).toFixed(1)}° — ${sp < 1.5 ? 'high' : sp < 3 ? 'moderate' : 'low'} agreement.`;
             return `<div class="space-y-3 text-xs md:text-sm leading-relaxed text-slate-300">
                 <p><strong>NOW:</strong> ${now}</p>
-                ${(() => { const ni = nightInfo(); if (!ni) return ''; const amt = [ni.rain >= 0.2 ? `about ${formatPrecip(ni.rain)} of rain` : '', ni.snow >= 0.2 ? `about ${formatSnow(ni.snow)} of snow` : ''].filter(Boolean).join(' and '); return `<p><strong>TONIGHT:</strong> ${esc(ni.cond.text.split(' · ')[0])}. Low near <strong>${formatTemp(ni.low)}</strong>${ni.high !== null ? `, with temperatures rising to around ${formatTemp(ni.high)} before sunrise` : ''}. ${(amt && precipExpected(ni.pp, ni.rain + ni.snow)) ? `Expect ${amt} (${ni.pp}% chance).` : ni.pp >= 20 ? `A ${ni.pp}% chance of a passing shower.` : ''}</p>`; })()}
+                ${(() => { const ni = nightInfo(); if (!ni) return ''; const amt = [ni.rain >= 0.2 ? `about ${formatPrecip(ni.rain)} of rain` : '', ni.snow >= 0.2 ? `about ${formatSnow(ni.snow)} of snow` : ''].filter(Boolean).join(' and '); return `<p><strong>TONIGHT:</strong> ${esc(ni.cond.text.split(', ')[0])}. Low near <strong>${formatTemp(ni.low)}</strong>${ni.high !== null ? `, with temperatures rising to around ${formatTemp(ni.high)} before sunrise` : ''}. ${(amt && precipExpected(ni.pp, ni.rain + ni.snow)) ? `Expect ${amt} (${ni.pp}% chance).` : ni.pp >= 20 ? `A ${ni.pp}% chance of a passing shower.` : ''}</p>`; })()}
                 ${nightInfo() ? '' : `<p><strong>TODAY:</strong> High near <strong>${formatTemp(t.bestMax)}</strong>${depTxt}; overnight low (into tomorrow morning) near ${formatTemp(t.bestMin)}. ${precipTxt} Peak gusts near ${formatSpeed(t.bestGust)}.</p>`}
                 <p><strong>OUTLOOK:</strong> Highs over the next ${bb.length} days range from ${formatTemp(Math.min(...highs))} to ${formatTemp(Math.max(...highs))}, showing ${trend}. ${wet.length ? `Measurable precipitation is most likely ${wet.join(', ')}.` : 'No significant precipitation is forecast.'} ${conf}${recordWatchText()}</p>
                 <p class="text-[11px] text-slate-500 italic">Generated from live multi-model data and station observations.</p>
@@ -3922,7 +3922,7 @@ body.no-data #sectionNav { display: none; }
             $('nighttimeTrendDisplay').innerText = `${formatTempDiff(olsMin.slope * 10, 2)} / decade`;
             const nv = stationClim && stationClim.norm ? Object.entries(stationClim.norm).filter(([k]) => k !== '02-29').map(([, v]) => (v.max + v.min) / 2) : null;
             $('normalTempDisplay').innerText = formatTemp(nv && nv.length > 300 ? nv.reduce((a, b) => a + b, 0) / nv.length : baseline, 1);
-            $('normalTempSub').innerText = `1991–2020 · ${years[years.length - 1]}: ${formatTempDiff(lastAnom, 1)}`;
+            $('normalTempSub').innerText = `1991–2020, ${years[years.length - 1]}: ${formatTempDiff(lastAnom, 1)}`;
             $('rSquaredValue').innerText = olsMean.rSquared.toFixed(3);
             $('stdErrValue').innerText = formatTempDiff(olsMean.stdErr, 2).replace('+', '');
 
@@ -4114,7 +4114,7 @@ body.no-data #sectionNav { display: none; }
             const rr = document.getElementById('recordsRange');
             const hasCli = !!(cliTotals && cliTotals.rows);
             const today = bestBetResults[0].date;
-            if (rr) rr.innerText = (cliTotals && cliTotals.byMD) ? `${cliTotals.station} · NWS climate reports` : (stationClim && stationClim.rec) ? `${stationClim.icao} · records ${stationClim.recStart}–present` : '';
+            if (rr) rr.innerText = (cliTotals && cliTotals.byMD) ? `${cliTotals.station}, NWS climate reports` : (stationClim && stationClim.rec) ? `${stationClim.icao}, records ${stationClim.recStart}–present` : '';
             dcFillPickers(today);
             const cur = !dcSel, y = cur ? +today.slice(0, 4) : dcSel.y, m = cur ? +today.slice(5, 7) : dcSel.m;
             const mm = String(m).padStart(2, '0');
@@ -4156,7 +4156,7 @@ body.no-data #sectionNav { display: none; }
                     if (!anySnow) return '';
                     const v = o ? cliVal(o.snow) : null, dp = o ? cliVal(o.snowdepth ?? o.snow_depth) : null;
                     const fall = !v ? '--' : (v.t && !(v.v > 0)) ? '<span class="text-cyan-200">T</span>' : v.v > 0 ? `<span class="text-cyan-200 font-semibold">${formatSnow(v.v * 2.54)}</span>` : '<span class="text-slate-400">0.0"</span>';
-                    return `<td>${fall}${dp && dp.v > 0 ? ` <span class="text-slate-400">· ${formatSnow(dp.v * 2.54)} on ground</span>` : ''}</td>`;
+                    return `<td>${fall}${dp && dp.v > 0 ? ` <span class="text-slate-400">(${formatSnow(dp.v * 2.54)} on ground)</span>` : ''}</td>`;
                 };
                 // month statistics
                 const S = { hi: [], lo: [], hn: [], ln: [], p: 0, pT: false, pn: 0, pnOk: true, s: 0, sT: false, sn: 0, wet: 0, hot: 0, frz: 0, max: null, min: null };
@@ -4230,14 +4230,14 @@ body.no-data #sectionNav { display: none; }
                         tile('Average high', fT(aH), dT(aH, nH)),
                         tile('Average low', fT(aL), dT(aL, nL)),
                         tile('Mean temperature', fT(mean), dT(mean, nMean)),
-                        tile('Precipitation', pVal, S.pnOk && S.pn > 0 ? `<span class="text-slate-400">normal ${formatPrecip(S.pn * 25.4)} · ${Math.round(100 * S.p / S.pn)}%</span>` : `<span class="text-slate-400">${S.wet} day${S.wet === 1 ? '' : 's'} ≥ 0.01"</span>`),
+                        tile('Precipitation', pVal, S.pnOk && S.pn > 0 ? `<span class="text-slate-400">normal ${formatPrecip(S.pn * 25.4)}, ${Math.round(100 * S.p / S.pn)}%</span>` : `<span class="text-slate-400">${S.wet} day${S.wet === 1 ? '' : 's'} ≥ 0.01"</span>`),
                         tile('Warmest', S.max ? fT(S.max.v).replace('.0', '') : '--', S.max ? `<span class="text-slate-400">${day(S.max.ds)}</span>` : ''),
                         tile('Coldest', S.min ? fT(S.min.v).replace('.0', '') : '--', S.min ? `<span class="text-slate-400">${day(S.min.ds)}</span>` : '')
                     ];
                     if (anySnow || S.sn > 0.05) tiles.push(tile('Snowfall', (S.sT && S.s < 0.05) ? 'T' : formatSnow(S.s * 2.54), S.sn > 0.05 ? `<span class="text-slate-400">normal ${formatSnow(S.sn * 2.54)}</span>` : ''));
-                    const extra = [S.hot ? `${S.hot} day${S.hot === 1 ? '' : 's'} ≥ 90°F` : '', S.frz ? `${S.frz} night${S.frz === 1 ? '' : 's'} ≤ 32°F` : '', S.pnOk && S.pn > 0 ? `${S.wet} day${S.wet === 1 ? '' : 's'} with precipitation` : ''].filter(Boolean).join(' · ');
+                    const extra = [S.hot ? `${S.hot} day${S.hot === 1 ? '' : 's'} ≥ 90°F` : '', S.frz ? `${S.frz} night${S.frz === 1 ? '' : 's'} ≤ 32°F` : '', S.pnOk && S.pn > 0 ? `${S.wet} day${S.wet === 1 ? '' : 's'} with precipitation` : ''].filter(Boolean).join(', ');
                     const label = new Date(Date.UTC(y, m - 1, 15)).toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
-                    sumEl.innerHTML = rowsDesc.some(Boolean) ? `<div class="text-xs text-slate-400 mb-2">${label}${cur ? ' to date' : ''} · ${S.hi.length} day${S.hi.length === 1 ? '' : 's'} reported${extra ? ' · ' + extra : ''}</div><div class="dcs-grid">${tiles.join('')}</div>` : '';
+                    sumEl.innerHTML = rowsDesc.some(Boolean) ? `<div class="text-xs text-slate-400 mb-2">${label}${cur ? ' to date' : ''}, ${S.hi.length} day${S.hi.length === 1 ? '' : 's'} reported${extra ? ', ' + extra : ''}</div><div class="dcs-grid">${tiles.join('')}</div>` : '';
                 }
 
                 // recent records (current month view)
@@ -4557,7 +4557,7 @@ body.no-data #sectionNav { display: none; }
                 $h('heroLo').innerText = formatTemp(ni.low); $h('heroLoLbl').innerText = 'Low tonight';
                 hiW.style.display = ni.high !== null ? '' : 'none';
                 if (ni.high !== null) { $h('heroHi').innerText = formatTemp(ni.high); $h('heroHiLbl').innerText = 'Rising to'; }
-                const parts = [ni.nowcast && ni.nowcast.wet ? `${NOWCAST_WORD[ni.nowcast.kind]} falling now; low tonight near ${formatTemp(ni.low)}.` : `${ni.cond.text.split(' · ')[0]} tonight with a low near ${formatTemp(ni.low)}.`];
+                const parts = [ni.nowcast && ni.nowcast.wet ? `${NOWCAST_WORD[ni.nowcast.kind]} falling now; low tonight near ${formatTemp(ni.low)}.` : `${ni.cond.text.split(', ')[0]} tonight with a low near ${formatTemp(ni.low)}.`];
                 if (ni.high !== null) parts.push(`Temperatures rise to around ${formatTemp(ni.high)} before sunrise.`);
                 if (precipExpected(ni.pp, ni.rain + ni.snow)) parts.push(`${ni.pp}% chance of precipitation${ni.rain >= 0.05 ? `, about ${formatPrecip(ni.rain)}` : ''}${ni.snow >= 0.05 ? ` (${formatSnow(ni.snow)} of snow)` : ''}.`);
                 else if (ni.pp >= 20) parts.push(`A ${ni.pp}% chance of a passing shower.`);
@@ -4577,7 +4577,7 @@ body.no-data #sectionNav { display: none; }
                 if (bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} more today.`);
                 if (bb.laterProb != null) parts.push(`Once it ends, ${bb.laterProb}% chance of more later today.`);
             } else {
-                parts.push(`${restOfDayPhrase() || cond.text.split(' · ')[0] + ' for the rest of today'}. High near ${formatTemp(bb.bestMax)}.`);
+                parts.push(`${restOfDayPhrase() || cond.text.split(', ')[0] + ' for the rest of today'}. High near ${formatTemp(bb.bestMax)}.`);
                 if (precipExpected(bb.precipProb, bb.bestPrecip) && bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} possible.`);
             }
             if (bb.bestGust >= 40) parts.push(`Gusts to ${formatSpeed(bb.bestGust)}.`);
@@ -4663,7 +4663,7 @@ body.no-data #sectionNav { display: none; }
             try {
                 const q = new URLSearchParams({ city: L.name, lat: (+L.lat).toFixed(4), lon: (+L.lon).toFixed(4) });
                 history.replaceState(null, '', `${location.pathname}?${q.toString()}`);
-                document.title = `${L.name} · Skyline Weather`;
+                document.title = `${L.name} – Skyline Weather`;
             } catch (e) {}
         }
         async function startLocation() {
