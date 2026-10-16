@@ -2016,8 +2016,8 @@ body.no-data #sectionNav { display: none; }
             h.is_day = h.time.map((t, j) => {
                 const s = sun[t.slice(0, 10)];
                 if (!s) return h.is_day ? h.is_day[j] : 0;
-                const mid = Date.parse(t) + 30 * 60000;
-                return mid >= s[0] && mid < s[1] ? 1 : 0;
+                const at = Date.parse(t);   // the sun is up at the card's time
+                return at >= s[0] && at < s[1] ? 1 : 0;
             });
         }
         function restOfDayPhrase() {
