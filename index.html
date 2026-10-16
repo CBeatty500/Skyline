@@ -1051,6 +1051,7 @@ body.no-data #sectionNav { display: none; }
                 computeBestBetPredictions();
                 applyOvernightLows();
                 applyRemainingToday();
+                applyContinuity();
                 floorTodayHigh();
                 renderDashboard();
                 renderDiscussion();
@@ -1597,6 +1598,44 @@ body.no-data #sectionNav { display: none; }
         }
 
         // Today's forecast high may never be lower than the high already measured today
+        // Forecast continuity. The last forecast shown for this place is remembered (in this browser) for 6 hours.
+        // A fresh run that differs only a little keeps the earlier number; a moderate change moves halfway toward the
+        // new value; a large change (new guidance or changing conditions) is taken as is. Observed rain right now
+        // always updates today's precipitation immediately.
+        let continuityInfo = null;
+        function applyContinuity() {
+            if (!bestBetResults || !bestBetResults.length || !currentLoc) return;
+            const key = `skyline:fc:${(+currentLoc.lat).toFixed(2)},${(+currentLoc.lon).toFixed(2)}`;
+            let prev = null;
+            try { prev = JSON.parse(localStorage.getItem(key) || 'null'); } catch (e) {}
+            const fresh = prev && prev.t && Date.now() - prev.t < 6 * 3600e3;
+            // per field: [hold below, take fully at or above]  (°C, mm, %, km/h)
+            const RULE = { bestMax: [0.6, 2.2], bestMin: [0.6, 2.2], bestPrecip: [0.8, 5], bestRain: [0.8, 5], bestSnow: [0.5, 3], precipProb: [8, 25], bestWind: [3, 15], bestGust: [4, 18] };
+            let held = 0, halved = 0, taken = 0;
+            if (fresh) {
+                bestBetResults.forEach((b, i) => {
+                    const p = prev.days && prev.days[b.date];
+                    if (!p || p.rem !== !!b.remaining) return;          // compare like with like (rest-of-today vs full day)
+                    Object.keys(RULE).forEach(k => {
+                        const o = p[k], v = b[k];
+                        if (o === null || o === undefined || v === null || v === undefined || isNaN(o) || isNaN(v)) return;
+                        if (i === 0 && (k === 'bestPrecip' || k === 'bestRain' || k === 'bestSnow' || k === 'precipProb') && b.nowcast && b.nowcast.wet) return;
+                        const [lo, hi] = RULE[k], d = v - o;
+                        const rel = (k === 'bestPrecip' || k === 'bestRain' || k === 'bestSnow') ? Math.abs(d) / Math.max(o, v, 0.1) : 1;
+                        if (Math.abs(d) < lo) { b[k] = o; held++; }
+                        else if (Math.abs(d) >= hi && rel >= 0.5) { taken++; }
+                        else { b[k] = o + d / 2; halved++; }
+                    });
+                    if (b.bestPrecip !== undefined && b.bestRain !== undefined && b.bestSnow !== undefined) b.bestRain = Math.min(b.bestRain, b.bestPrecip);
+                });
+            }
+            continuityInfo = fresh ? { held, halved, taken, ageMin: Math.round((Date.now() - prev.t) / 60000) } : null;
+            // remember what is shown now; keep the original timestamp while consecutive updates are being smoothed
+            const days = {};
+            bestBetResults.forEach(b => { const o = { rem: !!b.remaining }; Object.keys(RULE).forEach(k => { o[k] = b[k]; }); days[b.date] = o; });
+            try { localStorage.setItem(key, JSON.stringify({ t: fresh && (held + halved) > 0 ? prev.t : Date.now(), days })); } catch (e) {}
+        }
+
         function floorTodayHigh() {
             const bb = bestBetResults[0];
             if (!bb || !ensembleData) return;
@@ -3592,6 +3631,7 @@ body.no-data #sectionNav { display: none; }
                 stn ? `<b>Observation correction:</b> the hourly forecast starts from the latest ${esc(stn)} reading, and the model bias carries forward and fades over the following hours.` : `<b>Observation correction:</b> off — no nearby station observations.`,
                 (rG !== null && rG !== 1) || (rW !== null && rW !== 1) ? `<b>Wind calibration:</b> over the last 12 h the station measured ${rW !== null ? Math.round(rW * 100) + '% of the modelled wind' : '—'} and ${rG !== null ? Math.round(rG * 100) + '% of the modelled gusts' : '—'}; near-term wind forecasts are scaled by that ratio, fading back to the models over about a day.` : `<b>Wind calibration:</b> models and measured wind agree (no scaling).`,
                 bestBetResults[0] && bestBetResults[0].nwsBlendApplied ? `<b>NWS blend:</b> the official NWS point forecast is blended in at 40% for highs and lows.` : '',
+                continuityInfo ? `<b>Continuity:</b> compared with the forecast shown ${continuityInfo.ageMin} min ago, ${continuityInfo.held} values were held (change too small to matter), ${continuityInfo.halved} moved halfway toward the new guidance, and ${continuityInfo.taken} large changes were taken as is.` : `<b>Continuity:</b> no recent forecast to compare with; this is a fresh forecast.`,
                 `<b>Precipitation:</b> amounts are the weighted model blend; snow is converted from model water equivalent with a temperature-dependent snow-to-liquid ratio (8:1 near freezing up to 18:1 in deep cold).`
             ].filter(Boolean);
 
