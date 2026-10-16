@@ -4322,7 +4322,7 @@ body.no-data #sectionNav { display: none; }
                             </div>
                             
                             <div class="my-3 flex items-center justify-between">
-                                <div class="flex flex-col items-center gap-1.5 max-w-[110px] text-center">${iconHtml(cond, pv.precipProb, 'text-3xl')}<span class="text-[10px] leading-tight text-slate-400 mt-0.5">${cond.text}</span>${ni ? '' : tstmTag(bb.thunder)}</div>
+                                <div class="flex flex-col items-center gap-1.5 max-w-[110px] text-center">${iconHtml(cond, pv.precipProb, 'text-3xl')}<span class="text-[10px] leading-tight text-slate-400 mt-0.5">${cond.text}</span>${ni || !WET_ICONS.includes(cond.icon) ? '' : tstmTag(bb.thunder)}</div>
                                 <div class="text-right">
                                     ${ni ? `<div class="text-[10px] text-sky-300 font-semibold uppercase tracking-wider font-mono">Low tonight</div>
                                     <div class="text-xl font-black text-white">${formatTemp(ni.low)}</div>
@@ -4333,7 +4333,7 @@ body.no-data #sectionNav { display: none; }
                             </div>
 
                             <div class="flex justify-between items-center text-[11px] text-slate-300 font-mono mb-2.5 px-0.5">
-                                <span><i class="fa-solid fa-umbrella text-blue-400 mr-1"></i>${pv.precipProb}%</span>
+                                <span>${WET_ICONS.includes(cond.icon) ? `<i class="fa-solid fa-umbrella text-blue-400 mr-1"></i>${Math.round(pv.precipProb)}%` : ''}</span>
                                 <span><i class="fa-solid fa-wind text-slate-400 mr-1"></i>${compass(bb.windDir) ? compass(bb.windDir) + ' ' : ''}${formatSpeed(pv.bestWind)}</span>
                             </div>
                             ${ni ? periodStrip(i, 'tonight') : periodStrip(i)}
