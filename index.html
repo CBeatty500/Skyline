@@ -5327,9 +5327,6 @@ body.no-data #sectionNav { display: none; }
                         for (let i = 0; i < keys.length; i++) if (inWin(i, a, b) && fcT[i] !== null && fcT[i] !== undefined && (best < 0 || (hi ? fcT[i] > fcT[best] : fcT[i] < fcT[best]))) best = i;
                         if (best <= nowPos || best >= keys.length - 1) return -1;               // already happened, or cut off by the graph edge
                         if (keys[keys.length - 1] < b) return -1;                                     // window runs past the end of the graph
-                        const p = fcT[best - 1], q = fcT[best + 1];                                    // must be a true turning point of the curve
-                        if (p === null || p === undefined || q === null || q === undefined) return -1;
-                        if (hi ? (fcT[best] < p || fcT[best] < q) : (fcT[best] > p || fcT[best] > q)) return -1;
                         return best;
                     };
                     days.forEach(D => {
