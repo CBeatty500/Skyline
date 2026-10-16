@@ -2801,7 +2801,7 @@ body.no-data #sectionNav { display: none; }
             if (!climStnPromises[k]) climStnPromises[k] = (async () => {
                 const site = await nearestCliSite(lat, lon, obsIcao);
                 const icao = site ? site.id : obsIcao;   // no representative climate-report site: use the observing station shown at the top
-                const key = `climstn5:${k}`;
+                const key = `climstn6:${k}`;
                 const c = await idb.get(key);
                 if (c && Date.now() - c.t < 30 * 864e5) return c.v;
                 const pretty = n => String(n || '').toLowerCase().replace(/\b[a-z]/g, ch => ch.toUpperCase()).replace(/\bIntl\b/g, 'Intl').replace(/\bAp\b/g, 'Airport');
@@ -3112,8 +3112,6 @@ body.no-data #sectionNav { display: none; }
             })().catch(e => { cliNetPromise = null; throw e; });
             return cliNetPromise.then(list => {
                 const live = list.filter(s => !s.end || s.end >= new Date(Date.now() - 60 * 864e5).toISOString().slice(0, 10));
-                const own = live.find(s => s.id === obsIcao);
-                if (own && distKm(+lat, +lon, own.lat, own.lon) <= 60) return { ...own, km: distKm(+lat, +lon, own.lat, own.lon) };
                 let best = null;
                 live.forEach(s => { const km = distKm(+lat, +lon, s.lat, s.lon); if (km <= 40 && (!best || km < best.km)) best = { ...s, km }; });
                 return best;
@@ -3128,9 +3126,7 @@ body.no-data #sectionNav { display: none; }
                 const list = await cliNetPromise;
                 const live = list.filter(s => !s.end || s.end >= new Date(Date.now() - 60 * 864e5).toISOString().slice(0, 10));
                 const out = [];
-                const own = live.find(s => s.id === obsIcao);
-                if (own && distKm(+lat, +lon, own.lat, own.lon) <= 60) out.push({ ...own, km: distKm(+lat, +lon, own.lat, own.lon) });
-                live.filter(s => s !== own).map(s => ({ ...s, km: distKm(+lat, +lon, s.lat, s.lon) })).filter(s => s.km <= 40).sort((a, b) => a.km - b.km).forEach(s => out.push(s));
+                live.map(s => ({ ...s, km: distKm(+lat, +lon, s.lat, s.lon) })).filter(s => s.km <= 40 || (s.id === obsIcao && s.km <= 60)).sort((a, b) => a.km - b.km).forEach(s => out.push(s));
                 const ok = [];
                 for (const s of out.slice(0, 4)) if (await representative(lat, lon, s.lat, s.lon)) ok.push(s);
                 return ok;
@@ -4711,7 +4707,7 @@ body.no-data #sectionNav { display: none; }
         async function fetchStationClimate(nws, lat, lon) {
             const icao = (nws && nws.obs && nws.obs.stationId) || `${(+lat).toFixed(2)},${(+lon).toFixed(2)}`;
             const ovS = climOverride(lat, lon);
-            const key = `stnclim4:${icao}:${ovS ? ovS.ids[0] : 'auto'}`;
+            const key = `stnclim5:${(+lat).toFixed(2)},${(+lon).toFixed(2)}:${ovS ? ovS.ids[0] : 'auto'}`;
             const c = await idb.get(key);
             if (c && Date.now() - c.t < 7 * 864e5) return c;
             const out = { t: Date.now(), icao, rec: null, norm: null, recStart: null, name: icao };
