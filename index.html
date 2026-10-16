@@ -3142,7 +3142,15 @@ body.no-data #sectionNav { display: none; }
                 return r;
             };
             let rows = [], prev = [];
-            try { [rows, prev] = await Promise.all([get(y), getPrev().catch(() => [])]); } catch (e) { return null; }
+            const curKey = `clicur1:${icao}:${y}`;
+            const [r1, p1] = await Promise.all([
+                get(y).catch(() => new Promise(res => setTimeout(res, 1200)).then(() => get(y))).catch(() => null),
+                getPrev().catch(() => new Promise(res => setTimeout(res, 1200)).then(getPrev)).catch(() => [])
+            ]);
+            prev = p1 || [];
+            if (r1) { rows = r1; idb.set(curKey, { t: Date.now(), rows: r1 }).catch(() => {}); }
+            else { const c = await idb.get(curKey); rows = (c && c.rows) || []; }
+            if (!r1 && !rows.length && !prev.length) return null;
             rows = rows.filter(o => o && o.valid && o.valid < today).sort((a, b) => a.valid < b.valid ? -1 : 1);
             // official day-of-year records and normals from the reports (this year's report wins for dates already past)
             const byMD = {};
