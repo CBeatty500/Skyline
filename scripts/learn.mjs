@@ -111,7 +111,7 @@ async function loadPage(browser, loc) {
           diag: {   // what the live analyses found on this run (for the reviews)
             regional: typeof regionalInfo !== 'undefined' && regionalInfo ? { stations: regionalInfo.stations, flowMph: Math.round(regionalInfo.flow * 0.621), maxAdjC: regionalInfo.adj ? Math.max(...regionalInfo.adj.t.map(Math.abs)) : 0, msg: regionalInfo.msg || null } : null,
             radar: typeof radarInfo !== 'undefined' && radarInfo ? radarInfo.msg : null,
-            now: (() => { const c = getCurrentConditions(); return c ? { text: c.text, tempC: c.temp, radarWx: !!c.radarWx } : null; })(),
+            now: (() => { const c = getCurrentConditions(); return c ? { text: c.text, tempC: c.temp, radarWx: !!c.radarWx, source: c.sourceLabel, viaIEM: !!(nwsObs && nwsObs.viaIEM) } : null; })(),
             at: new Date().toISOString()
           }
         };

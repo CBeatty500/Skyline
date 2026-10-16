@@ -8,7 +8,7 @@
             const own = nwsObs && nwsObs.stationId;
             const list = (nwsStationList || []).map(f => ({ id: f.properties && f.properties.stationIdentifier, lat: f.geometry && f.geometry.coordinates[1], lon: f.geometry && f.geometry.coordinates[0], elev: f.properties && f.properties.elevation ? f.properties.elevation.value : null }))
                 .filter(s => s.id && /^[KP][A-Z0-9]{3}$/.test(s.id) && ok(s.lat) && ok(s.lon))
-                .map(s => ({ ...s, km: distKm(lat, lon, s.lat, s.lon) })).filter(s => s.km <= 160).sort((a, b) => a.km - b.km).slice(0, 28);
+                .map(s => ({ ...s, km: distKm(lat, lon, s.lat, s.lon) })).filter(s => s.km <= 160).sort((a, b) => a.km - b.km).slice(0, 16);
             if (list.length < 4) throw new Error('too few stations');
             const kmh = q => q && ok(q.value) ? (q.unitCode && /m_s/.test(q.unitCode) ? q.value * 3.6 : q.value) : null;
             const obs = (await Promise.all(list.map(s => fetch(`https://api.weather.gov/stations/${s.id}/observations/latest`).then(r => r.ok ? r.json() : null).catch(() => null))))
@@ -60,7 +60,9 @@
         async function loadRegional(token, lat, lon) {
             if (!nwsOffice) { regionalAdj = null; return; }
             try {
-                const r = await regionalAnalysis(+lat, +lon);
+                const ck = `${(+lat).toFixed(3)},${(+lon).toFixed(3)}`;   // reuse for 10 minutes (keeps NWS requests down on refresh)
+                const r = loadRegional._c && loadRegional._c.k === ck && Date.now() - loadRegional._c.t < 10 * 60e3 ? loadRegional._c.r : await regionalAnalysis(+lat, +lon);
+                loadRegional._c = { k: ck, t: loadRegional._c && loadRegional._c.r === r ? loadRegional._c.t : Date.now(), r };
                 if (token !== fetchToken) return;
                 regionalAdj = r && r.adj ? { ...r, cur: hourlyStart(), at: Date.now() } : null;
                 regionalInfo = r;

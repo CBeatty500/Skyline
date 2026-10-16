@@ -991,11 +991,32 @@ body.no-data #sectionNav { display: none; }
                         const pref = preferredStation(lat, lon);
                         if (pref) feats.unshift({ geometry: { coordinates: [pref.lon, pref.lat] }, properties: { stationIdentifier: pref.id, name: pref.name, elevation: { value: pref.elev } } });
                         for (const f of feats) {
-                            const o = await (await fetch(`https://api.weather.gov/stations/${f.properties.stationIdentifier}/observations/latest`)).json();
+                            let o = null;
+                            try { const rr = await fetch(`https://api.weather.gov/stations/${f.properties.stationIdentifier}/observations/latest`); o = rr.ok ? await rr.json() : null; } catch (e) { o = null; }
                             const v = o && o.properties;
                             if (v && v.temperature && v.temperature.value != null && v.timestamp && (Date.now() - new Date(v.timestamp)) < 3 * 3600e3) {
                                 out.obs = { ...v, stationId: f.properties.stationIdentifier, stationName: f.properties.name, stationLat: (f.geometry && f.geometry.coordinates) ? f.geometry.coordinates[1] : null, stationLon: (f.geometry && f.geometry.coordinates) ? f.geometry.coordinates[0] : null, stationElevM: (f.properties.elevation && f.properties.elevation.value != null) ? f.properties.elevation.value : (v.elevation ? v.elevation.value : null) };
                                 break;
+                            }
+                        }
+                    if (!out.obs) {
+                            // NWS API unavailable: the same airport reports from the Iowa Environmental Mesonet
+                            for (const f of feats) {
+                                const sid = f.properties.stationIdentifier || '', st = out.state;
+                                if (!st || !/^K[A-Z0-9]{3}$/.test(sid)) continue;
+                                try {
+                                    const day = n => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
+                                    const rows = (await Promise.all([day(0), day(-1)].map(d => fetch(`https://mesonet.agron.iastate.edu/api/1/obhistory.json?station=${sid.slice(1)}&network=${st}_ASOS&date=${d}&full=1`)
+                                        .then(r => r.ok ? r.json() : { data: [] }).then(j => Array.isArray(j.data) ? j.data : []).catch(() => [])))).flat();
+                                    const obs = rows.map(iemToObs).filter(o => o.timestamp && o.temperature && o.temperature.value !== null && Date.now() - new Date(o.timestamp) < 3 * 3600e3)
+                                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                                    if (obs.length) {
+                                        const v = obs[0]; delete v.intl;
+                                        out.obs = { ...v, stationId: sid, stationName: f.properties.name, stationLat: f.geometry && f.geometry.coordinates ? f.geometry.coordinates[1] : null, stationLon: f.geometry && f.geometry.coordinates ? f.geometry.coordinates[0] : null, stationElevM: f.properties.elevation && f.properties.elevation.value != null ? f.properties.elevation.value : null, viaIEM: true };
+                                        out.obsToday = obs.map(o => { delete o.intl; return o; });
+                                        break;
+                                    }
+                                } catch (e) {}
                             }
                         }
                     if (out.obs) {
@@ -2115,7 +2136,7 @@ body.no-data #sectionNav { display: none; }
             const own = nwsObs && nwsObs.stationId;
             const list = (nwsStationList || []).map(f => ({ id: f.properties && f.properties.stationIdentifier, lat: f.geometry && f.geometry.coordinates[1], lon: f.geometry && f.geometry.coordinates[0], elev: f.properties && f.properties.elevation ? f.properties.elevation.value : null }))
                 .filter(s => s.id && /^[KP][A-Z0-9]{3}$/.test(s.id) && ok(s.lat) && ok(s.lon))
-                .map(s => ({ ...s, km: distKm(lat, lon, s.lat, s.lon) })).filter(s => s.km <= 160).sort((a, b) => a.km - b.km).slice(0, 28);
+                .map(s => ({ ...s, km: distKm(lat, lon, s.lat, s.lon) })).filter(s => s.km <= 160).sort((a, b) => a.km - b.km).slice(0, 16);
             if (list.length < 4) throw new Error('too few stations');
             const kmh = q => q && ok(q.value) ? (q.unitCode && /m_s/.test(q.unitCode) ? q.value * 3.6 : q.value) : null;
             const obs = (await Promise.all(list.map(s => fetch(`https://api.weather.gov/stations/${s.id}/observations/latest`).then(r => r.ok ? r.json() : null).catch(() => null))))
@@ -2167,7 +2188,9 @@ body.no-data #sectionNav { display: none; }
         async function loadRegional(token, lat, lon) {
             if (!nwsOffice) { regionalAdj = null; return; }
             try {
-                const r = await regionalAnalysis(+lat, +lon);
+                const ck = `${(+lat).toFixed(3)},${(+lon).toFixed(3)}`;   // reuse for 10 minutes (keeps NWS requests down on refresh)
+                const r = loadRegional._c && loadRegional._c.k === ck && Date.now() - loadRegional._c.t < 10 * 60e3 ? loadRegional._c.r : await regionalAnalysis(+lat, +lon);
+                loadRegional._c = { k: ck, t: loadRegional._c && loadRegional._c.r === r ? loadRegional._c.t : Date.now(), r };
                 if (token !== fetchToken) return;
                 regionalAdj = r && r.adj ? { ...r, cur: hourlyStart(), at: Date.now() } : null;
                 regionalInfo = r;

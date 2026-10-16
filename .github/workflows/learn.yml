@@ -27,5 +27,5 @@ jobs:
           git add data/snapshots.json data/hourly_snaps.json data/learning.json
           git diff --cached --quiet && exit 0
           git commit -m "Forecast verification"
-          for i in 1 2 3; do git pull --rebase -q origin main && git push -q && exit 0; sleep 10; done
+          for i in 1 2 3; do git pull --rebase -X theirs -q origin main && git push -q && exit 0; git rebase --abort 2>/dev/null; sleep 10; done
           exit 1
