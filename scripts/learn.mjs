@@ -157,10 +157,13 @@ for (const loc of locs) {
       const slot = hs.hrs[x.ms] || (hs.hrs[x.ms] = {});
       if (!slot[lead]) slot[lead] = { d: x.d, t: x.t, td: x.td, cc: x.cc, pp: x.pp, ws: x.ws, wg: x.wg };   // first forecast per hour and lead
     });
+    // hourly checks use the location's main airport when one is listed, else the app's observing station
+    const obsId = loc.station || r.obsStation;
+    if (L.hourly && L.hourly.station && L.hourly.station !== obsId) delete L.hourly;   // a different station starts fresh
     const H = L.hourly || (L.hourly = { cells: {}, corr: {}, n: 0 });
     let scored = 0;
-    if (r.obsStation) {
-      const obs = (await stationObs(r.obsStation)).filter(o => ok(o.ms)).sort((a, b) => a.ms - b.ms);
+    if (obsId) {
+      const obs = (await stationObs(obsId)).filter(o => ok(o.ms)).sort((a, b) => a.ms - b.ms);
       const near = ms => { let b = null; for (const o of obs) { const d = Math.abs(o.ms - ms); if (d <= 25 * 60e3 && (!b || d < Math.abs(b.ms - ms))) b = o; } return b; };
       const oldest = obs.length ? obs[0].ms : Infinity;
       Object.keys(hs.hrs).map(Number).sort((a, b) => a - b).forEach(ms => {
@@ -182,7 +185,7 @@ for (const loc of locs) {
       });
     }
     Object.entries(H.cells).forEach(([c, cell]) => { H.corr[c] = hourlyCorr(cell); });
-    H.n = (H.n || 0) + scored; H.station = r.obsStation; H.updated = new Date().toISOString();
+    H.n = (H.n || 0) + scored; H.station = obsId; H.updated = new Date().toISOString();
     console.log(`${loc.name}: ${r.fc.length} days and ${r.hrs.length} hours saved; ${L.list.length} days and ${H.n} hours scored (${scored} new)`);
   } catch (e) {
     console.log(`${loc.name}: scoring failed (${e.message})`);
