@@ -1737,6 +1737,14 @@ body.no-data #sectionNav { display: none; }
             if (M !== null && Math.abs(M - H) >= 0.15) todayCurveTarget = H;
             _adjCache = null;
         }
+        function skyWording(t, day) {
+            if (!t) return t;
+            const pairs = day ? [[/^mostly clear$/i, 'Mostly Sunny'], [/^(clear|fair)$/i, 'Sunny'], [/^partly clear$/i, 'Partly Sunny']]
+                              : [[/^mostly sunny$/i, 'Mostly Clear'], [/^(sunny|fair)$/i, 'Clear'], [/^partly sunny$/i, 'Partly Cloudy']];
+            const s = String(t).trim();
+            for (const [re, w] of pairs) if (re.test(s)) return w;
+            return t.replace(day ? /\bfair\b/i : /\bsunny\b/i, day ? 'Sunny' : 'Clear');
+        }
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -4073,7 +4081,7 @@ body.no-data #sectionNav { display: none; }
                 r.wind = pick(w, r.wind);
                 
                 r.apparent = pick(num(o.heatIndex), pick(num(o.windChill), r.temp + (c.apparent_temperature - c.temperature_2m)));
-                r.text = o.textDescription || null;
+                r.text = skyWording(o.textDescription || null, r.isDay === 1 || r.isDay === true);
                 const spd = v => { const x = num(v); return x === null ? null : (v.unitCode && v.unitCode.includes('m_s') ? x * 3.6 : x); };
                 if (num(o.windSpeed) !== null) { r.dir = num(o.windDirection); r.gust = spd(o.windGust); }
                 r.vis = pick(num(o.visibility), r.vis);
