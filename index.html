@@ -412,19 +412,6 @@ body.no-data #sectionNav { display: none; }
         </div>
 
         <div id="dashboardContent" class="hidden space-y-5">
-            <div id="topAlertSlot">            <!-- Active Weather Watches & Advisories Panel -->
-            <div id="alertsContainer" class="glass-panel rounded-2xl p-4 border border-slate-700">
-                <div id="alertsHeader" class="flex items-center justify-between border-b border-slate-700/60 pb-2 mb-3">
-                    <h3 class="text-sm font-semibold text-slate-300 flex items-center gap-2">
-                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Active Weather Watches, Warnings & Advisories
-                    </h3>
-                    <span id="alertCountBadge" class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">0 Active</span>
-                </div>
-                <div id="alertsList" class="space-y-2">
-                    <!-- Injected dynamically -->
-                </div>
-            </div>
-</div>
                         <!-- Location Meta Header -->
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-blue-500 pl-4 py-1">
                 <div>
@@ -441,6 +428,19 @@ body.no-data #sectionNav { display: none; }
                 </div>
             </div>
 
+            <div id="topAlertSlot">            <!-- Active Weather Watches & Advisories Panel -->
+            <div id="alertsContainer" class="glass-panel rounded-2xl p-4 border border-slate-700">
+                <div id="alertsHeader" class="flex items-center justify-between border-b border-slate-700/60 pb-2 mb-3">
+                    <h3 class="text-sm font-semibold text-slate-300 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-400"></i> Active Weather Watches, Warnings & Advisories
+                    </h3>
+                    <span id="alertCountBadge" class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">0 Active</span>
+                </div>
+                <div id="alertsList" class="space-y-2">
+                    <!-- Injected dynamically -->
+                </div>
+            </div>
+</div>
             <div class="flex"><section id="sec-now" class="hero flex-1">
                     <div>
                         <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
