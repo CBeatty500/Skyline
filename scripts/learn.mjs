@@ -18,18 +18,26 @@ const nextDay = d => { const t = new Date(d + 'T00:00:00Z'); t.setUTCDate(t.getU
 const browser = await chromium.launch();
 for (const loc of locs) {
   const k = key(loc);
-  const page = await browser.newPage();
-  try {
+  let r = null, lastErr = null;
+  for (let attempt = 1; attempt <= 3 && !r; attempt++) {
+    const page = await browser.newPage();
+    try {
     const url = `file://${path.join(root, 'index.html')}?city=${encodeURIComponent(loc.name)}&lat=${loc.lat}&lon=${loc.lon}&nolearn=1`;
     await page.goto(url, { timeout: 60000 });
     await page.waitForFunction(() => typeof bestBetResults !== 'undefined' && bestBetResults.length > 0, null, { timeout: 90000 });
     await page.waitForTimeout(12000);   // station climate, climate reports, radar
-    const r = await page.evaluate(async () => ({
+    r = await page.evaluate(async () => ({
       today: ensembleData.daily.time[0],
       fc: bestBetResults.slice(0, 7).map(b => ({ date: b.date, max: b.learnRawMax ?? b.bestMax, min: b.learnRawMin ?? b.bestMin, pp: b.learnRawPP ?? b.precipProb, pr: b.bestPrecip ?? null })),
       meas: await measuredDays(),
       station: (cliTotals && cliTotals.station) || (nwsObs && nwsObs.stationId) || null
     }));
+    } catch (e) { lastErr = e; r = null; await new Promise(res => setTimeout(res, 20000)); }
+    finally { await page.close(); }
+  }
+  await new Promise(res => setTimeout(res, 5000));
+  if (!r) { console.log(`${loc.name}: skipped (${lastErr && lastErr.message})`); continue; }
+  try {
     // 1) save today's forecasts (first forecast per target day and lead)
     const st = snaps[k] || (snaps[k] = { name: loc.name, days: {} });
     r.fc.forEach((f, i) => {
@@ -76,8 +84,8 @@ for (const loc of locs) {
     Object.assign(L, { lat: loc.lat, lon: loc.lon, station: r.station, buckets, corr, total: L.list.length, updated: new Date().toISOString() });
     console.log(`${loc.name}: ${r.fc.length} days saved, ${L.list.length} scored`);
   } catch (e) {
-    console.log(`${loc.name}: skipped (${e.message})`);
-  } finally { await page.close(); }
+    console.log(`${loc.name}: scoring failed (${e.message})`);
+  }
 }
 await browser.close();
 learning.updated = new Date().toISOString();
