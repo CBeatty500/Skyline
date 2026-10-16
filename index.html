@@ -272,6 +272,25 @@ body.no-data #sectionNav { display: none; }
 .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
 @media (min-width: 1024px) { .hero-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 28px; row-gap: 22px; } .hero-main { flex-wrap: nowrap !important; align-self: center; } .hero-main > .flex-1 { flex: 0 1 auto !important; } .hero-alerts { min-width: 0; align-self: stretch; } .hero-alerts #alertsContainer { height: 100%; } }
 .hg-head .ho-name { white-space: nowrap; }
+.hero-cc, .hero-tsf { display: flex; flex-direction: column; min-width: 0; }
+.hero-cc > .metric-strip, .hero-tsf > .metric-strip { flex: 1; grid-auto-rows: 1fr; }
+.alert-pill { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: #a7f3d0; background: rgba(16,185,129,.12); border: 1px solid rgba(52,211,153,.35); border-radius: 999px; padding: 3px 10px; }
+.alert-pill.hidden { display: none; }
+.hero-main { grid-area: main; } #heroAlertSlot { grid-area: alerts; } .hero-cc { grid-area: cc; } .hero-tsf { grid-area: tsf; }
+.hero-grid { grid-template-areas: "main" "alerts" "cc" "tsf"; }
+.hero-grid.al-none #heroAlertSlot { display: none; }
+@media (min-width: 1024px) {
+  .hero-grid.al-few { grid-template-areas: "main alerts" "cc tsf"; }
+  .hero-grid.al-none { grid-template-areas: "main main" "cc tsf"; }
+  .hero-grid.al-many { grid-template-areas: "alerts alerts" "main main" "cc tsf"; }
+  .hero-grid.al-many #alertsList { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .hero-grid.al-many #alertsList > * { margin: 0 !important; }
+}
+@media (min-width: 1280px) {
+  .hero-grid.al-none { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "main cc tsf"; }
+  .hero-grid.al-many { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "alerts alerts alerts" "main cc tsf"; }
+  .hero-grid.al-none .hero-main, .hero-grid.al-many .hero-main { flex-direction: column; align-items: flex-start !important; gap: 6px !important; }
+}
 .hg-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; min-height: 18px; }
 .hg-meta { font-size: 11px; color: rgba(203,213,225,.7); font-family: ui-monospace, Menlo, monospace; text-align: right; }
 .msub { font-size: 10px; color: rgba(203,213,225,.72); margin-top: 2px; line-height: 1.35; }
@@ -413,7 +432,7 @@ body.no-data #sectionNav { display: none; }
                         <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
                             <span class="chip chip-static"><i class="fa-solid fa-satellite mr-1.5"></i><span id="currentObsSource">Current Conditions</span></span>
                             <span id="currentObsTime" class="text-xs text-slate-300/80"></span>
-                            <button onclick="refreshData()" class="refresh-btn" title="Refresh data" aria-label="Refresh data"><i class="fa-solid fa-rotate-right"></i><span>Refresh</span></button>
+                            <span id="alertPill" class="alert-pill hidden"><i class="fa-solid fa-circle-check"></i>No active alerts</span><button onclick="refreshData()" class="refresh-btn" title="Refresh data" aria-label="Refresh data"><i class="fa-solid fa-rotate-right"></i><span>Refresh</span></button>
                         </div>
                         <div id="currentStationLine" class="text-[11px] text-slate-300/70 font-mono mt-1"></div>
                     </div>
@@ -1445,6 +1464,25 @@ body.no-data #sectionNav { display: none; }
         function toggleModelAnalysis() { const c = SECTIONS.find(s => s.key === 'models'); if (c && c._panel) setSecOpen(c, c._panel.classList.contains('collapsed'), true); }
         initSections();
 
+        // none: a small 'no alerts' pill, conditions and today-so-far sit beside the temperature (3 columns on wide screens)
+        // few:  alerts fill the space beside the temperature
+        // many: alerts get a full-width row above (cards two across), the rest sits below in one row
+        let heroAlertCount = 0;
+        function layoutHeroAlerts() {
+            const g = document.querySelector('.hero-grid'), box = document.getElementById('alertsContainer'), pill = document.getElementById('alertPill');
+            if (!g || !box) return;
+            const n = heroAlertCount, wide = window.matchMedia('(min-width: 1024px)').matches;
+            g.classList.remove('al-none', 'al-few', 'al-many');
+            box.classList.toggle('hidden', n === 0);
+            if (pill) pill.classList.toggle('hidden', n !== 0);
+            if (n === 0) { g.classList.add('al-none'); return; }
+            if (!wide) { g.classList.add('al-few'); return; }
+            g.classList.add('al-few');
+            const main = g.querySelector('.hero-main');
+            const tooTall = n >= 3 || (main && box.scrollHeight > main.offsetHeight + 90);
+            if (tooTall) { g.classList.remove('al-few'); g.classList.add('al-many'); }
+        }
+        window.addEventListener('resize', () => { try { layoutHeroAlerts(); } catch (e) {} });
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -4239,6 +4277,8 @@ body.no-data #sectionNav { display: none; }
                         <strong class="font-bold text-sm block mb-1"><i class="fa-solid fa-triangle-exclamation mr-1.5"></i>${esc(a.title)} <span class="ml-1 text-[10px] font-mono font-normal opacity-70">[${a.tag}]</span></strong>
                         <p class="leading-relaxed opacity-90">${esc(a.text.slice(0, 320))}</p>
                     </div>`).join('');
+            heroAlertCount = alerts.length;
+            try { layoutHeroAlerts(); } catch (e) {}
         }
 
         // Data-driven discussion (built only from real numbers; no invented synoptic features)
