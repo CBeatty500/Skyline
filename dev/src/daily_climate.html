@@ -1,0 +1,45 @@
+<!-- Observed Climate -->
+                <div id="dailyClimatePanel" class="glass-panel rounded-2xl p-5 md:p-6">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+                        <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2"><i class="fa-solid fa-calendar-days text-amber-400"></i> Observed Climate</h3>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-1 -mt-1 mb-3"><span id="recordsRange" class="text-[11px] text-slate-400 font-mono"></span><button type="button" onclick="findClimStations()" class="dc-near"><i class="fa-solid fa-location-dot mr-1"></i>Nearby stations</button></div>
+                    <div id="dcStations" class="hidden dc-stns mb-3"></div>
+                    <div class="dc-prec mb-4">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+                            <span class="text-xs font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-cloud-showers-water text-blue-400 mr-1.5"></i>Precipitation totals</span>
+                            <span id="precipTotalsSource" class="text-[11px] text-slate-400 font-mono"></span>
+                        </div>
+                        <div id="precipTotalsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                    </div>
+                    <div class="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 mb-2">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-check text-amber-400"></i>
+                            <select id="dcMonth" class="dc-pick" aria-label="Month" onchange="dcSelect()"></select>
+                            <select id="dcYear" class="dc-pick" aria-label="Year" onchange="dcSelect()"></select>
+                            <span id="dcToDate" class="text-xs font-bold text-slate-200 uppercase tracking-wider"></span>
+                        </div>
+                        <span id="dcMeta" class="text-[11px] text-slate-400 font-mono"></span>
+                    </div>
+                    <div id="dcSummary" class="mb-4"></div>
+                    <div id="climateYesterday" class="hidden grid gap-2 md:grid-cols-2 mb-4"></div>
+                    <button type="button" id="dcTableToggle" class="dc-tt" aria-expanded="false" onclick="toggleDcTable()"><span class="text-xs font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-table-list text-sky-300 mr-1.5"></i>Daily observations</span><span class="text-[11px] text-slate-400 font-mono ml-auto mr-2" id="dcTableHint">Show table</span><i class="fa-solid fa-chevron-down text-slate-400 dc-tt-chev"></i></button>
+                    <div id="dcTableWrap" class="hidden overflow-x-auto -mx-1 px-1 mt-2">
+                        <table class="dclim w-full text-xs text-left text-slate-300">
+                            <thead class="text-[11px] text-slate-400 uppercase bg-slate-800/80 font-mono">
+                                <tr>
+                                    <th class="p-2.5 rounded-l-lg">Date</th>
+                                    <th class="p-2.5">High</th>
+                                    <th class="p-2.5">Low</th>
+                                    <th class="p-2.5">Precip</th>
+                                    <th id="dcSnowTh" class="p-2.5 hidden">Snowfall</th>
+                                    <th class="p-2.5">Normal H / L</th>
+                                    <th class="p-2.5">Record High</th>
+                                    <th class="p-2.5 rounded-r-lg">Record Low</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dailyRecordsTableBody" class="font-mono"></tbody>
+                        </table>
+                    </div>
+                    <span id="rSquaredValue" hidden></span><span id="stdErrValue" hidden></span>
+                </div>

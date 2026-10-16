@@ -1,0 +1,23 @@
+<div id="sec-quick" class="glass-panel rounded-2xl p-5 md:p-6">
+                <button type="button" onclick="toggleQuickView()" class="w-full flex flex-wrap items-center justify-between gap-2 text-left" aria-expanded="false" id="quickToggle">
+                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-table-cells text-amber-400"></i> Quick Glance at the Week Ahead</h3>
+                    <span class="flex items-center gap-3"><span id="quickViewSource" class="text-[11px] text-slate-400 font-mono hidden sm:inline"></span><i id="quickChevron" class="fa-solid fa-chevron-down text-slate-400 transition-transform"></i></span>
+                </button>
+                <div id="quickBody" class="hidden overflow-x-auto -mx-1 px-1 mt-3">
+                    <table class="dclim w-full text-xs text-left text-slate-300">
+                        <thead class="text-[11px] text-slate-400 uppercase bg-slate-800/80 font-mono">
+                            <tr>
+                                <th class="p-2.5 rounded-l-lg">Day</th>
+                                <th class="p-2.5"></th>
+                                <th class="p-2.5">High</th>
+                                <th class="p-2.5">Low</th>
+                                <th class="p-2.5">Precip</th>
+                                <th class="p-2.5">Normal H / L</th>
+                                <th class="p-2.5">Record High</th>
+                                <th class="p-2.5 rounded-r-lg">Record Low</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quickViewBody" class="font-mono"></tbody>
+                    </table>
+                </div>
+            </div>

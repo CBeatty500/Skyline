@@ -1,0 +1,1 @@
+{"properties": {"forecast": "https://api.weather.gov/gridpoints/LWX/1,1/forecast", "cwa": "LWX", "gridId": "LWX", "observationStations": "https://api.weather.gov/gridpoints/LWX/1,1/stations", "relativeLocation": {"properties": {"city": "Ashburn", "state": "VA"}}}}

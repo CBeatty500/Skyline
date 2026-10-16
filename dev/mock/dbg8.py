@@ -1,0 +1,8 @@
+exec(open('run_layout.py').read().split("        await pg.evaluate('window.scrollTo(0,0)')")[0].replace("import sys\nW=int(sys.argv[1]);OUT=sys.argv[2]\n","W=1440;OUT='d'\n") + """        await pg.add_style_tag(content='.topbar{position:static!important}')
+        await pg.evaluate('''(()=>{const h=ensembleData.hourly,c=hourlyStart();const f=h.time.findIndex(t=>t.startsWith(ensembleData.daily.time[1]));for(let j=f;j<f+24;j++){h.temperature_2m[j]=14-(j-f)*0.3;} renderCharts();})()''')
+        await pg.wait_for_timeout(400)
+        await pg.evaluate("document.getElementById('tempChartScroll').scrollLeft=900")
+        await pg.locator('.temp-col').screenshot(path='hl.png')
+        await b.close()
+asyncio.run(main())
+""")
