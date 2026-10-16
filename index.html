@@ -170,7 +170,7 @@ body.no-data #sectionNav { display: none; }
 @media (min-width: 1280px) { .hero-outlook:not(:empty) { display: flex; flex-direction: column; gap: 12px; padding: 12px 0 0; } }
 .hero-outlook .ho-name { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #fde68a; margin-bottom: 3px; }
 .hero-outlook p { font-size: 14px; line-height: 1.5; color: rgba(226,232,240,.92); }
-.feels-line { font-size: 15px; color: #cbd5e1; margin-top: 10px; text-align: center; }
+.feels-line { font-size: 15px; color: #cbd5e1; margin-top: 10px; margin-bottom: 14px; text-align: center; }
 @media (max-width: 767px) { .feels-line { font-size: 13px; margin-top: 6px; } }
 .hero-temp { font-weight: 300; font-size: clamp(5.5rem, 14vw, 9.5rem); line-height: .85; letter-spacing: -.05em; color: #fff; text-shadow: 0 6px 40px rgba(0,0,0,.25); }
 #currentWeatherIcon { font-size: clamp(3.6rem, 8vw, 5.6rem) !important; filter: drop-shadow(0 0 22px currentColor); }
@@ -5310,7 +5310,28 @@ body.no-data #sectionNav { display: none; }
                         x: { grid: { display: false }, ticks: { color: '#cbd5e1', font: { size: 11, weight: '500' }, autoSkip: false, maxRotation: 0, callback: (v, i) => pTicks(i) } },
                         y: { min: 0, max: 100, grid: { color: 'rgba(255, 255, 255, 0.07)' }, ticks: { color: '#c7d2fe', font: { size: 12, weight: '600' }, stepSize: 25, callback: v => v + '%' } }
                     }
-                }
+                },
+                plugins: [{ id: 'zeroPrecip', afterDatasetsDraw(ch) {
+                    if (!ch.getDatasetMeta || !ch.scales || !ch.scales.y) return;
+                    const g = ch.ctx, meta = ch.getDatasetMeta(0), y0 = ch.scales.y.getPixelForValue(0), { left, right, top, bottom } = ch.chartArea;
+                    g.save();
+                    // a short dash on the baseline marks each 0% hour
+                    g.fillStyle = 'rgba(199,210,254,.55)';
+                    meta.data.forEach((bar, i) => { if (!(precipProbs[i] > 0)) { const w = Math.max(4, (bar.width || 8) * 0.7); g.fillRect(bar.x - w / 2, y0 - 2, w, 2); } });
+                    if (!precipProbs.some(v => v > 0)) {
+                        const cx = (left + right) / 2, cy = top + (bottom - top) * 0.42;
+                        g.textAlign = 'center'; g.textBaseline = 'middle';
+                        g.fillStyle = 'rgba(15,23,42,.55)';
+                        const msg = '0% chance of precipitation', sub = 'every hour for the next 24 hours';
+                        g.font = "600 14px Outfit, system-ui, sans-serif"; const w1 = g.measureText(msg).width;
+                        g.font = "500 11.5px Outfit, system-ui, sans-serif"; const w2 = g.measureText(sub).width;
+                        const bw = Math.max(w1, w2) + 28, bh = 50;
+                        if (g.roundRect) { g.beginPath(); g.roundRect(cx - bw / 2, cy - bh / 2, bw, bh, 12); g.fill(); } else g.fillRect(cx - bw / 2, cy - bh / 2, bw, bh);
+                        g.fillStyle = '#e0e7ff'; g.font = "600 14px Outfit, system-ui, sans-serif"; g.fillText(msg, cx, cy - 9);
+                        g.fillStyle = '#a5b4fc'; g.font = "500 11.5px Outfit, system-ui, sans-serif"; g.fillText(sub, cx, cy + 11);
+                    }
+                    g.restore();
+                } }]
             });
         }
 
