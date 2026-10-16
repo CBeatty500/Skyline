@@ -201,9 +201,18 @@ body.no-data #sectionNav { display: none; }
 #obsDetailGrid > div { flex: 0 0 calc((100% - 12px) / 2); min-width: 0; box-sizing: border-box; }
 @media (min-width: 768px) { #obsDetailGrid > div { flex-basis: calc((100% - 36px) / 4); } }
 @media (min-width: 1280px) { #obsDetailGrid { gap: 10px; } #obsDetailGrid > div { flex-basis: calc((100% - 40px) / 5); padding: 10px 12px !important; } }
-.chart-precip > .glass-panel, .model-col > .glass-panel { flex: 1; display: flex; flex-direction: column; }
+.chart-precip > .glass-panel:first-child, .model-col > .glass-panel { flex: 1; display: flex; flex-direction: column; }
 .chart-precip .relative.h-56 { flex: 1; min-height: 14rem; height: auto !important; }
 .chart-precip .relative.h-56 > canvas { position: absolute; inset: 0; }
+/* the temperature graph grows to match the column beside it */
+@media (min-width: 1024px) {
+  .temp-col > .glass-panel { display: flex; flex-direction: column; }
+  .temp-col .flex:has(> #tempYAxis) { flex: 1; min-height: 18rem; }
+  .temp-col #tempYAxis { height: auto !important; align-self: stretch; }
+  .temp-col #tempChartScroll { display: flex; }
+  .temp-col #tempChartInner { height: auto !important; min-height: 18rem; align-self: stretch; flex: 0 0 auto; }
+  .temp-col #tempChartInner > canvas { position: absolute; inset: 0; }
+}
 .min-w-0 { min-width: 0; }
 #sec-details > .grid > div, #dashboardContent > .grid > div { min-width: 0; }
 :where(#dashboardContent .grid) { grid-template-columns: minmax(0, 1fr); }
@@ -240,6 +249,7 @@ body.no-data #sectionNav { display: none; }
 /* narrow columns */
 #todaySoFarGrid, #precipTotalsGrid { grid-template-columns: 1fr !important; }
 @media (min-width: 640px) { #precipTotalsGrid { grid-template-columns: repeat(2, 1fr) !important; } }
+@media (min-width: 1024px) { .chart-precip #precipTotalsGrid { grid-template-columns: 1fr !important; } .chart-precip #precipTotalsGrid > :last-child:nth-child(odd) { grid-column: auto !important; width: auto !important; justify-self: stretch !important; } }
 @media (min-width: 640px) and (max-width: 1279px) { #todaySoFarGrid { grid-template-columns: repeat(3, 1fr) !important; } }
 
 /* search suggestions: solid, readable panel */
@@ -451,8 +461,7 @@ body.no-data #sectionNav { display: none; }
             </div>
 
             <div id="sec-details" class="space-y-5">
-                <div class="grid xl:grid-cols-12 gap-5 items-stretch">
-                    <div class="xl:col-span-8 col-stretch">            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
+                            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
                 <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
                     <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-gauge text-teal-400"></i> Detailed Current Observations</h3>
                     <span id="obsDetailSource" class="text-[11px] text-slate-400 font-mono"></span>
@@ -460,20 +469,10 @@ body.no-data #sectionNav { display: none; }
                 <div id="obsDetailGrid" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
                 <div id="obsMetar"></div>
             </div>
-</div>
-                    <div class="xl:col-span-4 col-stretch">            <!-- Precipitation Totals -->
-            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
-                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-cloud-showers-water text-blue-400"></i> Precipitation Totals</h3>
-                    <span id="precipTotalsSource" class="text-[11px] text-slate-400 font-mono"></span>
-                </div>
-                <div id="precipTotalsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
-            </div>
-</div>
-                </div>
+
             </div>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
-                <div class="lg:col-span-2 flex flex-col min-w-0"><!-- Hourly Temp Multi-Model Chart -->
+                <div class="lg:col-span-2 flex flex-col min-w-0 temp-col"><!-- Hourly Temp Multi-Model Chart -->
                     <div class="glass-panel rounded-2xl p-5 border border-slate-800">
                         <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2 mb-2">
                             <i class="fa-solid fa-chart-line text-blue-400"></i> Temperature &amp; Dewpoint
@@ -494,7 +493,7 @@ body.no-data #sectionNav { display: none; }
                             <span><i class="inline-block w-4 h-0.5 align-middle mr-1" style="border-top:2px dashed #2dd4bf"></i>Forecast dewpoint</span>
                         </div>
                     </div></div>
-                <div class="flex flex-col chart-precip min-w-0"><!-- Precip Probabilities Chart -->
+                <div class="flex flex-col gap-5 chart-precip min-w-0"><!-- Precip Probabilities Chart -->
                     <div class="glass-panel rounded-2xl p-5 border border-slate-800">
                         <h3 class="text-sm font-bold text-slate-200 mb-3 flex items-center gap-2">
                             <i class="fa-solid fa-cloud-showers-heavy text-indigo-400"></i> Hourly Precipitation Chance
@@ -503,7 +502,15 @@ body.no-data #sectionNav { display: none; }
                         <div class="relative h-56 w-full">
                             <canvas id="precipChart"></canvas>
                         </div>
-                    </div></div>
+                    </div>            <!-- Precipitation Totals -->
+            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
+                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-cloud-showers-water text-blue-400"></i> Precipitation Totals</h3>
+                    <span id="precipTotalsSource" class="text-[11px] text-slate-400 font-mono"></span>
+                </div>
+                <div id="precipTotalsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+            </div>
+</div>
             </div>
             <div id="sec-climate"><!-- Daily Climate -->
                 <div id="dailyClimatePanel" class="glass-panel rounded-2xl p-5 md:p-6">
