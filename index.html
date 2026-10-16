@@ -225,10 +225,10 @@ body.no-data #sectionNav { display: none; }
 /* the temperature graph grows to match the column beside it */
 @media (min-width: 1024px) {
   .temp-col > .glass-panel { display: flex; flex-direction: column; }
-  .temp-col .flex:has(> #tempYAxis) { flex: 1; min-height: 18rem; }
+  .temp-col .flex:has(> #tempYAxis) { flex: 1; min-height: 15rem; }
   .temp-col #tempYAxis { height: auto !important; align-self: stretch; }
   .temp-col #tempChartScroll { display: flex; }
-  .temp-col #tempChartInner { height: auto !important; min-height: 18rem; align-self: stretch; flex: 0 0 auto; }
+  .temp-col #tempChartInner { height: auto !important; min-height: 15rem; align-self: stretch; flex: 0 0 auto; }
   .temp-col #tempChartInner > canvas { position: absolute; inset: 0; }
 }
 .min-w-0 { min-width: 0; }
@@ -267,7 +267,7 @@ body.no-data #sectionNav { display: none; }
 /* narrow columns */
 #todaySoFarGrid, #precipTotalsGrid { grid-template-columns: 1fr !important; }
 @media (min-width: 640px) { #precipTotalsGrid { grid-template-columns: repeat(2, 1fr) !important; } }
-@media (min-width: 1024px) { .chart-precip #precipTotalsGrid { grid-template-columns: 1fr !important; } .chart-precip #precipTotalsGrid > :last-child:nth-child(odd) { grid-column: auto !important; width: auto !important; justify-self: stretch !important; } }
+@media (min-width: 1024px) { #precipTotalsGrid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) !important; } #precipTotalsGrid > :last-child:nth-child(odd) { grid-column: auto !important; width: auto !important; justify-self: stretch !important; } }
 @media (min-width: 640px) and (max-width: 1279px) { #todaySoFarGrid { grid-template-columns: repeat(3, 1fr) !important; } }
 
 /* search suggestions: solid, readable panel */
@@ -300,7 +300,6 @@ body.no-data #sectionNav { display: none; }
   .col-stretch > .glass-panel { display: flex; flex-direction: column; }
   #obsDetailGrid { flex: 1; align-content: stretch; }
   #obsDetailGrid > div { display: flex; flex-direction: column; justify-content: center; }
-  #precipTotalsGrid { flex: 1; display: flex !important; flex-direction: column; gap: 10px; }
   #precipTotalsGrid > div { flex: 1; display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 18px; align-content: center; align-items: center; padding: 12px 16px !important; }
   #precipTotalsGrid > div > * { margin-top: 0 !important; }
   #precipTotalsGrid > div > :first-child { grid-column: 1 / -1; margin-bottom: 2px; }
@@ -529,26 +528,25 @@ body.no-data #sectionNav { display: none; }
                         <div class="relative h-56 w-full">
                             <canvas id="precipChart"></canvas>
                         </div>
-                    </div>            <!-- Precipitation Totals -->
-            <div class="glass-panel rounded-2xl p-5 border border-slate-800">
-                <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
-                    <h3 class="text-sm font-bold text-slate-200 flex items-center gap-2"><i class="fa-solid fa-cloud-showers-water text-blue-400"></i> Precipitation Totals</h3>
-                    <span id="precipTotalsSource" class="text-[11px] text-slate-400 font-mono"></span>
-                </div>
-                <div id="precipTotalsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                    </div></div>
             </div>
-</div>
-            </div>
-            <div id="sec-climate"><!-- Daily Climate -->
+            <div id="sec-climate"><!-- Observed Climate -->
                 <div id="dailyClimatePanel" class="glass-panel rounded-2xl p-5 md:p-6">
                     <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
-                        <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2"><i class="fa-solid fa-calendar-days text-amber-400"></i> Daily Climate</h3>
+                        <h3 class="text-lg md:text-xl font-black text-white flex items-center gap-2"><i class="fa-solid fa-calendar-days text-amber-400"></i> Observed Climate</h3>
                         <div class="flex items-center gap-2">
                             <select id="dcMonth" class="dc-pick" aria-label="Month" onchange="dcSelect()"></select>
                             <select id="dcYear" class="dc-pick" aria-label="Year" onchange="dcSelect()"></select>
                         </div>
                     </div>
                     <div id="recordsRange" class="text-[11px] text-slate-400 font-mono -mt-1 mb-3"></div>
+                    <div class="dc-prec mb-4">
+                        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-2">
+                            <span class="text-xs font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-cloud-showers-water text-blue-400 mr-1.5"></i>Precipitation totals</span>
+                            <span id="precipTotalsSource" class="text-[11px] text-slate-400 font-mono"></span>
+                        </div>
+                        <div id="precipTotalsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+                    </div>
                     <div id="dcSummary" class="mb-4"></div>
                     <div id="climateYesterday" class="hidden grid gap-2 md:grid-cols-2 mb-4"></div>
                     <div class="overflow-x-auto -mx-1 px-1">
