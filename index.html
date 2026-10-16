@@ -4852,15 +4852,15 @@ body.no-data #sectionNav { display: none; }
                     const fT = f => f === null ? '--' : (isImperial ? `${f.toFixed(1)}°F` : `${((f - 32) / 1.8).toFixed(1)}°C`);
                     const dT = (a, b) => (a === null || b === null) ? '' : (() => { const d = (a - b) * (isImperial ? 1 : 1 / 1.8); return `<span class="${d > 0.05 ? 'text-rose-300' : d < -0.05 ? 'text-sky-300' : 'text-slate-400'}">${d > 0 ? '+' : d < 0 ? '−' : '±'}${Math.abs(d).toFixed(1)}° vs normal</span>`; })();
                     const day = s => new Date(s + 'T12:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                    const tile = (lab, val, sub) => `<div class="dcs"><div class="text-[11px] text-slate-400">${lab}</div><div class="text-lg font-bold text-slate-100 font-mono">${val}</div><div class="text-[11px] mt-0.5">${sub || '&nbsp;'}</div></div>`;
+                    const tile = (lab, val, sub, vc) => `<div class="dcs"><div class="text-[11px] text-slate-400">${lab}</div><div class="text-lg font-bold ${vc || 'text-slate-100'} font-mono">${val}</div><div class="text-[11px] mt-0.5">${sub || '&nbsp;'}</div></div>`;
                     const pVal = (S.pT && S.p < 0.005) ? 'T' : formatPrecip(S.p * 25.4);
                     const tiles = [
                         tile('Average high', fT(aH), dT(aH, nH)),
                         tile('Average low', fT(aL), dT(aL, nL)),
                         tile('Mean temperature', fT(mean), dT(mean, nMean)),
-                        tile('Precipitation', pVal, S.pnOk && S.pn > 0 ? `<span class="text-slate-400">normal ${formatPrecip(S.pn * 25.4)}, ${Math.round(100 * S.p / S.pn)}%</span>` : `<span class="text-slate-400">${S.wet} day${S.wet === 1 ? '' : 's'} ≥ 0.01"</span>`),
-                        tile('Warmest', S.max ? fT(S.max.v).replace('.0', '') : '--', S.max ? `<span class="text-slate-400">${day(S.max.ds)}</span>` : ''),
-                        tile('Coldest', S.min ? fT(S.min.v).replace('.0', '') : '--', S.min ? `<span class="text-slate-400">${day(S.min.ds)}</span>` : '')
+                        tile('Warmest', S.max ? fT(S.max.v).replace('.0', '') : '--', S.max ? `<span class="text-slate-400">${day(S.max.ds)}</span>` : '', 'text-rose-200'),
+                        tile('Coldest', S.min ? fT(S.min.v).replace('.0', '') : '--', S.min ? `<span class="text-slate-400">${day(S.min.ds)}</span>` : '', 'text-sky-200'),
+                        tile('Precipitation', pVal, S.pnOk && S.pn > 0 ? `<span class="text-slate-400">normal ${formatPrecip(S.pn * 25.4)}, ${Math.round(100 * S.p / S.pn)}%</span>` : `<span class="text-slate-400">${S.wet} day${S.wet === 1 ? '' : 's'} ≥ 0.01"</span>`)
                     ];
                     if (anySnow || S.sn > 0.05) tiles.push(tile('Snowfall', (S.sT && S.s < 0.05) ? 'T' : formatSnow(S.s * 2.54), S.sn > 0.05 ? `<span class="text-slate-400">normal ${formatSnow(S.sn * 2.54)}</span>` : ''));
                     const extra = [S.hot ? `${S.hot} day${S.hot === 1 ? '' : 's'} ≥ 90°F` : '', S.frz ? `${S.frz} night${S.frz === 1 ? '' : 's'} ≤ 32°F` : '', S.pnOk && S.pn > 0 ? `${S.wet} day${S.wet === 1 ? '' : 's'} with precipitation` : ''].filter(Boolean).join(', ');
