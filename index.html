@@ -1715,16 +1715,27 @@ body.no-data #sectionNav { display: none; }
         }
         function tstmTag(p, cls) { return p != null && p >= 15 ? `<span class="tstm ${cls || ''}" title="${Math.round(p)}% chance of thunderstorms (NWS)"><i class="fa-solid fa-bolt"></i> ${Math.round(p)}%</span>` : ''; }
 
-        // today's high: when the observation-corrected hourly curve (latest obs + measured warming trend) peaks above the
-        // model blend, the curve is the better guide, so the high follows it
+        // Today's high. 1) The observation-corrected hourly curve (latest obs + measured warming trend) sets a floor on the
+        // model blend. 2) The official NWS forecast for today's daytime period is weighted in (40%) while that period is still
+        // ahead. 3) Never below what has already been measured. The hourly curve is then mapped so its peak matches.
+        let todayCurveTarget = null;
         function raiseTodayHigh() {
             const b = bestBetResults && bestBetResults[0];
             if (!b || b.bestMax == null) return;
+            todayCurveTarget = null; _adjCache = null;
             const a = obsAdjustedHourly(), h = ensembleData && ensembleData.hourly;
-            if (!a || !h) return;
-            let M = null;
-            for (let j = a.cur; j < a.T.length; j++) { const t = h.time[j]; if (!t || !t.startsWith(b.date)) continue; const hr = +t.slice(11, 13); if (hr < 6 || hr > 21 || a.T[j] == null) continue; if (M === null || a.T[j] > M) M = a.T[j]; }
-            if (M !== null && M > b.bestMax) { b.bestMax = M; _adjCache = null; }
+            let M = null, nLeft = 0;
+            if (a && h) for (let j = a.cur + 1; j < a.T.length; j++) { const t = h.time[j]; if (!t || !t.startsWith(b.date)) continue; const hr = +t.slice(11, 13); if (hr < 6 || hr > 21 || a.T[j] == null) continue; nLeft++; if (M === null || a.T[j] > M) M = a.T[j]; }
+            let H = b.bestMax;
+            if (M !== null && M > H) H = M;
+            const periods = nwsForecastData && nwsForecastData.properties && nwsForecastData.properties.periods;
+            const dayP = nLeft >= 3 && periods && periods.find(p => p.isDaytime && p.startTime.substring(0, 10) === b.date && p.temperature != null && Date.parse(p.endTime) > Date.now());
+            if (dayP) { const nC = dayP.temperatureUnit === 'C' ? dayP.temperature : (dayP.temperature - 32) / 1.8; H = H * 0.6 + nC * 0.4; b.nwsBlendApplied = true; }
+            const mh = typeof measuredHighAfterLow === 'function' ? measuredHighAfterLow() : null;
+            if (mh !== null && mh > H) H = mh;
+            b.bestMax = H;
+            if (M !== null && Math.abs(M - H) >= 0.15) todayCurveTarget = H;
+            _adjCache = null;
         }
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
@@ -3547,8 +3558,8 @@ body.no-data #sectionNav { display: none; }
                 const idx = [];
                 for (let j = Math.max(cur + 1, 0); j < T.length; j++) { const t = h.time[j]; if (t.startsWith(b.date) && +t.slice(11, 13) >= 6 && +t.slice(11, 13) <= 21 && T[j] !== null) idx.push(j); }
                 if (idx.length < 3) return;
-                const vals = idx.map(j => T[j]), M = Math.max(...vals), base = Math.min(...vals), H = b.bestMax;
-                if (di === 0) return;   // today: the observation-driven curve leads; the high is raised to it instead (raiseTodayHigh)
+                const vals = idx.map(j => T[j]), M = Math.max(...vals), base = Math.min(...vals), H = di === 0 ? todayCurveTarget : b.bestMax;
+                if (di === 0 && todayCurveTarget == null) return;   // today: mapped only to the final blended high (raiseTodayHigh)
                 if (Math.abs(M - H) < 0.15) return;
                 const delta = {};
                 idx.forEach(j => {
