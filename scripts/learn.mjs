@@ -107,7 +107,13 @@ async function loadPage(browser, loc) {
           meas: await measuredDays(),
           obsStation: nwsObs && nwsObs.stationId || null,
           station: (cliTotals && cliTotals.station) || (nwsObs && nwsObs.stationId) || null,
-          hrs
+          hrs,
+          diag: {   // what the live analyses found on this run (for the reviews)
+            regional: typeof regionalInfo !== 'undefined' && regionalInfo ? { stations: regionalInfo.stations, flowMph: Math.round(regionalInfo.flow * 0.621), maxAdjC: regionalInfo.adj ? Math.max(...regionalInfo.adj.t.map(Math.abs)) : 0, msg: regionalInfo.msg || null } : null,
+            radar: typeof radarInfo !== 'undefined' && radarInfo ? radarInfo.msg : null,
+            now: (() => { const c = getCurrentConditions(); return c ? { text: c.text, tempC: c.temp, radarWx: !!c.radarWx } : null; })(),
+            at: new Date().toISOString()
+          }
         };
       });
     } catch (e) { lastErr = e; await sleep(20000); }
@@ -213,6 +219,7 @@ async function doLocation(loc) {
       });
     }
     Object.entries(H.cells).forEach(([c, cell]) => { H.corr[c] = hourlyCorr(cell); });
+    L.diag = r.diag;
     H.n = (H.n || 0) + scored; H.station = obsId; H.updated = new Date().toISOString();
     console.log(`${loc.name}: ${r.fc.length} days and ${r.hrs.length} hours saved; ${L.list.length} days and ${H.n} hours scored (${scored} new)`);
   } catch (e) {
