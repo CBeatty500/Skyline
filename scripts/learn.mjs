@@ -122,6 +122,9 @@ async function loadPage(browser, loc) {
   throw lastErr || new Error('load failed');
 }
 
+// cities removed from data/locations.json are dropped from the published data too
+const keep = new Set(locs.map(key));
+[snaps, hsnaps, learning.locations].forEach(o => Object.keys(o).forEach(k => { if (!keep.has(k)) delete o[k]; }));
 const browser = await chromium.launch();
 async function doLocation(loc) {
   const k = key(loc);

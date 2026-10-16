@@ -31,6 +31,8 @@ Open-Meteo (forecast, individual models, elevation; multi-point for regional ana
 ## Layout decisions (owner's requests)
 Order: location, alerts (chips; under the city on phones), hero (Current Conditions and Today So Far 2x2 blocks, peak gust, feels-like centered under temperature, text forecast Today / Tonight / Tomorrow / Tomorrow Night stacked), details, hourly, graphs (temperature and precipitation, collapsible), 12-day forecast, AFD with Severe / Winter discussions, Quick Glance at the Week Ahead (open), Observed Climate (precipitation totals on top, month pickers under totals, Warmest / Coldest / Avg high / Avg low / Mean / Precipitation tiles, daily table collapsed, record trophies as popups, nearby station picker), long-term trend (closed), Model Analysis (closed). All sections collapsible with one uniform style. Place shortcuts: Ashburn, DC, New York, Denver, Chicago, Seattle, Anchorage, Miami.
 
+Mammoth Lakes was removed from verification (Oct 16) at the owner's request: unreliable station data.
+
 ## Current-conditions stations
 Tracked cities show current conditions from the same station their forecasts are verified against (VERIFY_STATIONS in the app, matching `obs` in data/locations.json; within 12 km of the city). Order: that station from the NWS API, then the same station from IEM, then the next nearest station. Keep the two lists in sync when cities or stations change.
 

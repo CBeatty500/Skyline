@@ -6,7 +6,6 @@
   {"name": "Denver", "lat": 39.7392, "lon": -104.9903, "obs": "KDEN", "daily": "KDEN"},
   {"name": "Chicago", "lat": 41.85, "lon": -87.65, "obs": "KMDW", "daily": "KMDW"},
   {"name": "Seattle", "lat": 47.6062, "lon": -122.3321, "obs": "KSEA", "daily": "KSEA"},
-  {"name": "Mammoth Lakes, CA", "lat": 37.6485, "lon": -118.9721, "obs": "KMMH", "daily": "KMMH"},
   {"name": "Brambleton, VA", "lat": 38.9846, "lon": -77.5397, "obs": "KIAD", "daily": "KIAD"},
   {"name": "Anchorage, AK", "lat": 61.2181, "lon": -149.9003, "obs": "PANC", "daily": "PANC"},
   {"name": "Miami, FL", "lat": 25.7617, "lon": -80.1918, "obs": "KMIA", "daily": "KMIA"},
