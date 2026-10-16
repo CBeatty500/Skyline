@@ -167,9 +167,9 @@ body.no-data #sectionNav { display: none; }
 .hero { position: relative; border-radius: 28px; padding: 24px; background: linear-gradient(140deg, rgba(255,255,255,.17), rgba(255,255,255,.05)), rgba(10,20,42,.10); border: 1px solid rgba(255,255,255,.2); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 30px 60px -30px rgba(0,0,0,.6); }
 @media (min-width: 768px) { .hero { padding: 36px; } }
 .hero-outlook { display: none; }
-@media (min-width: 1280px) { .hero-outlook:not(:empty) { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 22px; padding: 16px 0 0; } }
+@media (min-width: 1280px) { .hero-outlook:not(:empty) { display: flex; flex-direction: column; gap: 12px; padding: 12px 0 0; } }
 .hero-outlook .ho-name { font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #fde68a; margin-bottom: 3px; }
-.hero-outlook p { font-size: 13px; line-height: 1.5; color: rgba(226,232,240,.92); }
+.hero-outlook p { font-size: 14px; line-height: 1.5; color: rgba(226,232,240,.92); }
 .hero-temp { font-weight: 300; font-size: clamp(5.5rem, 14vw, 9.5rem); line-height: .85; letter-spacing: -.05em; color: #fff; text-shadow: 0 6px 40px rgba(0,0,0,.25); }
 #currentWeatherIcon { font-size: clamp(3.6rem, 8vw, 5.6rem) !important; filter: drop-shadow(0 0 22px currentColor); }
 .hl { display: inline-flex; align-items: baseline; gap: 6px; font-size: 15px; } .hl b { font-size: 26px; font-weight: 600; } .hl small { color: var(--mute); font-size: 11px; text-transform: uppercase; letter-spacing: .08em; }
@@ -1292,9 +1292,8 @@ body.no-data #sectionNav { display: none; }
             const P = [];
             const dayP = k => ({ name: wd(k), k, night: false, segs: [['in the morning', first + 24 * k + 6, first + 24 * k + 12], ['in the afternoon', first + 24 * k + 12, first + 24 * k + 18]] });
             const nightP = (k, name) => ({ name, k, night: true, segs: [['in the evening', first + 24 * k + 18, first + 24 * k + 24], ['after midnight', first + 24 * k + 24, first + 24 * k + 30]] });
-            if (!night) P.push(nightP(0, 'Tonight'));
-            P.push(dayP(1), nightP(1, `${wd(1)} Night`), dayP(2));
-            if (night) P.push(nightP(2, `${wd(2)} Night`));
+            if (!night) P.push(nightP(0, 'Tonight'), dayP(1), nightP(1, `${wd(1)} Night`));
+            else P.push(dayP(1), nightP(1, `${wd(1)} Night`), dayP(2));
             const thunderRisk = (s, e) => {
                 if (!spcData || !spcData.days) return null;
                 let best = null;
