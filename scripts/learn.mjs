@@ -124,10 +124,11 @@ for (const loc of locs) {
   const L = learning.locations[k] || (learning.locations[k] = { name: loc.name, list: [] });
   try {
     // daily checks also use the main airport when one is listed (its official climate record); else what the app measures
-    if (loc.station) {
-      const ad = await airportDays(loc.station);
-      if (ad && Object.keys(ad.days).length) { r.meas = ad.days; r.station = loc.station; L.dailySource = ad.name || loc.station; }
-      else console.log(`  ${loc.name}: no daily record for ${loc.station}; using the app's climate station`);
+    const dailyId = loc.daily || loc.station;
+    if (dailyId) {
+      const ad = await airportDays(dailyId);
+      if (ad && Object.keys(ad.days).length) { r.meas = ad.days; r.station = dailyId; L.dailySource = ad.name || dailyId; }
+      else console.log(`  ${loc.name}: no daily record for ${dailyId}; using the app's climate station`);
     }
     if (L.station && r.station && L.station !== r.station) L.list = [];   // a different station starts fresh
     // ---------- daily: highs, lows, rain chance and amount ----------
@@ -184,7 +185,7 @@ for (const loc of locs) {
       if (!slot[lead]) slot[lead] = { d: x.d, t: x.t, td: x.td, cc: x.cc, pp: x.pp, ws: x.ws, wg: x.wg };   // first forecast per hour and lead
     });
     // hourly checks use the location's main airport when one is listed, else the app's observing station
-    const obsId = loc.station || r.obsStation;
+    const obsId = loc.obs || loc.station || r.obsStation;
     if (L.hourly && L.hourly.station && L.hourly.station !== obsId) delete L.hourly;   // a different station starts fresh
     const H = L.hourly || (L.hourly = { cells: {}, corr: {}, n: 0 });
     let scored = 0;
