@@ -2572,8 +2572,8 @@ body.no-data #sectionNav { display: none; }
             const k = `${obsIcao || ''}:${(+lat).toFixed(2)}:${(+lon).toFixed(2)}`;
             if (!climStnPromises[k]) climStnPromises[k] = (async () => {
                 const site = await nearestCliSite(lat, lon, obsIcao);
-                const icao = site ? site.id : null;   // no representative climate-report site: find the nearest long-record gauge at a similar elevation
-                const key = `climstn4:${k}`;
+                const icao = site ? site.id : obsIcao;   // no representative climate-report site: use the observing station shown at the top
+                const key = `climstn5:${k}`;
                 const c = await idb.get(key);
                 if (c && Date.now() - c.t < 30 * 864e5) return c.v;
                 const pretty = n => String(n || '').toLowerCase().replace(/\b[a-z]/g, ch => ch.toUpperCase()).replace(/\bIntl\b/g, 'Intl').replace(/\bAp\b/g, 'Airport');
