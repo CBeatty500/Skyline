@@ -290,6 +290,7 @@ body.no-data #sectionNav { display: none; }
   .hero-main > .flex-1 .text-sm.mt-1 { margin-top: 2px !important; }
   .hero-main .hl b { font-size: 21px; } .hero-main .hl small { font-size: 10px; letter-spacing: .06em; } .hero-main .hl { gap: 5px; } }
 .hero .metric-strip { margin-top: auto; }
+@media (min-width: 1280px) { .hero:has(.hero-outlook:not(:empty)) .metric-strip { margin-top: 4px; } }
 
 /* desktop alignment: columns in a row end on the same line */
 @media (min-width: 1280px) {
@@ -394,7 +395,6 @@ body.no-data #sectionNav { display: none; }
                         </div>
                     </div>
                     <p id="heroNarrative" class="text-sm text-slate-200/90 leading-relaxed max-w-3xl -mt-1"></p>
-                    <div id="heroOutlook" class="hero-outlook"></div>
                     <div class="metric-strip">
                         <div><div class="mlabel"><i class="fa-solid fa-droplet text-teal-300"></i> Dewpoint</div><div class="mval"><span id="currentDewPoint">--</span> <span id="currentDewPointCategory" class="text-[10px] font-medium text-teal-300/90"></span></div><div class="text-[10px] text-slate-300/70">Humidity <span id="currentHumidity" class="font-semibold">--</span></div></div>
                         <div><div class="mlabel"><i class="fa-solid fa-wind text-teal-300"></i> Wind</div><div id="currentWind" class="mval">--</div></div>
@@ -402,6 +402,7 @@ body.no-data #sectionNav { display: none; }
                         <div><div class="mlabel"><i class="fa-solid fa-lungs text-slate-300"></i> Air quality</div><div id="currentAQI" class="mval">--</div></div>
                     </div>
                     <div id="heroSun" class="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 -mt-1 text-xs text-slate-200/90"></div>
+                    <div id="heroOutlook" class="hero-outlook"></div>
                 </section></div>
                 <div class="xl:col-span-4 col-fill">            <!-- Active Weather Watches & Advisories Panel -->
             <div id="alertsContainer" class="glass-panel rounded-2xl p-4 border border-slate-700">
