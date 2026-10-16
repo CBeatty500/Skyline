@@ -1502,35 +1502,33 @@ _r("""            if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.m
             $h('heroNarrative').innerText = parts.join(' ');
             $h('heroNarrLbl').innerText = 'Today';""")
 
-# ---- station observation: one failed request never aborts the lookup; IEM (same METARs) backs up the NWS API ----
+# ---- station observation: the location's own station first (NWS API, then the same reports from IEM), then the next station ----
 _r("""                        for (const f of feats) {
                             const o = await (await fetch(`https://api.weather.gov/stations/${f.properties.stationIdentifier}/observations/latest`)).json();
-                            const v = o && o.properties;""", """                        for (const f of feats) {
+                            const v = o && o.properties;""", """                        // the same airport reports from the Iowa Environmental Mesonet, for when the NWS API has nothing recent
+                        const iemLatest = async (f) => {
+                            const sid = f.properties.stationIdentifier || '', st = out.state;
+                            if (!st || !/^K[A-Z0-9]{3}$/.test(sid)) return null;
+                            const day = n => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
+                            const rows = (await Promise.all([day(0), day(-1)].map(d => fetch(`https://mesonet.agron.iastate.edu/api/1/obhistory.json?station=${sid.slice(1)}&network=${st}_ASOS&date=${d}&full=1`)
+                                .then(r => r.ok ? r.json() : { data: [] }).then(j => Array.isArray(j.data) ? j.data : []).catch(() => [])))).flat();
+                            const obs = rows.map(iemToObs).filter(o => o.timestamp && o.temperature && o.temperature.value !== null && Date.now() - new Date(o.timestamp) < 3 * 3600e3)
+                                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).map(o => { delete o.intl; return o; });
+                            return obs.length ? obs : null;
+                        };
+                        for (const f of feats) {
                             let o = null;
                             try { const rr = await fetch(`https://api.weather.gov/stations/${f.properties.stationIdentifier}/observations/latest`); o = rr.ok ? await rr.json() : null; } catch (e) { o = null; }
-                            const v = o && o.properties;""")
-_r("""                    if (out.obs) {
-                            try {
-                                const since""", """                    if (!out.obs) {
-                            // NWS API unavailable: the same airport reports from the Iowa Environmental Mesonet
-                            for (const f of feats) {
-                                const sid = f.properties.stationIdentifier || '', st = out.state;
-                                if (!st || !/^K[A-Z0-9]{3}$/.test(sid)) continue;
+                            let v = o && o.properties;
+                            if (!(v && v.temperature && v.temperature.value != null && v.timestamp && (Date.now() - new Date(v.timestamp)) < 3 * 3600e3)) {
+                                // nothing recent from the NWS for this station: same station from IEM before moving to another station
                                 try {
-                                    const day = n => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
-                                    const rows = (await Promise.all([day(0), day(-1)].map(d => fetch(`https://mesonet.agron.iastate.edu/api/1/obhistory.json?station=${sid.slice(1)}&network=${st}_ASOS&date=${d}&full=1`)
-                                        .then(r => r.ok ? r.json() : { data: [] }).then(j => Array.isArray(j.data) ? j.data : []).catch(() => [])))).flat();
-                                    const obs = rows.map(iemToObs).filter(o => o.timestamp && o.temperature && o.temperature.value !== null && Date.now() - new Date(o.timestamp) < 3 * 3600e3)
-                                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                                    if (obs.length) {
-                                        const v = obs[0]; delete v.intl;
-                                        out.obs = { ...v, stationId: sid, stationName: f.properties.name, stationLat: f.geometry && f.geometry.coordinates ? f.geometry.coordinates[1] : null, stationLon: f.geometry && f.geometry.coordinates ? f.geometry.coordinates[0] : null, stationElevM: f.properties.elevation && f.properties.elevation.value != null ? f.properties.elevation.value : null, viaIEM: true };
-                                        out.obsToday = obs.map(o => { delete o.intl; return o; });
-                                        break;
-                                    }
+                                    const io = await iemLatest(f);
+                                    if (io) { v = { ...io[0], viaIEM: true }; out.obsToday = io; }
                                 } catch (e) {}
-                            }
-                        }
-                    if (out.obs) {
-                            try {
-                                const since""")
+                            }""")
+_r("""                                out.obsToday = (t.features || []).map(f => f.properties);""", """                                const nwsRows = (t.features || []).map(f => f.properties);
+                                if (out.obs.viaIEM) {   // keep the IEM reports and add any the NWS has that IEM does not
+                                    const have = new Set(out.obsToday.filter(o => o && o.timestamp).map(o => Math.round(new Date(o.timestamp) / 120000)));
+                                    out.obsToday = [...out.obsToday, ...nwsRows.filter(o => o && o.timestamp && !have.has(Math.round(new Date(o.timestamp) / 120000)))].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                                } else out.obsToday = nwsRows;""")
