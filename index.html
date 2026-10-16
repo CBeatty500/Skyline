@@ -4882,10 +4882,10 @@ body.no-data #sectionNav { display: none; }
                     const tiles = [
                         tile('Warmest', S.max ? fT(S.max.v).replace('.0', '') : '--', S.max ? `<span class="text-slate-400">${day(S.max.ds)}</span>` : '', 'text-rose-200'),
                         tile('Coldest', S.min ? fT(S.min.v).replace('.0', '') : '--', S.min ? `<span class="text-slate-400">${day(S.min.ds)}</span>` : '', 'text-sky-200'),
-                        tile('Precipitation', pVal, S.pnOk && S.pn > 0 ? `<span class="text-slate-400">normal ${formatPrecip(S.pn * 25.4)}, ${Math.round(100 * S.p / S.pn)}%</span>` : `<span class="text-slate-400">${S.wet} day${S.wet === 1 ? '' : 's'} ≥ 0.01"</span>`),
                         tile('Average high', fT(aH), dT(aH, nH)),
                         tile('Average low', fT(aL), dT(aL, nL)),
-                        tile('Mean temperature', fT(mean), dT(mean, nMean))
+                        tile('Mean temperature', fT(mean), dT(mean, nMean)),
+                        tile('Precipitation', pVal, S.pnOk && S.pn > 0 ? `<span class="text-slate-400">normal ${formatPrecip(S.pn * 25.4)}, ${Math.round(100 * S.p / S.pn)}%</span>` : `<span class="text-slate-400">${S.wet} day${S.wet === 1 ? '' : 's'} ≥ 0.01"</span>`)
                     ];
                     if (anySnow || S.sn > 0.05) tiles.push(tile('Snowfall', (S.sT && S.s < 0.05) ? 'T' : formatSnow(S.s * 2.54), S.sn > 0.05 ? `<span class="text-slate-400">normal ${formatSnow(S.sn * 2.54)}</span>` : ''));
                     const extra = [S.hot ? `${S.hot} day${S.hot === 1 ? '' : 's'} ≥ 90°F` : '', S.frz ? `${S.frz} night${S.frz === 1 ? '' : 's'} ≤ 32°F` : '', S.pnOk && S.pn > 0 ? `${S.wet} day${S.wet === 1 ? '' : 's'} with precipitation` : ''].filter(Boolean).join(', ');
