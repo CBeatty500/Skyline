@@ -21,13 +21,18 @@ out = out[:_a] + '<style id="tw">' + _css + '</style>' + out[_b:]
 assert 'cdn.tailwindcss.com' not in out and 'tailwind.config' not in out
 print('tailwind css bytes', len(_css))
 
-SITE = 'https://weatherisawesome.netlify.app/'
+SITE = 'https://cbeatty500.github.io/Skyline/'
 _icon = ("data:image/svg+xml," + "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb84d'/%3E%3Cstop offset='1' stop-color='%23ff7a59'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Ccircle cx='26' cy='26' r='10' fill='%231a1205'/%3E%3Cpath d='M22 48h22a9 9 0 0 0 0-18 12 12 0 0 0-22 4 7 7 0 0 0 0 14z' fill='%23fff7ec'/%3E%3C/svg%3E")
 _meta = f'''
     <meta name="description" content="Skyline: a meteorologist's weather dashboard with live station observations, an observation-corrected multi-model forecast, and official climate records.">
     <meta name="theme-color" content="#0b2f63">
     <link rel="icon" href="{_icon}">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png?v=2">
+    <link rel="manifest" href="manifest.webmanifest">
+    <meta name="apple-mobile-web-app-title" content="Best Bet Weather">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Skyline Weather">
     <meta property="og:title" content="Skyline Weather">
@@ -63,7 +68,7 @@ print('middle dots left:', len(_left), [out[max(0, i - 40):i + 10] for i in _lef
 for _a, _b in [
     ('<title>Skyline Weather</title>', '<title>Best Bet Weather</title>'),
     ('content="Skyline: a meteorologist\'s weather dashboard with live station observations, an observation-corrected multi-model forecast, and official climate records."',
-     'content="Best Bet Weather. The forecast you can bet on. Smart money on the sky."'),
+     'content="Best Bet Weather. A forecast you can bet on."'),
     ('content="Skyline Weather"', 'content="Best Bet Weather"'),
     ('aria-label="Skyline"', 'aria-label="Best Bet Weather"'),
     ('<span class="brand-name hidden sm:inline">Skyline</span>', '<span class="brand-name hidden sm:inline">Best Bet Weather</span>'),
@@ -85,6 +90,9 @@ out = out.replace('<span class="brand-mark"><i class="fa-solid fa-cloud-sun"></i
 out = _re3.sub(r'<link rel="icon" href="[^"]*">', '<link rel="icon" href="' + _FAV.replace('\\', '\\\\') + '">', out, count=1)
 assert '<i class="fa-solid fa-cloud-sun text-6xl mb-5 text-amber-300"></i>' in out
 out = out.replace('<i class="fa-solid fa-cloud-sun text-6xl mb-5 text-amber-300"></i>', '<div class="flex justify-center mb-5">' + _LOGO_BIG + '</div>', 1)
-out = out.replace('>The Best Bet Forecast.</h2>', '>The forecast you can bet on.</h2>', 1)
+out = out.replace('>The Best Bet Forecast.</h2>', '>Best Bet Weather</h2>', 1)
 _i = out.index('</style>')
 out = out[:_i] + '\n.brand-mark { background: none !important; width: 38px; height: 38px; } .brand-mark svg { display: block; }\n' + out[_i:]
+
+# the page must start with the doctype: nothing stray before it (a find-and-replace with an empty pattern would put text there)
+assert out.lstrip().startswith('<!DOCTYPE html>'), 'stray text before <!DOCTYPE html>: ' + out[:120]

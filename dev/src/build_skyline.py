@@ -114,8 +114,8 @@ main = f'''<main class="wrap pb-16 pt-5 space-y-5">
 
         <div id="statusMessage" class="text-center py-20 px-6 glass-panel">
             <i class="fa-solid fa-cloud-sun text-6xl mb-5 text-amber-300"></i>
-            <h2 class="font-display text-3xl md:text-4xl text-white mb-3">The Best Bet Forecast.</h2>
-            <p class="max-w-lg mx-auto text-base text-slate-300 leading-relaxed">Smart money on the sky.</p>
+            <h2 class="font-display text-[1.75rem] sm:text-4xl text-white mb-2 whitespace-nowrap">The Best Bet Forecast.</h2>
+            <p class="mx-auto text-base sm:text-lg text-slate-300 whitespace-nowrap">A forecast you can bet on.</p>
         </div>
 
         <div id="dashboardContent" class="hidden space-y-5">

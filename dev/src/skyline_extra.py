@@ -1501,8 +1501,6 @@ _r("""            const v = { T, D, bT, bD, cur, trend };""", """            for
 _r("""(bestBetResults || []).slice(0, 3).map(b => b.bestMax).join(',')}`;
             if (_adjCache""", """(bestBetResults || []).slice(0, 3).map(b => b.bestMax).join(',')}|${regionalAdj ? regionalAdj.at : 0}`;
             if (_adjCache""")
-out = out.replace("""""", """                if (regionalInfo && regionalInfo.msg) parts.splice(1, 0, regionalInfo.msg);
-""", 1)
 _r("""
             $h('heroNarrative').innerText = parts.join(' ');
             $h('heroNarrLbl').innerText = 'Today';""", """            if (regionalInfo && regionalInfo.msg) parts.splice(1, 0, regionalInfo.msg);
