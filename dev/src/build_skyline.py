@@ -37,12 +37,14 @@ header = '''<div id="skyBg"></div>
             <button onclick="refreshData()" id="refreshTop" class="unit-btn shrink-0" title="Refresh data" aria-label="Refresh data"><i class="fa-solid fa-rotate-right"></i><span>Refresh</span></button>
             <button onclick="toggleUnits()" id="unitToggleBtn" class="unit-btn shrink-0" title="Switch units"><i class="fa-solid fa-temperature-half"></i><span id="unitToggleLabel">°F · in · mph</span></button>
         </div>
-        <div class="wrap pb-2.5 rail">
-            <span class="rail-label">Places</span><button onclick="useMyLocation()" id="myLocBtn" class="chip" title="Use my location"><i class="fa-solid fa-location-crosshairs mr-1.5 text-sky-300"></i>My location</button>''' + chips + '''
-            <span id="sectionNav" class="flex items-center gap-1 pl-3 ml-1 border-l border-white/15">
-                <a href="#sec-now" class="navpill">Now</a><a href="#sec-hourly" class="navpill">Hourly</a><a href="#sec-forecast" class="navpill">Forecast</a>
-                <a href="#sec-details" class="navpill">Details</a><a href="#sec-climate" class="navpill">Climate</a>
+        <div class="wrap pb-2.5 rail" id="navRail">
+            <span id="sectionNav" class="flex items-center gap-1">
+                <a href="#sec-now" class="navpill">Now</a><a href="#sec-details" class="navpill">Details</a><a href="#sec-radar" class="navpill">Radar</a><a href="#sec-hourly" class="navpill">Hourly</a><a href="#sec-forecast" class="navpill">Forecast</a><a href="#sec-climate" class="navpill">Climate</a>
             </span>
+            <span class="rail-sep" aria-hidden="true"></span>
+            <button onclick="useMyLocation()" id="myLocBtn" class="chip" title="Use my location"><i class="fa-solid fa-location-crosshairs mr-1.5 text-sky-300"></i>My location</button>
+            <button type="button" id="placesToggle" class="chip" onclick="togglePlaces()" aria-expanded="false" aria-controls="placeChips"><i class="fa-solid fa-city mr-1.5 text-slate-400"></i>Places<i class="fa-solid fa-chevron-right ml-1.5 text-[9px] text-slate-400 pl-chev"></i></button>
+            <span id="placeChips" class="place-chips">''' + chips + '''</span>
         </div>
     </header>'''
 
@@ -251,6 +253,13 @@ body[data-sky="clear-night"] #skyBg::before { background: radial-gradient(1px 1p
 .unit-btn span { display: none; } @media (min-width: 900px) { .unit-btn span { display: inline; } }
 .rail { display: flex; align-items: center; gap: 6px; overflow-x: auto; scrollbar-width: none; }
 .rail::-webkit-scrollbar { display: none; }
+.rail-sep { flex: 0 0 1px; align-self: stretch; margin: 3px 4px; background: rgba(255,255,255,.15); }
+body.no-data .rail-sep { display: none; }
+.place-chips { display: none; align-items: center; gap: 6px; }
+.place-chips.open { display: flex; }
+#placesToggle[aria-expanded="true"] .pl-chev { transform: rotate(180deg); }
+@media (min-width: 1024px) { .place-chips { display: flex; } #placesToggle { display: none; } }
+@media (max-width: 639px) { .navpill { padding: 4px 8px; } #sectionNav { gap: 0; } }
 .rail-label { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); margin-right: 4px; }
 .chip { padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid var(--line); font-size: 12px; color: var(--ink); white-space: nowrap; }
 .chip:hover { background: rgba(255,255,255,.16); }

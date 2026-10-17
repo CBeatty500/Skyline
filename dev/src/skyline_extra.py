@@ -1894,3 +1894,24 @@ out = out[:_a] + """        function fitSearchPh() {
         window.addEventListener('resize', fitSearchPh);
         try { document.fonts && document.fonts.ready.then(fitSearchPh); } catch (e) {}
 """ + out[_a:]
+
+# ---- header rail: section tabs first, city shortcuts behind a Places button (always shown on wide screens) ----
+_a = out.index('        function restOfDayPhrase() {')
+out = out[:_a] + """        function togglePlaces(force) {
+            const c = document.getElementById('placeChips'), b = document.getElementById('placesToggle'), r = document.getElementById('navRail'); if (!c || !b) return;
+            const open = force !== undefined ? force : !c.classList.contains('open');
+            c.classList.toggle('open', open); b.setAttribute('aria-expanded', open);
+            if (open && r) r.scrollTo({ left: Math.max(0, b.offsetLeft - 12), behavior: 'smooth' });
+        }
+        // picking a place closes the list again
+        document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#placeChips .chip')) setTimeout(() => togglePlaces(false), 150); });
+        // a tab for a collapsed section opens it
+        document.addEventListener('click', e => {
+            const a = e.target.closest && e.target.closest('.navpill'); if (!a) return;
+            try {
+                const id = a.getAttribute('href').slice(1);
+                const cfg = SECTIONS.find(s => s._panel && (s._panel.id === id || (s._panel.closest && s._panel.closest('#' + id) && s._panel.parentElement && s._panel.parentElement.id === id)));
+                if (cfg && cfg._panel.classList.contains('collapsed')) setSecOpen(cfg, true, false);
+            } catch (x) {}
+        });
+""" + out[_a:]
