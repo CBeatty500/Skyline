@@ -2,8 +2,10 @@
 import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
-const [lat, lon, name] = [process.env.LAT || '39.0437', process.env.LON || '-77.4875', process.env.NAME || 'Ashburn, VA'];
+const places = (process.env.PLACES || '39.0437,-77.4875,Ashburn, VA').split(';').map(p => { const [a, b, ...n] = p.split(','); return [a.trim(), b.trim(), n.join(',').trim()]; });
 const browser = await chromium.launch();
+const results = [];
+for (const [lat, lon, name] of places) {
 const page = await browser.newPage();
 const errors = []; page.on('pageerror', e => errors.push(String(e))); page.on('console', m => { if (['warning', 'error'].includes(m.type())) errors.push(m.type() + ': ' + m.text().slice(0, 300)); });
 const t0 = Date.now();
@@ -21,5 +23,8 @@ const snap = async label => page.evaluate(lbl => {
 const snaps = [await snap('first view')];
 for (const s of [5, 15, 30]) { await page.waitForTimeout(s * 1000 - (s === 5 ? 0 : s === 15 ? 5000 : 15000)); snaps.push(await snap(`+${s}s`)); }
 const timings = await page.evaluate(() => performance.getEntriesByType('resource').map(r => ({ url: r.name.replace(/\?.*/, '').slice(0, 110), start: Math.round(r.startTime), dur: Math.round(r.duration) })).sort((a, b) => b.dur - a.dur).slice(0, 30));
-fs.writeFileSync('data/diag.json', JSON.stringify({ at: new Date().toISOString(), firstViewMs: firstView, errors, snaps, timings }, null, 1));
+results.push({ name, at: new Date().toISOString(), firstViewMs: firstView, errors, snaps, timings: timings.slice(0, 8) });
+await page.close();
+}
+fs.writeFileSync('data/diag.json', JSON.stringify(results, null, 1));
 await browser.close();
