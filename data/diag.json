@@ -1,8 +1,8 @@
 [
  {
   "name": "Ashburn, VA",
-  "at": "2026-10-17T13:09:16.111Z",
-  "firstViewMs": 3193,
+  "at": "2026-10-17T13:12:32.813Z",
+  "firstViewMs": 4291,
   "errors": [],
   "snaps": [
    {
@@ -145,7 +145,7 @@
    },
    {
     "label": "+5s",
-    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. A 50% chance of a trace to 0.05\" of rain this morning. North winds 10-20 mph. Overnight low near 37°F.",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. A 60% chance of drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
     "outlook": "TONIGHT\n\nClear. Low near 37°F. North winds 5-15 mph.\n\nSUNDAY\n\nSunny. High near 59°F.\n\nSUNDAY NIGHT\n\nClear. Low near 38°F.",
     "windTags": [
      "Breezy",
@@ -158,62 +158,64 @@
      "wsp": {},
      "area": null
     },
-    "cond": "Cloudy",
+    "cond": "Light Drizzle",
     "radar": {
      "here": 14,
-     "here3": 14,
+     "here3": 16,
      "passed": false,
      "clearUpstream": true,
      "endMin": null,
      "motionSrc": "radar",
      "moving": true,
-     "mph": 19,
-     "arrive": 140,
-     "peak": 23,
-     "any": 33,
+     "mph": 7,
+     "arrive": null,
+     "peak": 0,
+     "any": 37,
      "ahead": [
       14,
-      14,
-      12,
-      13,
       16,
-      23,
-      23
-     ]
+      14,
+      14,
+      14,
+      14,
+      13
+     ],
+     "drizzle": true,
+     "lightFrac": 0.86
     },
     "radarInfo": null,
     "hours": [
      {
       "t": "09:00",
-      "pp": 13,
-      "code": 3,
-      "wet": 0,
+      "pp": 55,
+      "code": 51,
+      "wet": 51,
       "thunder": 0,
       "cc": 97,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 11,
-      "code": 3,
-      "wet": 0,
+      "pp": 45,
+      "code": 51,
+      "wet": 51,
       "thunder": 0,
       "cc": 97,
-      "dry": true
+      "dry": false
      },
      {
       "t": "11:00",
-      "pp": 50,
-      "code": 80,
-      "wet": 80,
+      "pp": 40,
+      "code": 51,
+      "wet": 51,
       "thunder": 0,
       "cc": 95,
       "dry": false
      },
      {
       "t": "12:00",
-      "pp": 35,
-      "code": 80,
+      "pp": 6,
+      "code": 3,
       "wet": 0,
       "thunder": 0,
       "cc": 90,
@@ -300,10 +302,10 @@
     ],
     "nowcast": {
      "wet": false,
-     "kind": "rain",
-     "endedAgo": 2.25,
+     "kind": "drizzle",
+     "endedAgo": 0,
      "lastHourMm": 0,
-     "persist": 0
+     "persist": 20
     },
     "obs": {
      "id": "KIAD",
@@ -313,7 +315,7 @@
    },
    {
     "label": "+15s",
-    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. A 50% chance of a trace to 0.05\" of rain this morning. North winds 10-20 mph. Overnight low near 37°F.",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. A 60% chance of drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
     "outlook": "TONIGHT\n\nClear. Low near 37°F. North winds 5-15 mph.\n\nSUNDAY\n\nSunny. High near 59°F.\n\nSUNDAY NIGHT\n\nClear. Low near 38°F.",
     "windTags": [
      "Breezy",
@@ -326,62 +328,64 @@
      "wsp": {},
      "area": null
     },
-    "cond": "Cloudy",
+    "cond": "Light Drizzle",
     "radar": {
      "here": 14,
-     "here3": 14,
+     "here3": 16,
      "passed": false,
      "clearUpstream": true,
      "endMin": null,
      "motionSrc": "radar",
      "moving": true,
-     "mph": 19,
-     "arrive": 140,
-     "peak": 23,
-     "any": 33,
+     "mph": 7,
+     "arrive": null,
+     "peak": 0,
+     "any": 37,
      "ahead": [
       14,
-      14,
-      12,
-      13,
       16,
-      23,
-      23
-     ]
+      14,
+      14,
+      14,
+      14,
+      13
+     ],
+     "drizzle": true,
+     "lightFrac": 0.86
     },
     "radarInfo": null,
     "hours": [
      {
       "t": "09:00",
-      "pp": 13,
-      "code": 3,
-      "wet": 0,
+      "pp": 55,
+      "code": 51,
+      "wet": 51,
       "thunder": 0,
       "cc": 97,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 11,
-      "code": 3,
-      "wet": 0,
+      "pp": 45,
+      "code": 51,
+      "wet": 51,
       "thunder": 0,
       "cc": 97,
-      "dry": true
+      "dry": false
      },
      {
       "t": "11:00",
-      "pp": 50,
-      "code": 80,
-      "wet": 80,
+      "pp": 40,
+      "code": 51,
+      "wet": 51,
       "thunder": 0,
       "cc": 95,
       "dry": false
      },
      {
       "t": "12:00",
-      "pp": 35,
-      "code": 80,
+      "pp": 6,
+      "code": 3,
       "wet": 0,
       "thunder": 0,
       "cc": 90,
@@ -468,10 +472,10 @@
     ],
     "nowcast": {
      "wet": false,
-     "kind": "rain",
-     "endedAgo": 2.25,
+     "kind": "drizzle",
+     "endedAgo": 0,
      "lastHourMm": 0,
-     "persist": 0
+     "persist": 20
     },
     "obs": {
      "id": "KIAD",
@@ -481,7 +485,7 @@
    },
    {
     "label": "+30s",
-    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. A 50% chance of a trace to 0.05\" of rain this morning. North winds 10-20 mph. Overnight low near 37°F.",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. A 60% chance of drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
     "outlook": "TONIGHT\n\nClear. Low near 37°F. North winds 5-15 mph.\n\nSUNDAY\n\nSunny. High near 59°F.\n\nSUNDAY NIGHT\n\nClear. Low near 38°F.",
     "windTags": [
      "Breezy",
@@ -494,62 +498,64 @@
      "wsp": {},
      "area": null
     },
-    "cond": "Cloudy",
+    "cond": "Light Drizzle",
     "radar": {
      "here": 14,
-     "here3": 14,
+     "here3": 16,
      "passed": false,
      "clearUpstream": true,
      "endMin": null,
      "motionSrc": "radar",
      "moving": true,
-     "mph": 19,
-     "arrive": 140,
-     "peak": 23,
-     "any": 33,
+     "mph": 7,
+     "arrive": null,
+     "peak": 0,
+     "any": 37,
      "ahead": [
       14,
-      14,
-      12,
-      13,
       16,
-      23,
-      23
-     ]
+      14,
+      14,
+      14,
+      14,
+      13
+     ],
+     "drizzle": true,
+     "lightFrac": 0.86
     },
     "radarInfo": null,
     "hours": [
      {
       "t": "09:00",
-      "pp": 13,
-      "code": 3,
-      "wet": 0,
+      "pp": 55,
+      "code": 51,
+      "wet": 51,
       "thunder": 0,
       "cc": 97,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 11,
-      "code": 3,
-      "wet": 0,
+      "pp": 45,
+      "code": 51,
+      "wet": 51,
       "thunder": 0,
       "cc": 97,
-      "dry": true
+      "dry": false
      },
      {
       "t": "11:00",
-      "pp": 50,
-      "code": 80,
-      "wet": 80,
+      "pp": 40,
+      "code": 51,
+      "wet": 51,
       "thunder": 0,
       "cc": 95,
       "dry": false
      },
      {
       "t": "12:00",
-      "pp": 35,
-      "code": 80,
+      "pp": 6,
+      "code": 3,
       "wet": 0,
       "thunder": 0,
       "cc": 90,
@@ -636,10 +642,10 @@
     ],
     "nowcast": {
      "wet": false,
-     "kind": "rain",
-     "endedAgo": 2.25,
+     "kind": "drizzle",
+     "endedAgo": 0,
      "lastHourMm": 0,
-     "persist": 0
+     "persist": 20
     },
     "obs": {
      "id": "KIAD",
@@ -651,43 +657,43 @@
   "timings": [
    {
     "url": "https://api.weather.gov/stations/KIAD/observations",
-    "start": 616,
-    "dur": 1037
+    "start": 554,
+    "dur": 1028
    },
    {
     "url": "https://data.rcc-acis.org/StnData",
-    "start": 4953,
-    "dur": 638
-   },
-   {
-    "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 286,
-    "dur": 549
-   },
-   {
-    "url": "https://data.rcc-acis.org/StnMeta",
-    "start": 4113,
-    "dur": 548
-   },
-   {
-    "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 286,
-    "dur": 541
+    "start": 5865,
+    "dur": 646
    },
    {
     "url": "https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather/MapServer/identify",
-    "start": 2308,
-    "dur": 504
+    "start": 2715,
+    "dur": 632
    },
    {
     "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
-    "start": 836,
-    "dur": 496
+    "start": 653,
+    "dur": 418
    },
    {
-    "url": "https://mesonet.agron.iastate.edu/cgi-bin/afos/retrieve.py",
-    "start": 2302,
-    "dur": 397
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 256,
+    "dur": 413
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 256,
+    "dur": 396
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 5861,
+    "dur": 310
+   },
+   {
+    "url": "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/8/97/74",
+    "start": 6904,
+    "dur": 224
    }
   ]
  }
