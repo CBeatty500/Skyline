@@ -408,6 +408,12 @@ body.no-data #sectionNav { display: none; }
 .home-btn { width: 32px; height: 32px; border-radius: 999px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06); color: #94a3b8; display: grid; place-items: center; font-size: 13px; cursor: pointer; flex-shrink: 0; }
 .home-btn:hover { color: #e2e8f0; border-color: rgba(255,255,255,.3); }
 .home-btn.on { color: #1a1205; background: linear-gradient(135deg, #ffc062, #ff7a59); border-color: transparent; }
+.wtag { display: inline-flex; align-items: center; gap: 4px; font: 700 10px/1.4 ui-monospace, Menlo, monospace; border-radius: 999px; padding: 1px 7px; margin-top: 2px; border: 1px solid; }
+.wtag.wl1 { color: #99f6e4; background: rgba(45,212,191,.10); border-color: rgba(45,212,191,.40); }
+.wtag.wl2 { color: #fcd34d; background: rgba(245,158,11,.14); border-color: rgba(251,191,36,.45); }
+.wtag.wl3 { color: #fda4af; background: rgba(244,63,94,.16); border-color: rgba(251,113,133,.55); }
+.hwind { font: 10px ui-monospace, Menlo, monospace; margin-top: 2px; }
+.hwind.wl1 { color: #5eead4; } .hwind.wl2 { color: #fcd34d; } .hwind.wl3 { color: #fb7185; font-weight: 700; }
 .rec-btn { background: none; border: 0; padding: 0; cursor: pointer; }
 .rec-pop { position: fixed; z-index: 80; max-width: 280px; padding: 8px 11px; border-radius: 10px; background: #1e293b; border: 1px solid rgba(251,191,36,.55); color: #fde68a; font: 500 12px/1.45 'Outfit', system-ui, sans-serif; box-shadow: 0 12px 30px -10px rgba(0,0,0,.7); }
 #heroAlertSlot #alertsContainer { background: rgba(8,16,34,.3); border-color: rgba(255,255,255,.14); box-shadow: none; }
@@ -1376,6 +1382,7 @@ body.no-data #sectionNav { display: none; }
                 if (nwsOffice) loadRadar(token, lat, lon);
                 if (typeof RM !== 'undefined' && RM.map) { radarMapCenter(true); if (document.getElementById('rmWarn').checked) radarMapWarnings(true); }
                 if (nwsOffice) loadRegional(token, lat, lon);
+                loadTropical(token, lat, lon);
                 loadHourlyLearning(token, lat, lon);
             } catch (err) {
                 console.error("Fetch operational data failed:", err);
@@ -1532,16 +1539,16 @@ body.no-data #sectionNav { display: none; }
                     }
                 }
                 const sky = skyCondition(cl.length ? cl.reduce((x, y) => x + y, 0) / cl.length : null, day >= n / 2).text.toLowerCase();
-                let state = sky;
+                let state = sky; const wlv = windLevel(s, e);
                 if (wetH) { wetAll = true; codeAll = Math.max(codeAll, code); }   // precipitation is described once, in the precipitation sentence
                 const last = parts[parts.length - 1];
-                if (last && last.state === state) last.labels.push(label);
-                else parts.push({ state, labels: [label] });
+                if (last && last.sky === sky && last.lv === wlv) last.labels.push(label);
+                else parts.push({ sky, lv: wlv, state: skyWindState(last, sky, wlv), labels: [label] });
             });
             if (!parts.length) return null;
             const cap = t => t[0].toUpperCase() + t.slice(1);
             const text = parts.length === 1 ? cap(parts[0].state)
-                : cap(parts.map((p, i) => `${p.state} ${p.labels.length > 1 ? 'through the ' + p.labels[p.labels.length - 1].replace(/^in the |^after /, '') : p.labels[0]}`).join(', then '));
+                : cap(parts.map((p, i) => `${p.state} ${p.labels.length > 1 ? 'through the ' + p.labels[p.labels.length - 1].replace(/^in the |^after /, '') : p.labels[0]}`).join(', then ')).replace(/, then (becoming|less windy)/g, ', $1');
             return { text, wet: wetAll };
         }
         function periodAmount(s, e) {
@@ -2934,6 +2941,136 @@ body.no-data #sectionNav { display: none; }
             if (ni.early || mid < 0 || mid >= endIdx) return [['overnight', cur, endIdx]];
             return [['this evening', cur, mid], ['after midnight', mid, endIdx]].filter(([, s, e]) => e - s >= 1);
         }
+        // ---------- Breezy / windy / very windy ----------
+        // sustained wind (not gusts) for a stretch of hours: breezy 10+ mph, windy 20+ mph, very windy 30+ mph or while a
+        // wind advisory / high wind / tropical storm / hurricane warning is in effect
+        const WIND_WORD = ['', 'breezy', 'windy', 'very windy'];
+        const WIND_ALERT_RE = /wind advisory|high wind|extreme wind|hurricane warning|tropical storm warning/i;
+        function windAlertAt(ms) {
+            return (nwsAlerts || []).some(a => WIND_ALERT_RE.test(a.event || '') && Date.parse(a.onset || a.effective || 0) <= ms && ms < Date.parse(a.ends || a.expires || 0));
+        }
+        function windLevelOf(kmh) { return kmh >= 48 ? 3 : kmh >= 32 ? 2 : kmh >= 16 ? 1 : 0; }
+        let _wR = null;
+        function windHourKmh(j) {
+            try {
+                if (!_wR || _wR.d !== ensembleData) _wR = { d: ensembleData, r: windCalib('wind_speed_10m') };
+                const w = windForecastAt('wind_speed_10m', j, _wR.r);
+                return w == null || isNaN(w) ? null : w;
+            } catch (e) { return null; }
+        }
+        function hourWindLevel(j) {
+            let lv = windLevelOf(windHourKmh(j) || 0);
+            try { if (windAlertAt(hourMs(j) + 18e5)) lv = 3; } catch (e) {}
+            return lv;
+        }
+        // a stretch counts when the wind holds for more than a single hour (second-highest hour when there are 3+)
+        function windLevel(s, e) {
+            const h = ensembleData && ensembleData.hourly; if (!h) return 0;
+            const v = []; let alert = 0;
+            for (let j = Math.max(0, s); j < e && j < h.time.length; j++) {
+                const w = windHourKmh(j); if (w != null) v.push(w);
+                try { if (windAlertAt(hourMs(j) + 18e5)) alert++; } catch (x) {}
+            }
+            if (alert >= Math.min(2, Math.max(1, e - s))) return 3;
+            if (!v.length) return 0;
+            v.sort((a, b) => b - a);
+            return windLevelOf(v[Math.min(v.length >= 3 ? 1 : v.length - 1, v.length - 1)]);
+        }
+        // sky words for one part of a period, given the part before it
+        function skyWindState(prev, sky, lv) {
+            if (prev && prev.sky === sky) return lv ? `becoming ${WIND_WORD[lv]}` : 'less windy';
+            return lv ? `${sky} and ${WIND_WORD[lv]}` : sky;
+        }
+        function windPhrase(sky, s, e) { const lv = windLevel(s, e); return lv ? `${sky} and ${WIND_WORD[lv]}` : sky; }
+        const WIND_TAG_CLS = ['', 'wl1', 'wl2', 'wl3'];
+        // day card: daytime (6 AM to 6 PM, from now for today) or tonight
+        function windTag(i, ni) {
+            try {
+                const h = ensembleData.hourly, d = ensembleData.daily;
+                let s, e;
+                if (ni) { const ts = tonightSegs(ni); s = ts[0][1]; e = ts[ts.length - 1][2]; }
+                else { const f = h.time.findIndex(t => t.startsWith(d.time[i])); if (f < 0) return ''; s = Math.max(f + 6, i === 0 ? hourlyStart() : 0); e = f + 18; }
+                const lv = windLevel(s, e); if (!lv) return '';
+                const w = WIND_WORD[lv];
+                return `<span class="wtag ${WIND_TAG_CLS[lv]}" title="${w[0].toUpperCase() + w.slice(1)}"><i class="fa-solid fa-wind"></i> ${w[0].toUpperCase() + w.slice(1)}</span>`;
+            } catch (e) { return ''; }
+        }
+        // hourly cell: sustained speed once it is breezy
+        function hourWindTag(j) {
+            const lv = hourWindLevel(j); if (!lv) return '';
+            const k = isImperial ? 0.621371 : 1, w = windHourKmh(j);
+            return `<span class="hwind ${WIND_TAG_CLS[lv]}" title="${WIND_WORD[lv]}"><i class="fa-solid fa-wind"></i> ${w != null ? Math.round(w * k) + (isImperial ? ' mph' : '') : ''}</span>`;
+        }
+        // ---------- Tropical cyclones: National Hurricane Center / Central Pacific Hurricane Center ----------
+        // One identify request: forecast cones that include the location, the 5-day wind speed probabilities there
+        // (34 / 50 / 64 kt), and any 7-day development area. Covers the Atlantic, East and Central Pacific basins.
+        let tropicalInfo = null;
+        const NHC_MS = 'https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather/MapServer';
+        const NHC_CONES = [8, 34, 60, 86, 112, 138, 164, 190, 216, 242, 268, 294, 320, 346, 372];
+        function nhcPct(s) { const m = String(s || '').match(/(\d+)/); return m ? +m[1] + (/^\s*>/.test(s) ? 1 : 0) : 0; }
+        async function loadTropical(token, lat, lon) {
+            tropicalInfo = null;
+            lat = +lat; lon = +lon;
+            if (!(lat > 0 && lat < 55 && (lon < -40 || lon > 160))) return;   // outside NHC / CPHC waters and coasts
+            const key = `skyline:trop:${lat.toFixed(2)},${lon.toFixed(2)}`;
+            try { const c = JSON.parse(sessionStorage.getItem(key) || 'null'); if (c && Date.now() - c.at < 20 * 60e3) { tropicalInfo = c.v; if (token === fetchToken) renderActiveAlerts(); return; } } catch (e) {}
+            try {
+                const url = `${NHC_MS}/identify?geometry=${lon},${lat}&geometryType=esriGeometryPoint&sr=4326&layers=all:${NHC_CONES.join(',')},395,396,397,3`
+                    + `&tolerance=1&mapExtent=${lon - 5},${lat - 5},${lon + 5},${lat + 5}&imageDisplay=400,400,96&returnGeometry=false&f=json`;
+                const j = await (await fetch(url)).json();
+                const R = (j && j.results) || [];
+                const A = (r, ...k) => { for (const x of k) if (r.attributes && r.attributes[x] != null) return r.attributes[x]; return null; };
+                const v = { cones: [], wsp: {}, area: null };
+                const best = {};
+                R.forEach(r => {
+                    if (NHC_CONES.includes(r.layerId)) v.cones.push({ layer: r.layerId, name: A(r, 'Storm Name', 'stormname') || r.value, bin: A(r, 'Bin Number', 'binnumber') });
+                    else if (r.layerId >= 395 && r.layerId <= 397) {
+                        const lab = A(r, 'Percentage', 'percentage') || r.value, kt = { 395: 34, 396: 50, 397: 64 }[r.layerId];
+                        if (!best[kt] || nhcPct(lab) > nhcPct(best[kt])) best[kt] = lab;
+                    } else if (r.layerId === 3) {
+                        const p7 = A(r, 'Seven-Day Probability Forecast', 'prob7day'), p2 = A(r, 'Two-Day Probability Forecast', 'prob2day');
+                        if (!v.area || nhcPct(p7) > nhcPct(v.area.p7)) v.area = { p7, p2 };
+                    }
+                });
+                v.wsp = best;
+                // current position and strength of each storm whose cone covers the location
+                await Promise.all(v.cones.map(async c => {
+                    try {
+                        const q = await (await fetch(`${NHC_MS}/${c.layer - 2}/query?where=tau%3D0&outFields=stormname,stormtype,maxwind,tcdir,tcspd,lat,lon&returnGeometry=false&f=json`)).json();
+                        const a = q && q.features && q.features[0] && q.features[0].attributes;
+                        if (a) Object.assign(c, { name: a.stormname || c.name, type: a.stormtype, kt: a.maxwind, dir: a.tcdir, spd: a.tcspd, slat: a.lat, slon: a.lon });
+                    } catch (e) {}
+                }));
+                if (token !== fetchToken) return;
+                tropicalInfo = v;
+                try { sessionStorage.setItem(key, JSON.stringify({ at: Date.now(), v })); } catch (e) {}
+                renderActiveAlerts();
+            } catch (e) { /* the hurricane center service is unreachable: nothing to add */ }
+        }
+        function tropicalAlerts() {
+            const v = tropicalInfo; if (!v) return [];
+            const out = [], src = 'NHC';
+            const ktKmh = kt => kt * 1.852, link = bin => bin ? [{ label: 'Hurricane center graphics', href: `https://www.nhc.noaa.gov/graphics_${String(bin).toLowerCase()}.shtml` }] : [{ label: 'National Hurricane Center', href: 'https://www.nhc.noaa.gov/' }];
+            const w34 = v.wsp[34], w64 = v.wsp[64];
+            v.cones.forEach(c => {
+                const bits = [];
+                if (c.kt != null && c.kt < 999) bits.push(`Maximum sustained winds ${formatSpeed(ktKmh(c.kt))}.`);
+                if (c.slat != null && c.slon != null) {
+                    const km = distKm(+currentLoc.lat, +currentLoc.lon, c.slat, c.slon);
+                    const y = Math.sin((c.slon - currentLoc.lon) * Math.PI / 180) * Math.cos(c.slat * Math.PI / 180);
+                    const x = Math.cos(currentLoc.lat * Math.PI / 180) * Math.sin(c.slat * Math.PI / 180) - Math.sin(currentLoc.lat * Math.PI / 180) * Math.cos(c.slat * Math.PI / 180) * Math.cos((c.slon - currentLoc.lon) * Math.PI / 180);
+                    const brg = (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+                    bits.push(`Centered ${isImperial ? Math.round(km * 0.621371 / 10) * 10 + ' miles' : Math.round(km / 10) * 10 + ' km'} ${compass(brg)} of here${c.dir != null && c.dir < 999 && c.spd != null && c.spd < 999 ? `, moving ${compass(c.dir)} at ${formatSpeed(ktKmh(c.spd))}` : ''}.`);
+                }
+                if (w34) bits.push(`Chance of tropical-storm-force winds here within 5 days: ${w34}${w64 ? `; hurricane-force: ${w64}` : ''}.`);
+                out.push({ type: c.type === 'HU' || nhcPct(w34) >= 50 ? 'danger' : 'warning', tag: src, title: `${c.name || 'Tropical cyclone'}: this location is in the forecast cone`, text: bits.join(' '), links: link(c.bin) });
+            });
+            if (!v.cones.length && nhcPct(w34) >= 5)
+                out.push({ type: nhcPct(w34) >= 50 ? 'danger' : 'warning', tag: src, title: 'Tropical-Storm-Force Wind Chance', text: `${w34} chance of tropical-storm-force winds (39+ mph) here within 5 days${w64 ? `; hurricane-force: ${w64}` : ''}.`, links: link(null) });
+            if (v.area && nhcPct(v.area.p7) >= 10)
+                out.push({ type: 'warning', tag: src, title: 'Tropical Development Area', text: `This location is inside an area the hurricane center is watching: ${v.area.p7} chance of a tropical cyclone forming within 7 days${nhcPct(v.area.p2) ? ` (${v.area.p2} within 2 days)` : ''}.`, links: [{ label: 'Tropical weather outlook', href: 'https://www.nhc.noaa.gov/gtwo.php' }] });
+            return out;
+        }
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
@@ -2959,17 +3096,17 @@ body.no-data #sectionNav { display: none; }
                     }
                 }
                 const sky = skyCondition(cl.length ? cl.reduce((x, y) => x + y, 0) / cl.length : null, day >= n / 2).text.toLowerCase();
-                let state = sky;
+                let state = sky; const wlv = windLevel(s, e);
 
                 const last = parts[parts.length - 1];
-                if (last && last.state === state) last.labels.push(label.replace('this ', ''));
-                else parts.push({ state, labels: [label] });
+                if (last && last.sky === sky && last.lv === wlv) last.labels.push(label.replace('this ', ''));
+                else parts.push({ sky, lv: wlv, state: skyWindState(last, sky, wlv), labels: [label] });
             });
             if (!parts.length) return null;
             const cap = t => t[0].toUpperCase() + t.slice(1);
             if (parts.length === 1) return `${cap(parts[0].state)} for the rest of today`;
             const bits = parts.map(p => `${p.state} ${p.labels.length > 1 ? p.labels.slice(0, -1).join(', ') + ' and ' + p.labels.slice(-1) : p.labels[0]}`);
-            return cap(bits.length > 2 ? bits.slice(0, -1).join(', ') + ', then ' + bits.slice(-1) : bits.join(', then '));
+            return cap(bits.length > 2 ? bits.slice(0, -1).join(', ') + ', then ' + bits.slice(-1) : bits.join(', then ')).replace(/, then (becoming|less windy)/g, ', $1');
         }
 
         function precipExpected(p, amtMm) { return (p || 0) >= 50 || ((p || 0) >= 40 && (amtMm || 0) >= 2.5); }
@@ -5591,7 +5728,7 @@ body.no-data #sectionNav { display: none; }
                             </div>
                             
                             <div class="my-3 flex items-center justify-between">
-                                <div class="flex flex-col items-center gap-1.5 max-w-[110px] text-center">${iconHtml(cond, pv.precipProb, 'text-3xl')}<span class="text-[10px] leading-tight text-slate-400 mt-0.5">${cond.text}</span>${ni || !WET_ICONS.includes(cond.icon) ? '' : tstmTag(bb.thunder)}</div>
+                                <div class="flex flex-col items-center gap-1.5 max-w-[110px] text-center">${iconHtml(cond, pv.precipProb, 'text-3xl')}<span class="text-[10px] leading-tight text-slate-400 mt-0.5">${cond.text}</span>${ni || !WET_ICONS.includes(cond.icon) ? '' : tstmTag(bb.thunder)}${windTag(i, ni)}</div>
                                 <div class="text-right">
                                     ${ni ? `<div class="text-[10px] text-sky-300 font-semibold uppercase tracking-wider font-mono">Low tonight</div>
                                     <div class="text-xl font-black text-white">${formatTemp(ni.low)}</div>
@@ -5658,7 +5795,7 @@ body.no-data #sectionNav { display: none; }
                         <i class="fa-solid ${cond.icon} text-xl my-2 ${cond.color}"></i>
                         <span class="text-xs font-bold text-white font-mono">${formatTemp(j === s ? (ccH && ccH.temp !== null ? ccH.temp : h.temperature_2m[j]) : (adjH && adjH.T[j] !== null ? adjH.T[j] : h.temperature_2m[j]))}</span>
                         <span class="text-[10px] font-mono mt-1 ${pp >= 10 ? 'text-blue-300' : 'text-transparent'}"><i class="fa-solid fa-droplet"></i> ${pp !== null ? pp : 0}%</span>
-                        ${(t => t != null && t >= 15 ? `<span class="text-[10px] font-mono text-amber-300"><i class="fa-solid fa-bolt"></i> ${Math.round(t)}%</span>` : '')(thunderAt(j))}
+                        ${(t => t != null && t >= 15 ? `<span class="text-[10px] font-mono text-amber-300"><i class="fa-solid fa-bolt"></i> ${Math.round(t)}%</span>` : '')(thunderAt(j))}${j === s ? '' : hourWindTag(j)}
                     </div>`;
             }
             container.innerHTML = html;
@@ -5856,6 +5993,7 @@ body.no-data #sectionNav { display: none; }
                     return L;
                 })()
             }));
+            try { alerts.push(...tropicalAlerts()); } catch (e) {}
             alerts.push(...spcAlerts());
             if (bestBetResults.length > 0) {
                 const bb = bestBetResults[0];
@@ -6844,7 +6982,7 @@ body.no-data #sectionNav { display: none; }
                 $h('heroLo').innerText = formatTemp(ni.low); $h('heroLoLbl').innerText = 'Low tonight';
                 hiW.style.display = ni.high !== null ? '' : 'none';
                 if (ni.high !== null) { $h('heroHi').innerText = formatTemp(ni.high); $h('heroHiLbl').innerText = 'Rising to'; }
-                const parts = [ni.nowcast && ni.nowcast.wet ? `${NOWCAST_WORD[ni.nowcast.kind]} ${rainEndText() || 'falling now'}; low tonight near ${formatTemp(ni.low)}.` : `${(t => t[0] + t.slice(1).toLowerCase())(ni.cond.text.split(', ')[0])} tonight with a low near ${formatTemp(ni.low)}.`];
+                const parts = [ni.nowcast && ni.nowcast.wet ? `${NOWCAST_WORD[ni.nowcast.kind]} ${rainEndText() || 'falling now'}; low tonight near ${formatTemp(ni.low)}.` : `${(t => t[0] + t.slice(1).toLowerCase())((() => { const ts = tonightSegs(ni); return windPhrase(ni.cond.text.split(', ')[0], ts[0][1], ts[ts.length - 1][2]); })())} tonight with a low near ${formatTemp(ni.low)}.`];
                 if (ni.high !== null) parts.push(`Temperatures rise to around ${formatTemp(ni.high)} before sunrise.`);
                 { const tsg = tonightSegs(ni); periodExtras(tsg, radarInfo && radarInfo.arrive).forEach(x => parts.push(x)); }
                 if (rf.high && rf.high.type === 'set') parts.push(rf.high.tie ? 'Today tied the daily record high.' : 'Today set a new daily record high.');

@@ -1822,3 +1822,42 @@ _r("""                if (wetH) {
                     else if (wpp >= 60) state = `${sky} with ${kind} likely`;
                     else state = `${sky} with a ${Math.round(wpp / 10) * 10}% chance of ${kind}`;
                 }""", "")
+
+# ---- breezy / windy / very windy in the wording, the day cards and the hourly cells ----
+_a = out.index('        function restOfDayPhrase() {')
+out = out[:_a] + open('/home/claude/wind_level.js').read() + out[_a:]
+assert out.count("                let state = sky;") == 2
+out = out.replace("                let state = sky;", "                let state = sky; const wlv = windLevel(s, e);")
+# a part with the same sky as the one before differs only in wind: 'Mostly cloudy, becoming windy this afternoon'
+_r("""                const last = parts[parts.length - 1];
+                if (last && last.state === state) last.labels.push(label.replace('this ', ''));
+                else parts.push({ state, labels: [label] });""", """                const last = parts[parts.length - 1];
+                if (last && last.sky === sky && last.lv === wlv) last.labels.push(label.replace('this ', ''));
+                else parts.push({ sky, lv: wlv, state: skyWindState(last, sky, wlv), labels: [label] });""")
+_r("""                const last = parts[parts.length - 1];
+                if (last && last.state === state) last.labels.push(label);
+                else parts.push({ state, labels: [label] });""", """                const last = parts[parts.length - 1];
+                if (last && last.sky === sky && last.lv === wlv) last.labels.push(label);
+                else parts.push({ sky, lv: wlv, state: skyWindState(last, sky, wlv), labels: [label] });""")
+_r("""            return cap(bits.length > 2 ? bits.slice(0, -1).join(', ') + ', then ' + bits.slice(-1) : bits.join(', then '));""",
+   """            return cap(bits.length > 2 ? bits.slice(0, -1).join(', ') + ', then ' + bits.slice(-1) : bits.join(', then ')).replace(/, then (becoming|less windy)/g, ', $1');""")
+_r("""                : cap(parts.map((p, i) => `${p.state} ${p.labels.length > 1 ? 'through the ' + p.labels[p.labels.length - 1].replace(/^in the |^after /, '') : p.labels[0]}`).join(', then '));""",
+   """                : cap(parts.map((p, i) => `${p.state} ${p.labels.length > 1 ? 'through the ' + p.labels[p.labels.length - 1].replace(/^in the |^after /, '') : p.labels[0]}`).join(', then ')).replace(/, then (becoming|less windy)/g, ', $1');""")
+_r("""(ni.cond.text.split(' · ')[0])} tonight with a low near""", """((() => { const ts = tonightSegs(ni); return windPhrase(ni.cond.text.split(' · ')[0], ts[0][1], ts[ts.length - 1][2]); })())} tonight with a low near""")
+_r("""${cond.text}</span>${ni || !WET_ICONS.includes(cond.icon) ? '' : tstmTag(bb.thunder)}""", """${cond.text}</span>${ni || !WET_ICONS.includes(cond.icon) ? '' : tstmTag(bb.thunder)}${windTag(i, ni)}""")
+_r("""(t => t != null && t >= 15 ? `<span class="text-[10px] font-mono text-amber-300"><i class="fa-solid fa-bolt"></i> ${Math.round(t)}%</span>` : '')(thunderAt(j))}""", """(t => t != null && t >= 15 ? `<span class="text-[10px] font-mono text-amber-300"><i class="fa-solid fa-bolt"></i> ${Math.round(t)}%</span>` : '')(thunderAt(j))}${j === s ? '' : hourWindTag(j)}""")
+_r(""".rec-btn { background: none;""", """.wtag { display: inline-flex; align-items: center; gap: 4px; font: 700 10px/1.4 ui-monospace, Menlo, monospace; border-radius: 999px; padding: 1px 7px; margin-top: 2px; border: 1px solid; }
+.wtag.wl1 { color: #99f6e4; background: rgba(45,212,191,.10); border-color: rgba(45,212,191,.40); }
+.wtag.wl2 { color: #fcd34d; background: rgba(245,158,11,.14); border-color: rgba(251,191,36,.45); }
+.wtag.wl3 { color: #fda4af; background: rgba(244,63,94,.16); border-color: rgba(251,113,133,.55); }
+.hwind { font: 10px ui-monospace, Menlo, monospace; margin-top: 2px; }
+.hwind.wl1 { color: #5eead4; } .hwind.wl2 { color: #fcd34d; } .hwind.wl3 { color: #fb7185; font-weight: 700; }
+.rec-btn { background: none;""")
+
+# ---- tropical cyclones (NHC / CPHC) in the alerts ----
+_a = out.index('        function restOfDayPhrase() {')
+out = out[:_a] + open('/home/claude/tropical.js').read() + out[_a:]
+_r("""                if (nwsOffice) loadRegional(token, lat, lon);""", """                if (nwsOffice) loadRegional(token, lat, lon);
+                loadTropical(token, lat, lon);""")
+_r("""            alerts.push(...spcAlerts());""", """            try { alerts.push(...tropicalAlerts()); } catch (e) {}
+            alerts.push(...spcAlerts());""")

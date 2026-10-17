@@ -58,3 +58,9 @@ A link naming a city (or a reload of one) opens that city; ?home=1 on such a lin
 
 ## Climate station choices
 Nearest representative station within 40 km and 300 m elevation (observing station's own site to 60 km); per-location override in the picker. Burke uses Reagan (DCA) climate; Mammoth Lakes uses the Mammoth airport observations plus IEM daily data.
+
+## Wind wording and tropical alerts (Oct 17)
+- Sustained wind (calibrated, not gusts) per part of a period, second-highest hour when 3+ hours: breezy 10+ mph, windy 20+ mph, very windy 30+ mph or while a Wind Advisory / High Wind / Extreme Wind / Tropical Storm or Hurricane Warning is in effect (wind_level.js).
+- The word joins the sky phrase: "Sunny and breezy this morning"; a part with the same sky says only the change: "Mostly cloudy this morning, becoming windy this afternoon", "less windy after midnight". Tonight: "Mostly clear and breezy tonight".
+- Icons: day cards get a Breezy / Windy / Very windy tag (teal / amber / rose); hourly cells show a wind icon and sustained mph once breezy.
+- Tropical (tropical.js): one identify request to NOAA's NHC_tropical_weather MapServer (CORS allowed; CurrentStorms.json is not) for cones containing the location (layers 8,34,...,372), 5-day wind speed probabilities 34/50/64 kt (395-397) and 7-day development areas (3); cone storms get current strength/motion from the points layer (cone id - 2, tau=0). Shown in alerts tagged NHC. Atlantic, East and Central Pacific only. NWS point alerts already carry hurricane/tropical storm/storm surge watches and warnings. Cached 20 min per session.
