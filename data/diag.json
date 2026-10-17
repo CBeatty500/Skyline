@@ -1,15 +1,15 @@
 [
  {
   "name": "New York, NY",
-  "at": "2026-10-17T13:42:46.396Z",
-  "firstViewMs": 3047,
+  "at": "2026-10-17T13:44:53.631Z",
+  "firstViewMs": 3755,
   "errors": [
-   "warning: Radar nowcast unavailable: Error: radar samples\n    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=New%20York%2C%20NY&lat=40.7143&lon=-74.0060:1985:60)\n    at async Promise.all (index 0)\n    at async radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=New%"
+   "warning: Radar nowcast unavailable: Error: radar samples\n    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=New%20York%2C%20NY&lat=40.7143&lon=-74.0060:1984:60)\n    at async Promise.all (index 0)\n    at async radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=New%"
   ],
   "snaps": [
    {
     "label": "first view",
-    "narrative": "Overcast this morning, mostly cloudy this afternoon, then clear this evening. Breezy. High near 53°F. North winds 15-20 mph with gusts to 30 mph. Overnight low near 39°F.",
+    "narrative": "Overcast this morning, mostly cloudy this afternoon, then clear this evening. Breezy, with a high near 53°F. North winds 15-20 mph with gusts to 30 mph. Overnight low near 39°F.",
     "outlook": "TONIGHT\n\nClear and breezy in the evening, less windy after midnight. Low near 39°F. North winds 5-15 mph with gusts to 25 mph.\n\nSUNDAY\n\nSunny. High near 57°F.\n\nSUNDAY NIGHT\n\nClear. Low near 44°F.",
     "windTags": [
      "Breezy",
@@ -28,20 +28,20 @@
     "hours": [
      {
       "t": "09:00",
-      "pp": 12,
+      "pp": 10,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 93,
+      "cc": 96,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 11,
+      "pp": 8,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 94,
+      "cc": 95,
       "dry": false
      },
      {
@@ -50,16 +50,16 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 94,
+      "cc": 91,
       "dry": false
      },
      {
       "t": "12:00",
-      "pp": 4,
+      "pp": 3,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 84,
+      "cc": 92,
       "dry": false
      },
      {
@@ -68,16 +68,16 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 85,
+      "cc": 92,
       "dry": false
      },
      {
       "t": "14:00",
-      "pp": 2,
+      "pp": 3,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 89,
+      "cc": 92,
       "dry": false
      },
      {
@@ -86,7 +86,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 71,
+      "cc": 77,
       "dry": false
      },
      {
@@ -95,7 +95,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 72,
+      "cc": 75,
       "dry": false
      },
      {
@@ -104,7 +104,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 56,
+      "cc": 63,
       "dry": false
      },
      {
@@ -113,7 +113,7 @@
       "code": 0,
       "wet": 0,
       "thunder": 0,
-      "cc": 5,
+      "cc": 10,
       "dry": false
      },
      {
@@ -122,7 +122,7 @@
       "code": 0,
       "wet": 0,
       "thunder": 0,
-      "cc": 3,
+      "cc": 7,
       "dry": false
      },
      {
@@ -151,7 +151,7 @@
    },
    {
     "label": "+5s",
-    "narrative": "Overcast this morning, mostly cloudy this afternoon, then clear this evening. Breezy. High near 53°F. North winds 15-20 mph with gusts to 30 mph. Overnight low near 39°F.",
+    "narrative": "Overcast this morning, mostly cloudy this afternoon, then clear this evening. Breezy, with a high near 53°F. North winds 15-20 mph with gusts to 30 mph. Overnight low near 39°F.",
     "outlook": "TONIGHT\n\nClear and breezy in the evening, less windy after midnight. Low near 39°F. North winds 5-15 mph with gusts to 25 mph.\n\nSUNDAY\n\nSunny. High near 57°F.\n\nSUNDAY NIGHT\n\nClear. Low near 44°F.",
     "windTags": [
      "Breezy",
@@ -174,20 +174,20 @@
     "hours": [
      {
       "t": "09:00",
-      "pp": 12,
+      "pp": 10,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 93,
+      "cc": 96,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 11,
+      "pp": 8,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 94,
+      "cc": 95,
       "dry": false
      },
      {
@@ -196,16 +196,16 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 94,
+      "cc": 91,
       "dry": false
      },
      {
       "t": "12:00",
-      "pp": 4,
+      "pp": 3,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 84,
+      "cc": 92,
       "dry": false
      },
      {
@@ -214,16 +214,16 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 85,
+      "cc": 92,
       "dry": false
      },
      {
       "t": "14:00",
-      "pp": 2,
+      "pp": 3,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 89,
+      "cc": 92,
       "dry": false
      },
      {
@@ -232,7 +232,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 71,
+      "cc": 77,
       "dry": false
      },
      {
@@ -241,7 +241,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 72,
+      "cc": 75,
       "dry": false
      },
      {
@@ -250,7 +250,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 56,
+      "cc": 63,
       "dry": false
      },
      {
@@ -259,7 +259,7 @@
       "code": 0,
       "wet": 0,
       "thunder": 0,
-      "cc": 5,
+      "cc": 10,
       "dry": false
      },
      {
@@ -268,7 +268,7 @@
       "code": 0,
       "wet": 0,
       "thunder": 0,
-      "cc": 3,
+      "cc": 7,
       "dry": false
      },
      {
@@ -302,7 +302,7 @@
    },
    {
     "label": "+15s",
-    "narrative": "Overcast this morning, mostly cloudy this afternoon, then clear this evening. Breezy. High near 53°F. North winds 15-20 mph with gusts to 30 mph. Overnight low near 39°F.",
+    "narrative": "Overcast this morning, mostly cloudy this afternoon, then clear this evening. Breezy, with a high near 53°F. North winds 15-20 mph with gusts to 30 mph. Overnight low near 39°F.",
     "outlook": "TONIGHT\n\nClear and breezy in the evening, less windy after midnight. Low near 39°F. North winds 5-15 mph with gusts to 25 mph.\n\nSUNDAY\n\nSunny. High near 57°F.\n\nSUNDAY NIGHT\n\nClear. Low near 44°F.",
     "windTags": [
      "Breezy",
@@ -325,20 +325,20 @@
     "hours": [
      {
       "t": "09:00",
-      "pp": 12,
+      "pp": 10,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 93,
+      "cc": 96,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 11,
+      "pp": 8,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 94,
+      "cc": 95,
       "dry": false
      },
      {
@@ -347,16 +347,16 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 94,
+      "cc": 91,
       "dry": false
      },
      {
       "t": "12:00",
-      "pp": 4,
+      "pp": 3,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 84,
+      "cc": 92,
       "dry": false
      },
      {
@@ -365,16 +365,16 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 85,
+      "cc": 92,
       "dry": false
      },
      {
       "t": "14:00",
-      "pp": 2,
+      "pp": 3,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 89,
+      "cc": 92,
       "dry": false
      },
      {
@@ -383,7 +383,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 71,
+      "cc": 77,
       "dry": false
      },
      {
@@ -392,7 +392,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 72,
+      "cc": 75,
       "dry": false
      },
      {
@@ -401,7 +401,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 56,
+      "cc": 63,
       "dry": false
      },
      {
@@ -410,7 +410,7 @@
       "code": 0,
       "wet": 0,
       "thunder": 0,
-      "cc": 5,
+      "cc": 10,
       "dry": false
      },
      {
@@ -419,7 +419,7 @@
       "code": 0,
       "wet": 0,
       "thunder": 0,
-      "cc": 3,
+      "cc": 7,
       "dry": false
      },
      {
@@ -453,7 +453,7 @@
    },
    {
     "label": "+30s",
-    "narrative": "Overcast this morning, mostly cloudy this afternoon, then clear this evening. Breezy. High near 53°F. North winds 15-20 mph with gusts to 30 mph. Overnight low near 39°F.",
+    "narrative": "Overcast this morning, mostly cloudy this afternoon, then clear this evening. Breezy, with a high near 53°F. North winds 15-20 mph with gusts to 30 mph. Overnight low near 39°F.",
     "outlook": "TONIGHT\n\nClear and breezy in the evening, less windy after midnight. Low near 39°F. North winds 5-15 mph with gusts to 25 mph.\n\nSUNDAY\n\nSunny. High near 57°F.\n\nSUNDAY NIGHT\n\nClear. Low near 44°F.",
     "windTags": [
      "Breezy",
@@ -476,20 +476,20 @@
     "hours": [
      {
       "t": "09:00",
-      "pp": 12,
+      "pp": 10,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 93,
+      "cc": 96,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 11,
+      "pp": 8,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 94,
+      "cc": 95,
       "dry": false
      },
      {
@@ -498,16 +498,16 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 94,
+      "cc": 91,
       "dry": false
      },
      {
       "t": "12:00",
-      "pp": 4,
+      "pp": 3,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 84,
+      "cc": 92,
       "dry": false
      },
      {
@@ -516,16 +516,16 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 85,
+      "cc": 92,
       "dry": false
      },
      {
       "t": "14:00",
-      "pp": 2,
+      "pp": 3,
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 89,
+      "cc": 92,
       "dry": false
      },
      {
@@ -534,7 +534,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 71,
+      "cc": 77,
       "dry": false
      },
      {
@@ -543,7 +543,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 72,
+      "cc": 75,
       "dry": false
      },
      {
@@ -552,7 +552,7 @@
       "code": 3,
       "wet": 0,
       "thunder": 0,
-      "cc": 56,
+      "cc": 63,
       "dry": false
      },
      {
@@ -561,7 +561,7 @@
       "code": 0,
       "wet": 0,
       "thunder": 0,
-      "cc": 5,
+      "cc": 10,
       "dry": false
      },
      {
@@ -570,7 +570,7 @@
       "code": 0,
       "wet": 0,
       "thunder": 0,
-      "cc": 3,
+      "cc": 7,
       "dry": false
      },
      {
@@ -606,43 +606,675 @@
   "timings": [
    {
     "url": "https://data.rcc-acis.org/StnData",
-    "start": 4177,
-    "dur": 1352
-   },
-   {
-    "url": "https://api.weather.gov/stations/KLGA/observations",
-    "start": 520,
-    "dur": 1026
+    "start": 7739,
+    "dur": 1965
    },
    {
     "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 257,
-    "dur": 684
-   },
-   {
-    "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 257,
-    "dur": 659
-   },
-   {
-    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
-    "start": 917,
-    "dur": 541
-   },
-   {
-    "url": "https://mesonet.agron.iastate.edu/api/1/daily.json",
-    "start": 5364,
-    "dur": 290
-   },
-   {
-    "url": "https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather/MapServer/identify",
-    "start": 2163,
-    "dur": 280
+    "start": 5331,
+    "dur": 1566
    },
    {
     "url": "https://api.open-meteo.com/v1/elevation",
-    "start": 3840,
-    "dur": 255
+    "start": 5553,
+    "dur": 1409
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/elevation",
+    "start": 5553,
+    "dur": 1290
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 231,
+    "dur": 1197
+   },
+   {
+    "url": "https://api.weather.gov/stations/KLGA/observations",
+    "start": 442,
+    "dur": 1042
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 231,
+    "dur": 1003
+   },
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 1235,
+    "dur": 377
+   }
+  ]
+ },
+ {
+  "name": "Honolulu, HI",
+  "at": "2026-10-17T13:45:25.335Z",
+  "firstViewMs": 1593,
+  "errors": [
+   "warning: Regional analysis unavailable: too few reports"
+  ],
+  "snaps": [
+   {
+    "label": "first view",
+    "narrative": "Mostly clear and breezy tonight with a low near 78°F. Northeast winds 10-15 mph with gusts to 30 mph.",
+    "outlook": "SUNDAY\n\nMostly sunny and breezy. High near 82°F. Northeast winds 10-20 mph with gusts to 30 mph.\n\nSUNDAY NIGHT\n\nMostly clear and breezy. Low near 75°F. Northeast winds 15-20 mph with gusts to 30 mph.\n\nMONDAY\n\nMostly sunny and breezy. High near 82°F. Northeast winds 10-20 mph with gusts to 30 mph.",
+    "windTags": [
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy"
+    ],
+    "hourWind": " 11 mph |  13 mph |  14 mph |  14 mph |  14 mph |  15 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  14 mph |  14 mph |  15 mph |  16 mph |  14 mph |  14 mph |  14 mph |  15 mph |  15 mph |  15 mph |  16 mph |  15 mph |  16 mph",
+    "alerts": " No active watches or warnings for this location.",
+    "tropical": null,
+    "radarOpen": false,
+    "cond": "Partly Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "03:00",
+      "pp": 19,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 34,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 17,
+      "code": 1,
+      "wet": 0,
+      "thunder": null,
+      "cc": 38,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 16,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 34,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 10,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 24,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 9,
+      "code": 51,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 19,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 26,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 15,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 13,
+      "dry": false
+     }
+    ],
+    "spc": [],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "PHNL",
+     "ts": "2026-10-17T12:53:00+00:00",
+     "txt": "Partly Cloudy"
+    }
+   },
+   {
+    "label": "+5s",
+    "narrative": "Mostly clear and breezy tonight with a low near 78°F. Northeast winds 10-15 mph with gusts to 30 mph.",
+    "outlook": "SUNDAY\n\nMostly sunny and breezy. High near 82°F. Northeast winds 10-20 mph with gusts to 30 mph.\n\nSUNDAY NIGHT\n\nMostly clear and breezy. Low near 75°F. Northeast winds 15-20 mph with gusts to 30 mph.\n\nMONDAY\n\nMostly sunny and breezy. High near 82°F. Northeast winds 10-20 mph with gusts to 30 mph.",
+    "windTags": [
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy"
+    ],
+    "hourWind": " 11 mph |  13 mph |  14 mph |  14 mph |  14 mph |  15 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  14 mph |  14 mph |  15 mph |  16 mph |  14 mph |  14 mph |  14 mph |  15 mph |  15 mph |  15 mph |  16 mph |  15 mph |  16 mph",
+    "alerts": " No active watches or warnings for this location.",
+    "tropical": {
+     "cones": [],
+     "wsp": {},
+     "area": null
+    },
+    "radarOpen": false,
+    "cond": "Partly Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "03:00",
+      "pp": 19,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 34,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 17,
+      "code": 1,
+      "wet": 0,
+      "thunder": null,
+      "cc": 38,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 16,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 34,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 10,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 24,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 9,
+      "code": 51,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 19,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 26,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 15,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 13,
+      "dry": false
+     }
+    ],
+    "spc": [],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "PHNL",
+     "ts": "2026-10-17T12:53:00+00:00",
+     "txt": "Partly Cloudy"
+    }
+   },
+   {
+    "label": "+15s",
+    "narrative": "Mostly clear and breezy tonight with a low near 78°F. Northeast winds 10-15 mph with gusts to 30 mph.",
+    "outlook": "SUNDAY\n\nMostly sunny and breezy. High near 82°F. Northeast winds 10-20 mph with gusts to 30 mph.\n\nSUNDAY NIGHT\n\nMostly clear and breezy. Low near 75°F. Northeast winds 15-20 mph with gusts to 30 mph.\n\nMONDAY\n\nMostly sunny and breezy. High near 82°F. Northeast winds 10-20 mph with gusts to 30 mph.",
+    "windTags": [
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy"
+    ],
+    "hourWind": " 11 mph |  13 mph |  14 mph |  14 mph |  14 mph |  15 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  14 mph |  14 mph |  15 mph |  16 mph |  14 mph |  14 mph |  14 mph |  15 mph |  15 mph |  15 mph |  16 mph |  15 mph |  16 mph",
+    "alerts": " No active watches or warnings for this location.",
+    "tropical": {
+     "cones": [],
+     "wsp": {},
+     "area": null
+    },
+    "radarOpen": false,
+    "cond": "Partly Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "03:00",
+      "pp": 19,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 34,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 17,
+      "code": 1,
+      "wet": 0,
+      "thunder": null,
+      "cc": 38,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 16,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 34,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 10,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 24,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 9,
+      "code": 51,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 19,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 26,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 15,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 13,
+      "dry": false
+     }
+    ],
+    "spc": [],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "PHNL",
+     "ts": "2026-10-17T12:53:00+00:00",
+     "txt": "Partly Cloudy"
+    }
+   },
+   {
+    "label": "+30s",
+    "narrative": "Mostly clear and breezy tonight with a low near 78°F. Northeast winds 10-15 mph with gusts to 30 mph.",
+    "outlook": "SUNDAY\n\nMostly sunny and breezy. High near 82°F. Northeast winds 10-20 mph with gusts to 30 mph.\n\nSUNDAY NIGHT\n\nMostly clear and breezy. Low near 75°F. Northeast winds 15-20 mph with gusts to 30 mph.\n\nMONDAY\n\nMostly sunny and breezy. High near 82°F. Northeast winds 10-20 mph with gusts to 30 mph.",
+    "windTags": [
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy"
+    ],
+    "hourWind": " 11 mph |  13 mph |  14 mph |  14 mph |  14 mph |  15 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  14 mph |  14 mph |  15 mph |  16 mph |  14 mph |  14 mph |  14 mph |  15 mph |  15 mph |  15 mph |  16 mph |  15 mph |  16 mph",
+    "alerts": " No active watches or warnings for this location.",
+    "tropical": {
+     "cones": [],
+     "wsp": {},
+     "area": null
+    },
+    "radarOpen": false,
+    "cond": "Partly Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "03:00",
+      "pp": 19,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 34,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 17,
+      "code": 1,
+      "wet": 0,
+      "thunder": null,
+      "cc": 38,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 16,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 34,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 10,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 24,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 9,
+      "code": 51,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 19,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 26,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 9,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 22,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 15,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 6,
+      "code": 0,
+      "wet": 0,
+      "thunder": null,
+      "cc": 13,
+      "dry": false
+     }
+    ],
+    "spc": [],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "PHNL",
+     "ts": "2026-10-17T12:53:00+00:00",
+     "txt": "Partly Cloudy"
+    }
+   }
+  ],
+  "timings": [
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 2501,
+    "dur": 806
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 162,
+    "dur": 416
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 161,
+    "dur": 400
+   },
+   {
+    "url": "https://api.weather.gov/stations/PHNL/observations",
+    "start": 460,
+    "dur": 390
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 2408,
+    "dur": 387
+   },
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 564,
+    "dur": 379
+   },
+   {
+    "url": "https://api.weather.gov/stations/PHJR/observations/latest",
+    "start": 1270,
+    "dur": 280
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/geojson/network/NWSCLI.geojson",
+    "start": 1916,
+    "dur": 276
    }
   ]
  }
