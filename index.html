@@ -1902,15 +1902,27 @@ body.no-data #sectionNav { display: none; }
             }
             return out;
         }
+        // newest scan time; some of NOAA's servers lag (even by a day), so a stale answer is retried on another request
+        async function radarLatestTime() {
+            let best = null;
+            for (let a = 0; a < 4; a++) {
+                try {
+                    const info = await (await fetch(`${RADAR_IS}?f=json&_=${Date.now()}${a}`)).json();
+                    let t = info && info.timeInfo && info.timeInfo.timeExtent ? info.timeInfo.timeExtent[1] : null;
+                    if (t && t > Date.now()) t = Math.floor((Date.now() - 4 * 60e3) / 6e4) * 6e4;
+                    if (t && (!best || t > best)) best = t;
+                    if (best && Date.now() - best < 30 * 60e3) return best;
+                } catch (e) {}
+            }
+            return best;
+        }
         async function radarNowcast(lat, lon) {
             // 33 x 33 samples over +-1.5 deg (about 10 km apart); three frames 15 minutes apart
             const N = 33, C = 16, dLat = 1.5, dLon = 1.5 / Math.cos(lat * Math.PI / 180);
             const pts = [];
             for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) pts.push([+(lon - dLon + 2 * dLon * x / (N - 1)).toFixed(4), +(lat + dLat - 2 * dLat * y / (N - 1)).toFixed(4)]);
             const kmX = 2 * dLon * 111.32 * Math.cos(lat * Math.PI / 180) / (N - 1), kmY = 2 * dLat * 111.32 / (N - 1);
-            const info = await (await fetch(`${RADAR_IS}?f=json`)).json();
-            let tEnd = info && info.timeInfo && info.timeInfo.timeExtent ? info.timeInfo.timeExtent[1] : null;
-            if (tEnd && tEnd > Date.now()) tEnd = Math.floor((Date.now() - 4 * 60e3) / 6e4) * 6e4;   // the service sometimes reports a time ahead of now
+            const tEnd = await radarLatestTime();
             if (!tEnd || Date.now() - tEnd > 45 * 60e3) throw new Error('radar not current');
             const [B, M, A] = await Promise.all([radarFrame(pts, tEnd), radarFrame(pts, tEnd - 15 * 60e3), radarFrame(pts, tEnd - 30 * 60e3)]);
             const g = (arr, x, y) => (x < 0 || y < 0 || x >= N || y >= N) ? 0 : arr[y * N + x];
@@ -2632,14 +2644,13 @@ body.no-data #sectionNav { display: none; }
             if (!RM.map) return;
             const tok = ++RM.token, b = RM.map.getBounds(), sz = RM.map.getSize();
             try {
-                const info = await (await fetch(`${RADAR_IS}?f=json`)).json();
-                let tEnd = info && info.timeInfo && info.timeInfo.timeExtent ? info.timeInfo.timeExtent[1] : null;
-                if (tEnd && tEnd > Date.now()) tEnd = Math.floor((Date.now() - 4 * 60e3) / 6e4) * 6e4;   // the service sometimes reports a time ahead of now
+                const tEnd = await radarLatestTime();
+                const stale = !tEnd || Date.now() - tEnd > 45 * 60e3;
                 const fr = await rmFrame(tEnd, b, sz);
                 if (tok !== RM.token) return;
                 RM.overlay.setUrl(fr.url); RM.overlay.setBounds(fr.bounds);
                 RM.tEnd = tEnd; RM.frames = [];
-                document.getElementById('rmTime').innerText = rmStamp(tEnd);
+                document.getElementById('rmTime').innerText = rmStamp(tEnd) + (stale ? ' (radar delayed)' : '');
             } catch (e) { document.getElementById('rmTime').innerText = 'Radar unavailable'; }
         }
         function radarMapStop() {
