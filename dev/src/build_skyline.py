@@ -107,7 +107,7 @@ QUICK = open('/home/claude/quick_view.html').read()
 MODEL_HTML = open('/home/claude/model_analysis.html').read()
 main = f'''<main class="wrap pb-16 pt-5 space-y-5">
 {B['hero'].split(chr(10))[0] and ''}
-        <div id="toastContainer" class="hidden glass-panel border-l-4 border-amber-500 p-4 rounded-xl flex justify-between items-center text-sm shadow-xl">
+        <div id="toastContainer" role="status" aria-live="polite" class="toast-float hidden glass-panel border-l-4 border-amber-500 p-4 rounded-xl flex justify-between items-center text-sm shadow-xl">
             <div class="flex items-center gap-3"><i class="fa-solid fa-circle-exclamation text-amber-400 text-lg"></i><span id="toastMessage" class="text-slate-200">System Notification</span></div>
             <button onclick="closeToast()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
@@ -168,6 +168,10 @@ css = r'''
 html { scroll-behavior: smooth; }
 body { font-family: 'Outfit', system-ui, sans-serif !important; color: var(--ink) !important; background: #07101f !important; padding: 0 !important; }
 .font-display, .hero-temp, h2 { font-family: 'Fraunces', Georgia, serif; }
+/* notices float over whatever the visitor is looking at, not at the top of the page */
+.toast-float{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);width:min(calc(100vw - 24px),520px);z-index:3000;background:rgba(10,20,42,.96)!important;backdrop-filter:blur(10px);box-shadow:0 18px 40px -12px rgba(0,0,0,.7)!important;animation:toastIn .25s ease-out}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,12px)}to{opacity:1;transform:translate(-50%,0)}}
+
 /* welcome hero */
 .bb-hero{position:relative;overflow:hidden;border-radius:1.75rem;padding:3.25rem 1.25rem 2.25rem;text-align:center;
   background:radial-gradient(120% 80% at 50% 0%,#24508f 0%,#173566 45%,#0d1f42 100%);border:1px solid rgba(255,255,255,.09);

@@ -1861,3 +1861,9 @@ _r("""                if (nwsOffice) loadRegional(token, lat, lon);""", """     
                 loadTropical(token, lat, lon);""")
 _r("""            alerts.push(...spcAlerts());""", """            try { alerts.push(...tropicalAlerts()); } catch (e) {}
             alerts.push(...spcAlerts());""")
+
+# notices hide themselves after a few seconds
+_r("""            document.getElementById('toastMessage').innerText = msg;
+            container.classList.remove('hidden');""", """            document.getElementById('toastMessage').innerText = msg;
+            container.classList.remove('hidden');
+            clearTimeout(window._toastT); window._toastT = setTimeout(closeToast, Math.min(12000, 4000 + String(msg).length * 45));""")
