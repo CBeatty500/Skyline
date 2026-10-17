@@ -1929,7 +1929,8 @@ _r("""            <div class="flex flex-col md:flex-row md:items-center justify-
 # ---- wind when precipitation is falling now (no sky sentence), and the observed wind in the 'Now' hourly cell ----
 _r("""${j === s ? '' : hourWindTag(j)}""", """${j === s ? nowWindTag(ccH) : hourWindTag(j)}""")
 _r("""                parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`);""",
-   """                parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`);
-                { const ws = windSentence(todaySegs()); if (ws) parts.push(ws); }""")
+   """                { const ws = windSentence(todaySegs());
+                  if (/^\\w+( \\w+)?\\.$/.test(ws) && !/^Becoming/.test(ws)) parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}. ${ws.slice(0, -1)}, with a high near ${formatTemp(bb.bestMax)}.`);   // 'Breezy, with a high near 54'
+                  else { parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`); if (ws) parts.push(ws); } }""")
 _r("""                if (ni.high !== null) parts.push(`Temperatures rise to around""", """                if (ni.nowcast && ni.nowcast.wet) { const ws = windSentence(tonightSegs(ni)); if (ws) parts.push(ws); }
                 if (ni.high !== null) parts.push(`Temperatures rise to around""")

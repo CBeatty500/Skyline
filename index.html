@@ -7120,8 +7120,9 @@ body.no-data #sectionNav { display: none; }
             $h('heroLo').innerText = formatTemp(bb.bestMin);
             const cond = dailyCondition(bb), parts = [], nc = bb.nowcast;
             if (nc && nc.wet) {
-                parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`);
-                { const ws = windSentence(todaySegs()); if (ws) parts.push(ws); }
+                { const ws = windSentence(todaySegs());
+                  if (/^\w+( \w+)?\.$/.test(ws) && !/^Becoming/.test(ws)) parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}. ${ws.slice(0, -1)}, with a high near ${formatTemp(bb.bestMax)}.`);   // 'Breezy, with a high near 54'
+                  else { parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`); if (ws) parts.push(ws); } }
 
             } else {
                 const ph = restOfDayPhrase() || '';
