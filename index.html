@@ -2594,13 +2594,13 @@ body.no-data #sectionNav { display: none; }
             const sw = L.CRS.EPSG3857.project(b.getSouthWest()), ne = L.CRS.EPSG3857.project(b.getNorthEast());
             const w = Math.min(1400, sz.x), h = Math.round(sz.y * w / sz.x);
             const q = new URLSearchParams({ bbox: [sw.x, sw.y, ne.x, ne.y].join(','), bboxSR: '3857', imageSR: '3857', size: `${w},${h}`, format: 'png32', transparent: 'true',
-                interpolation: 'RSP_NearestNeighbor', f: 'json' });
+                interpolation: 'RSP_NearestNeighbor', f: 'image' });
             if (t) q.set('time', String(t));
-            const meta = await (await fetch(`${RADAR_IS}/exportImage?${q}`)).json();   // the image and the extent it really covers
-            if (!meta || !meta.href || !meta.extent) throw new Error('radar export');
-            const ex = meta.extent, unproj = (x, y) => L.CRS.EPSG3857.unproject(L.point(x, y));
-            const realB = L.latLngBounds(unproj(ex.xmin, ex.ymin), unproj(ex.xmax, ex.ymax));
-            const r = await fetch(meta.href); if (!r.ok) throw new Error('radar ' + r.status);
+            // the server keeps pixels square: it widens the shorter side of the requested area around its centre
+            const res = Math.max((ne.x - sw.x) / w, (ne.y - sw.y) / h), cxm = (sw.x + ne.x) / 2, cym = (sw.y + ne.y) / 2;
+            const unproj = (x, y) => L.CRS.EPSG3857.unproject(L.point(x, y));
+            const realB = L.latLngBounds(unproj(cxm - res * w / 2, cym - res * h / 2), unproj(cxm + res * w / 2, cym + res * h / 2));
+            const r = await fetch(`${RADAR_IS}/exportImage?${q}`); if (!r.ok) throw new Error('radar ' + r.status);
             const bmp = await createImageBitmap(await r.blob());
             const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
             const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0, w, h);
