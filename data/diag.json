@@ -1,751 +1,4231 @@
-{
- "at": "2026-10-17T09:18:16.382Z",
- "firstViewMs": 2689,
- "errors": [],
- "snaps": [
-  {
-   "label": "first view",
-   "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. Overnight low near 37°F.",
-   "cond": "Cloudy",
-   "radar": null,
-   "radarInfo": null,
-   "hours": [
-    {
-     "t": "05:00",
-     "pp": 39,
-     "code": 1,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 77,
-     "dry": false
+[
+ {
+  "name": "Ashburn, VA",
+  "at": "2026-10-17T09:23:28.460Z",
+  "firstViewMs": 3844,
+  "errors": [
+   "warning: Radar nowcast unavailable: Error: radar samples\n    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1862:56)\n    at async Promise.all (index 0)\n    at async radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn"
+  ],
+  "snaps": [
+   {
+    "label": "first view",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. Overnight low near 37°F.",
+    "cond": "Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 39,
+      "code": 1,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 31,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 100,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 26,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 100,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 81,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 6,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 90,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 4,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 86,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 3,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 87,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 1,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 1,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 67,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 1,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 27,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 16,
+      "dry": false
+     }
+    ],
+    "spc": null,
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 0,
+     "lastHourMm": 0,
+     "persist": 60
     },
-    {
-     "t": "06:00",
-     "pp": 31,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 100,
-     "dry": false
-    },
-    {
-     "t": "07:00",
-     "pp": 26,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 100,
-     "dry": false
-    },
-    {
-     "t": "08:00",
-     "pp": 12,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 93,
-     "dry": false
-    },
-    {
-     "t": "09:00",
-     "pp": 8,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 81,
-     "dry": false
-    },
-    {
-     "t": "10:00",
-     "pp": 6,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 90,
-     "dry": false
-    },
-    {
-     "t": "11:00",
-     "pp": 4,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 86,
-     "dry": false
-    },
-    {
-     "t": "12:00",
-     "pp": 3,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 87,
-     "dry": false
-    },
-    {
-     "t": "13:00",
-     "pp": 1,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 77,
-     "dry": false
-    },
-    {
-     "t": "14:00",
-     "pp": 1,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 67,
-     "dry": false
-    },
-    {
-     "t": "15:00",
-     "pp": 0,
-     "code": 1,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 27,
-     "dry": false
-    },
-    {
-     "t": "16:00",
-     "pp": 0,
-     "code": 0,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 16,
-     "dry": false
+    "obs": {
+     "id": "KIAD",
+     "ts": "2026-10-17T08:55:00+00:00",
+     "txt": "Cloudy"
     }
-   ],
-   "spc": null,
-   "nowcast": {
-    "wet": false,
-    "kind": "rain",
-    "endedAgo": 0.3333333333333333,
-    "lastHourMm": 0,
-    "persist": 48
    },
-   "obs": {
-    "id": "KIAD",
-    "ts": "2026-10-17T08:55:00+00:00",
-    "txt": "Cloudy"
+   {
+    "label": "+5s",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. Overnight low near 37°F.",
+    "cond": "Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 39,
+      "code": 1,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 31,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 100,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 26,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 100,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 81,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 6,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 90,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 4,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 86,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 3,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 87,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 1,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 1,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 67,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 1,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 27,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 16,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 0,
+     "lastHourMm": 0,
+     "persist": 60
+    },
+    "obs": {
+     "id": "KIAD",
+     "ts": "2026-10-17T08:55:00+00:00",
+     "txt": "Cloudy"
+    }
+   },
+   {
+    "label": "+15s",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. Overnight low near 37°F.",
+    "cond": "Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 39,
+      "code": 1,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 31,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 100,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 26,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 100,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 81,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 6,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 90,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 4,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 86,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 3,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 87,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 1,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 1,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 67,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 1,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 27,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 16,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 0,
+     "lastHourMm": 0,
+     "persist": 60
+    },
+    "obs": {
+     "id": "KIAD",
+     "ts": "2026-10-17T08:55:00+00:00",
+     "txt": "Cloudy"
+    }
+   },
+   {
+    "label": "+30s",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. Overnight low near 37°F.",
+    "cond": "Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 39,
+      "code": 1,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 31,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 100,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 26,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 100,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 81,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 6,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 90,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 4,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 86,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 3,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 87,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 1,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 1,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 67,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 1,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 27,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 16,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 0,
+     "lastHourMm": 0,
+     "persist": 60
+    },
+    "obs": {
+     "id": "KIAD",
+     "ts": "2026-10-17T08:55:00+00:00",
+     "txt": "Cloudy"
+    }
    }
-  },
-  {
-   "label": "+5s",
-   "narrative": "Rain ending around 6:15 AM, with a high near 55°F. Then a 26% chance of a passing shower. Overnight low near 37°F.",
-   "cond": "Light Rain",
-   "radar": {
-    "here": 20,
-    "here3": 25,
-    "passed": false,
-    "clearUpstream": true,
-    "endMin": 70,
-    "motionSrc": "steering",
-    "moving": true,
-    "mph": 44,
-    "arrive": 0,
-    "peak": 26,
-    "any": 124,
-    "ahead": [
-     20,
-     26,
-     16,
-     0,
-     11,
-     11,
-     0
-    ]
+  ],
+  "timings": [
+   {
+    "url": "https://api.weather.gov/stations/KIAD/observations",
+    "start": 437,
+    "dur": 828
    },
-   "radarInfo": null,
-   "hours": [
-    {
-     "t": "05:00",
-     "pp": 75,
-     "code": 80,
-     "wet": 80,
-     "thunder": 0,
-     "cc": 77,
-     "dry": false
-    },
-    {
-     "t": "06:00",
-     "pp": 30,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 100,
-     "dry": true
-    },
-    {
-     "t": "07:00",
-     "pp": 26,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 100,
-     "dry": true
-    },
-    {
-     "t": "08:00",
-     "pp": 12,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 93,
-     "dry": false
-    },
-    {
-     "t": "09:00",
-     "pp": 8,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 81,
-     "dry": false
-    },
-    {
-     "t": "10:00",
-     "pp": 6,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 90,
-     "dry": false
-    },
-    {
-     "t": "11:00",
-     "pp": 4,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 86,
-     "dry": false
-    },
-    {
-     "t": "12:00",
-     "pp": 3,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 87,
-     "dry": false
-    },
-    {
-     "t": "13:00",
-     "pp": 1,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 77,
-     "dry": false
-    },
-    {
-     "t": "14:00",
-     "pp": 1,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 67,
-     "dry": false
-    },
-    {
-     "t": "15:00",
-     "pp": 0,
-     "code": 1,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 27,
-     "dry": false
-    },
-    {
-     "t": "16:00",
-     "pp": 0,
-     "code": 0,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 16,
-     "dry": false
-    }
-   ],
-   "spc": [
-    {
-     "cat": null,
-     "valid": null
-    }
-   ],
-   "nowcast": {
-    "wet": true,
-    "kind": "rain",
-    "lastHourMm": 0
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 5418,
+    "dur": 627
    },
-   "obs": {
-    "id": "KIAD",
-    "ts": "2026-10-17T08:55:00+00:00",
-    "txt": "Cloudy"
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 241,
+    "dur": 450
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 241,
+    "dur": 438
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 5324,
+    "dur": 409
+   },
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 683,
+    "dur": 381
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/cgi-bin/afos/retrieve.py",
+    "start": 2311,
+    "dur": 252
+   },
+   {
+    "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
+    "start": 3952,
+    "dur": 212
    }
-  },
-  {
-   "label": "+15s",
-   "narrative": "Rain ending around 6:15 AM, with a high near 55°F. Then a 26% chance of a passing shower. Overnight low near 37°F.",
-   "cond": "Light Rain",
-   "radar": {
-    "here": 20,
-    "here3": 25,
-    "passed": false,
-    "clearUpstream": true,
-    "endMin": 70,
-    "motionSrc": "steering",
-    "moving": true,
-    "mph": 44,
-    "arrive": 0,
-    "peak": 26,
-    "any": 124,
-    "ahead": [
-     20,
-     26,
-     16,
-     0,
-     11,
-     11,
-     0
-    ]
-   },
-   "radarInfo": null,
-   "hours": [
-    {
-     "t": "05:00",
-     "pp": 75,
-     "code": 80,
-     "wet": 80,
-     "thunder": 0,
-     "cc": 77,
-     "dry": false
+  ]
+ },
+ {
+  "name": "Chicago",
+  "at": "2026-10-17T09:24:02.744Z",
+  "firstViewMs": 3578,
+  "errors": [
+   "warning: Radar nowcast unavailable: Error: radar samples\n    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=Chicago&lat=41.85&lon=-87.65:1862:56)\n    at async Promise.all (index 0)\n    at async radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=Chicago&lat=41.85&l"
+  ],
+  "snaps": [
+   {
+    "label": "first view",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 55°F. Overnight low near 41°F.",
+    "cond": "Mostly Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "04:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 19,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 14,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 8,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 14,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 7,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     }
+    ],
+    "spc": null,
+    "nowcast": {
+     "wet": false,
+     "kind": "drizzle",
+     "endedAgo": 5.25,
+     "lastHourMm": 0,
+     "persist": 2
     },
-    {
-     "t": "06:00",
-     "pp": 30,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 100,
-     "dry": true
-    },
-    {
-     "t": "07:00",
-     "pp": 26,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 100,
-     "dry": true
-    },
-    {
-     "t": "08:00",
-     "pp": 12,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 93,
-     "dry": false
-    },
-    {
-     "t": "09:00",
-     "pp": 8,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 81,
-     "dry": false
-    },
-    {
-     "t": "10:00",
-     "pp": 6,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 90,
-     "dry": false
-    },
-    {
-     "t": "11:00",
-     "pp": 4,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 86,
-     "dry": false
-    },
-    {
-     "t": "12:00",
-     "pp": 3,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 87,
-     "dry": false
-    },
-    {
-     "t": "13:00",
-     "pp": 1,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 77,
-     "dry": false
-    },
-    {
-     "t": "14:00",
-     "pp": 1,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 67,
-     "dry": false
-    },
-    {
-     "t": "15:00",
-     "pp": 0,
-     "code": 1,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 27,
-     "dry": false
-    },
-    {
-     "t": "16:00",
-     "pp": 0,
-     "code": 0,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 16,
-     "dry": false
+    "obs": {
+     "id": "KMDW",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Mostly Clear"
     }
-   ],
-   "spc": [
-    {
-     "cat": null,
-     "valid": null
-    }
-   ],
-   "nowcast": {
-    "wet": true,
-    "kind": "rain",
-    "lastHourMm": 0
    },
-   "obs": {
-    "id": "KIAD",
-    "ts": "2026-10-17T08:55:00+00:00",
-    "txt": "Cloudy"
+   {
+    "label": "+5s",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 55°F. Overnight low near 41°F.",
+    "cond": "Mostly Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "04:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 19,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 14,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 8,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 14,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 7,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "drizzle",
+     "endedAgo": 5.25,
+     "lastHourMm": 0,
+     "persist": 2
+    },
+    "obs": {
+     "id": "KMDW",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Mostly Clear"
+    }
+   },
+   {
+    "label": "+15s",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 55°F. Overnight low near 41°F.",
+    "cond": "Mostly Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "04:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 19,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 14,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 8,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 14,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 7,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "drizzle",
+     "endedAgo": 5.25,
+     "lastHourMm": 0,
+     "persist": 2
+    },
+    "obs": {
+     "id": "KMDW",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Mostly Clear"
+    }
+   },
+   {
+    "label": "+30s",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 55°F. Overnight low near 41°F.",
+    "cond": "Mostly Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "04:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 19,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 14,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 2,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 8,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 14,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 7,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 12,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 10,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "drizzle",
+     "endedAgo": 5.25,
+     "lastHourMm": 0,
+     "persist": 2
+    },
+    "obs": {
+     "id": "KMDW",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Mostly Clear"
+    }
    }
-  },
-  {
-   "label": "+30s",
-   "narrative": "Rain ending around 6:15 AM, with a high near 55°F. Then a 26% chance of a passing shower. Overnight low near 37°F.",
-   "cond": "Light Rain",
-   "radar": {
-    "here": 20,
-    "here3": 25,
-    "passed": false,
-    "clearUpstream": true,
-    "endMin": 70,
-    "motionSrc": "steering",
-    "moving": true,
-    "mph": 44,
-    "arrive": 0,
-    "peak": 26,
-    "any": 124,
-    "ahead": [
-     20,
-     26,
-     16,
-     0,
-     11,
-     11,
-     0
-    ]
+  ],
+  "timings": [
+   {
+    "url": "https://api.weather.gov/stations/KMDW/observations",
+    "start": 241,
+    "dur": 950
    },
-   "radarInfo": null,
-   "hours": [
-    {
-     "t": "05:00",
-     "pp": 75,
-     "code": 80,
-     "wet": 80,
-     "thunder": 0,
-     "cc": 77,
-     "dry": false
-    },
-    {
-     "t": "06:00",
-     "pp": 30,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 100,
-     "dry": true
-    },
-    {
-     "t": "07:00",
-     "pp": 26,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 100,
-     "dry": true
-    },
-    {
-     "t": "08:00",
-     "pp": 12,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 93,
-     "dry": false
-    },
-    {
-     "t": "09:00",
-     "pp": 8,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 81,
-     "dry": false
-    },
-    {
-     "t": "10:00",
-     "pp": 6,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 90,
-     "dry": false
-    },
-    {
-     "t": "11:00",
-     "pp": 4,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 86,
-     "dry": false
-    },
-    {
-     "t": "12:00",
-     "pp": 3,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 87,
-     "dry": false
-    },
-    {
-     "t": "13:00",
-     "pp": 1,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 77,
-     "dry": false
-    },
-    {
-     "t": "14:00",
-     "pp": 1,
-     "code": 3,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 67,
-     "dry": false
-    },
-    {
-     "t": "15:00",
-     "pp": 0,
-     "code": 1,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 27,
-     "dry": false
-    },
-    {
-     "t": "16:00",
-     "pp": 0,
-     "code": 0,
-     "wet": 0,
-     "thunder": 0,
-     "cc": 16,
-     "dry": false
-    }
-   ],
-   "spc": [
-    {
-     "cat": null,
-     "valid": null
-    }
-   ],
-   "nowcast": {
-    "wet": true,
-    "kind": "rain",
-    "lastHourMm": 0
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 5035,
+    "dur": 778
    },
-   "obs": {
-    "id": "KIAD",
-    "ts": "2026-10-17T08:55:00+00:00",
-    "txt": "Cloudy"
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 150,
+    "dur": 585
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 3707,
+    "dur": 496
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 150,
+    "dur": 445
+   },
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 597,
+    "dur": 374
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 5193,
+    "dur": 371
+   },
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 5248,
+    "dur": 279
    }
-  }
- ],
- "timings": [
-  {
-   "url": "https://api.weather.gov/stations/KIAD/observations",
-   "start": 544,
-   "dur": 927
-  },
-  {
-   "url": "https://data.rcc-acis.org/StnData",
-   "start": 3908,
-   "dur": 636
-  },
-  {
-   "url": "https://api.open-meteo.com/v1/forecast",
-   "start": 273,
-   "dur": 555
-  },
-  {
-   "url": "https://api.open-meteo.com/v1/forecast",
-   "start": 272,
-   "dur": 502
-  },
-  {
-   "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
-   "start": 775,
-   "dur": 470
-  },
-  {
-   "url": "https://mesonet.agron.iastate.edu/cgi-bin/afos/retrieve.py",
-   "start": 1973,
-   "dur": 359
-  },
-  {
-   "url": "https://api.weather.gov/stations/KOKV/observations/latest",
-   "start": 1976,
-   "dur": 303
-  },
-  {
-   "url": "https://api.weather.gov/alerts/active",
-   "start": 469,
-   "dur": 291
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
-   "start": 2753,
-   "dur": 289
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
-   "start": 2752,
-   "dur": 261
-  },
-  {
-   "url": "https://www.ncei.noaa.gov/access/services/data/v1",
-   "start": 3909,
-   "dur": 255
-  },
-  {
-   "url": "https://api.open-meteo.com/v1/elevation",
-   "start": 2919,
-   "dur": 254
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
-   "start": 2754,
-   "dur": 250
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/1/query",
-   "start": 1972,
-   "dur": 238
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/17/query",
-   "start": 1972,
-   "dur": 227
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/9/query",
-   "start": 1972,
-   "dur": 226
-  },
-  {
-   "url": "https://api.weather.gov/stations/KGAI/observations/latest",
-   "start": 1975,
-   "dur": 209
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer",
-   "start": 1974,
-   "dur": 208
-  },
-  {
-   "url": "https://api.weather.gov/stations/KHWY/observations/latest",
-   "start": 1975,
-   "dur": 208
-  },
-  {
-   "url": "https://api.weather.gov/gridpoints/LWX/80,76/forecast",
-   "start": 469,
-   "dur": 207
-  },
-  {
-   "url": "https://api.weather.gov/gridpoints/LWX/80,76",
-   "start": 469,
-   "dur": 198
-  },
-  {
-   "url": "https://api.weather.gov/points/39.0437,-77.4875",
-   "start": 273,
-   "dur": 195
-  },
-  {
-   "url": "https://api.weather.gov/stations/KFRR/observations/latest",
-   "start": 1976,
-   "dur": 195
-  },
-  {
-   "url": "https://data.rcc-acis.org/StnMeta",
-   "start": 3388,
-   "dur": 178
-  },
-  {
-   "url": "https://api.weather.gov/stations/KDAA/observations/latest",
-   "start": 1975,
-   "dur": 172
-  },
-  {
-   "url": "https://api.weather.gov/stations/KJYO/observations/latest",
-   "start": 1975,
-   "dur": 170
-  },
-  {
-   "url": "https://raw.githubusercontent.com/CBeatty500/Skyline/main/data/learning.json",
-   "start": 133,
-   "dur": 164
-  },
-  {
-   "url": "https://mesonet.agron.iastate.edu/json/cli.py",
-   "start": 3390,
-   "dur": 162
-  },
-  {
-   "url": "https://api.weather.gov/stations/KRSP/observations/latest",
-   "start": 1976,
-   "dur": 151
-  },
-  {
-   "url": "https://api.weather.gov/stations/KNYG/observations/latest",
-   "start": 1976,
-   "dur": 146
-  }
- ]
-}
+  ]
+ },
+ {
+  "name": "Seattle",
+  "at": "2026-10-17T09:24:36.951Z",
+  "firstViewMs": 3940,
+  "errors": [
+   "warning: Radar nowcast unavailable: Error: radar samples\n    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=Seattle&lat=47.6062&lon=-122.3321:1862:56)\n    at async Promise.all (index 0)\n    at async radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=Seattle&lat=47",
+   "error: Failed to load resource: net::ERR_TIMED_OUT"
+  ],
+  "snaps": [
+   {
+    "label": "first view",
+    "narrative": "Overcast tonight with a low near 55°F. A 42% chance of a passing shower. Gusts to 27 mph.",
+    "cond": "Mostly Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "02:00",
+      "pp": 14,
+      "code": 2,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 63,
+      "dry": false
+     },
+     {
+      "t": "03:00",
+      "pp": 36,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 42,
+      "code": 3,
+      "wet": 80,
+      "thunder": 1,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 35,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 97,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 21,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 95,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 18,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 26,
+      "code": 3,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 92,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 25,
+      "code": 3,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 80,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 11,
+      "code": 1,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 47,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 10,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 7,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 73,
+      "dry": false
+     }
+    ],
+    "spc": null,
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KSEA",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Mostly Cloudy"
+    }
+   },
+   {
+    "label": "+5s",
+    "narrative": "Overcast tonight with a low near 55°F. A 42% chance of a passing shower. Gusts to 27 mph.",
+    "cond": "Mostly Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "02:00",
+      "pp": 14,
+      "code": 2,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 63,
+      "dry": false
+     },
+     {
+      "t": "03:00",
+      "pp": 36,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 42,
+      "code": 3,
+      "wet": 80,
+      "thunder": 1,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 35,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 97,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 21,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 95,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 18,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 26,
+      "code": 3,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 92,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 25,
+      "code": 3,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 80,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 11,
+      "code": 1,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 47,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 10,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 7,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 73,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KSEA",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Mostly Cloudy"
+    }
+   },
+   {
+    "label": "+15s",
+    "narrative": "Overcast tonight with a low near 55°F. A 42% chance of a passing shower. Gusts to 27 mph.",
+    "cond": "Mostly Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "02:00",
+      "pp": 14,
+      "code": 2,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 63,
+      "dry": false
+     },
+     {
+      "t": "03:00",
+      "pp": 36,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 42,
+      "code": 3,
+      "wet": 80,
+      "thunder": 1,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 35,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 97,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 21,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 95,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 18,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 26,
+      "code": 3,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 92,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 25,
+      "code": 3,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 80,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 11,
+      "code": 1,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 47,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 10,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 7,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 73,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KSEA",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Mostly Cloudy"
+    }
+   },
+   {
+    "label": "+30s",
+    "narrative": "Overcast tonight with a low near 55°F. A 42% chance of a passing shower. Gusts to 27 mph.",
+    "cond": "Mostly Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "02:00",
+      "pp": 14,
+      "code": 2,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 63,
+      "dry": false
+     },
+     {
+      "t": "03:00",
+      "pp": 36,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 42,
+      "code": 3,
+      "wet": 80,
+      "thunder": 1,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 35,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 97,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 21,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 95,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 18,
+      "code": 3,
+      "wet": 0,
+      "thunder": 6,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 26,
+      "code": 3,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 92,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 25,
+      "code": 3,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 80,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 11,
+      "code": 1,
+      "wet": 0,
+      "thunder": 5,
+      "cc": 47,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 10,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 77,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 7,
+      "code": 3,
+      "wet": 0,
+      "thunder": 1,
+      "cc": 73,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KSEA",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Mostly Cloudy"
+    }
+   }
+  ],
+  "timings": [
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 1153,
+    "dur": 30096
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 4196,
+    "dur": 1998
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/elevation",
+    "start": 4236,
+    "dur": 1895
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 141,
+    "dur": 1877
+   },
+   {
+    "url": "https://api.weather.gov/stations/KSEA/observations",
+    "start": 241,
+    "dur": 1020
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 141,
+    "dur": 1010
+   },
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 4319,
+    "dur": 997
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/elevation",
+    "start": 1542,
+    "dur": 581
+   }
+  ]
+ },
+ {
+  "name": "Miami, FL",
+  "at": "2026-10-17T09:25:10.729Z",
+  "firstViewMs": 3048,
+  "errors": [
+   "warning: Regional analysis unavailable: no flow",
+   "error: Failed to load resource: net::ERR_TIMED_OUT"
+  ],
+  "snaps": [
+   {
+    "label": "first view",
+    "narrative": "Mostly cloudy this morning, mostly cloudy with thunderstorms likely this afternoon, then overcast with thunderstorms likely this evening. High near 86°F. About 3.44\" possible. Overnight low near 74°F.",
+    "cond": "Mostly Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 23,
+      "code": 2,
+      "wet": 0,
+      "thunder": 15,
+      "cc": 57,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 18,
+      "code": 3,
+      "wet": 0,
+      "thunder": 15,
+      "cc": 63,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 20,
+      "code": 3,
+      "wet": 0,
+      "thunder": 15,
+      "cc": 70,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 10,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 13,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 9,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 80,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 9,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 82,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
+      "thunder": 22,
+      "cc": 79,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 30,
+      "code": 3,
+      "wet": 0,
+      "thunder": 33,
+      "cc": 85,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 48,
+      "code": 3,
+      "wet": 95,
+      "thunder": 33,
+      "cc": 84,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 56,
+      "code": 3,
+      "wet": 95,
+      "thunder": 33,
+      "cc": 83,
+      "dry": false
+     }
+    ],
+    "spc": null,
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 3.9166666666666665,
+     "lastHourMm": 0,
+     "persist": 4
+    },
+    "obs": {
+     "id": "KMIA",
+     "ts": "2026-10-17T08:55:00+00:00",
+     "txt": "Mostly Clear"
+    }
+   },
+   {
+    "label": "+5s",
+    "narrative": "Mostly cloudy with showers likely this morning, mostly cloudy with showers and thunderstorms likely this afternoon, then overcast with showers and thunderstorms likely this evening. High near 86°F. Rain arriving around 7:30 AM. About 3.44\" possible. Overnight low near 74°F.",
+    "cond": "Mostly Clear",
+    "radar": {
+     "here": 0,
+     "here3": 0,
+     "passed": false,
+     "clearUpstream": false,
+     "endMin": null,
+     "motionSrc": "radar",
+     "moving": true,
+     "mph": 13,
+     "arrive": 120,
+     "peak": 34,
+     "any": 9,
+     "ahead": [
+      0,
+      0,
+      0,
+      0,
+      34,
+      34,
+      34
+     ]
+    },
+    "radarInfo": "Rain arriving around 7:30 AM.",
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 23,
+      "code": 2,
+      "wet": 0,
+      "thunder": 15,
+      "cc": 57,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 18,
+      "code": 3,
+      "wet": 0,
+      "thunder": 15,
+      "cc": 63,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 65,
+      "code": 81,
+      "wet": 81,
+      "thunder": 15,
+      "cc": 70,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 50,
+      "code": 81,
+      "wet": 81,
+      "thunder": 12,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 13,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 9,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 80,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 9,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 82,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
+      "thunder": 22,
+      "cc": 79,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 30,
+      "code": 3,
+      "wet": 0,
+      "thunder": 33,
+      "cc": 85,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 48,
+      "code": 3,
+      "wet": 95,
+      "thunder": 33,
+      "cc": 84,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 56,
+      "code": 3,
+      "wet": 95,
+      "thunder": 33,
+      "cc": 83,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": {
+       "n": 0,
+       "name": "General Thunderstorms",
+       "c": "#c1e9c1",
+       "code": "TSTM"
+      },
+      "valid": "2026-10-17T12:00:00.000Z"
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 3.9166666666666665,
+     "lastHourMm": 0,
+     "persist": 20
+    },
+    "obs": {
+     "id": "KMIA",
+     "ts": "2026-10-17T08:55:00+00:00",
+     "txt": "Mostly Clear"
+    }
+   },
+   {
+    "label": "+15s",
+    "narrative": "Mostly cloudy with showers likely this morning, mostly cloudy with showers and thunderstorms likely this afternoon, then overcast with showers and thunderstorms likely this evening. High near 86°F. Rain arriving around 7:30 AM. About 3.44\" possible. Overnight low near 74°F.",
+    "cond": "Mostly Clear",
+    "radar": {
+     "here": 0,
+     "here3": 0,
+     "passed": false,
+     "clearUpstream": false,
+     "endMin": null,
+     "motionSrc": "radar",
+     "moving": true,
+     "mph": 13,
+     "arrive": 120,
+     "peak": 34,
+     "any": 9,
+     "ahead": [
+      0,
+      0,
+      0,
+      0,
+      34,
+      34,
+      34
+     ]
+    },
+    "radarInfo": "Rain arriving around 7:30 AM.",
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 23,
+      "code": 2,
+      "wet": 0,
+      "thunder": 15,
+      "cc": 57,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 18,
+      "code": 3,
+      "wet": 0,
+      "thunder": 15,
+      "cc": 63,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 65,
+      "code": 81,
+      "wet": 81,
+      "thunder": 15,
+      "cc": 70,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 50,
+      "code": 81,
+      "wet": 81,
+      "thunder": 12,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 13,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 9,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 80,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 9,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 82,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
+      "thunder": 22,
+      "cc": 79,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 30,
+      "code": 3,
+      "wet": 0,
+      "thunder": 33,
+      "cc": 85,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 48,
+      "code": 3,
+      "wet": 95,
+      "thunder": 33,
+      "cc": 84,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 56,
+      "code": 3,
+      "wet": 95,
+      "thunder": 33,
+      "cc": 83,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": {
+       "n": 0,
+       "name": "General Thunderstorms",
+       "c": "#c1e9c1",
+       "code": "TSTM"
+      },
+      "valid": "2026-10-17T12:00:00.000Z"
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 3.9166666666666665,
+     "lastHourMm": 0,
+     "persist": 20
+    },
+    "obs": {
+     "id": "KMIA",
+     "ts": "2026-10-17T08:55:00+00:00",
+     "txt": "Mostly Clear"
+    }
+   },
+   {
+    "label": "+30s",
+    "narrative": "Mostly cloudy with showers likely this morning, mostly cloudy with showers and thunderstorms likely this afternoon, then overcast with showers and thunderstorms likely this evening. High near 86°F. Rain arriving around 7:30 AM. About 3.44\" possible. Overnight low near 74°F.",
+    "cond": "Mostly Clear",
+    "radar": {
+     "here": 0,
+     "here3": 0,
+     "passed": false,
+     "clearUpstream": false,
+     "endMin": null,
+     "motionSrc": "radar",
+     "moving": true,
+     "mph": 13,
+     "arrive": 120,
+     "peak": 34,
+     "any": 9,
+     "ahead": [
+      0,
+      0,
+      0,
+      0,
+      34,
+      34,
+      34
+     ]
+    },
+    "radarInfo": "Rain arriving around 7:30 AM.",
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 23,
+      "code": 2,
+      "wet": 0,
+      "thunder": 15,
+      "cc": 57,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 18,
+      "code": 3,
+      "wet": 0,
+      "thunder": 15,
+      "cc": 63,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 65,
+      "code": 81,
+      "wet": 81,
+      "thunder": 15,
+      "cc": 70,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 50,
+      "code": 81,
+      "wet": 81,
+      "thunder": 12,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
+      "thunder": 13,
+      "cc": 74,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 9,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 80,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 9,
+      "code": 3,
+      "wet": 0,
+      "thunder": 12,
+      "cc": 82,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
+      "thunder": 22,
+      "cc": 79,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 30,
+      "code": 3,
+      "wet": 0,
+      "thunder": 33,
+      "cc": 85,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 48,
+      "code": 3,
+      "wet": 95,
+      "thunder": 33,
+      "cc": 84,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 56,
+      "code": 3,
+      "wet": 95,
+      "thunder": 33,
+      "cc": 83,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": {
+       "n": 0,
+       "name": "General Thunderstorms",
+       "c": "#c1e9c1",
+       "code": "TSTM"
+      },
+      "valid": "2026-10-17T12:00:00.000Z"
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 3.9166666666666665,
+     "lastHourMm": 0,
+     "persist": 20
+    },
+    "obs": {
+     "id": "KMIA",
+     "ts": "2026-10-17T08:55:00+00:00",
+     "txt": "Mostly Clear"
+    }
+   }
+  ],
+  "timings": [
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 569,
+    "dur": 30105
+   },
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 4377,
+    "dur": 1346
+   },
+   {
+    "url": "https://api.weather.gov/stations/KMIA/observations",
+    "start": 295,
+    "dur": 979
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 144,
+    "dur": 461
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 144,
+    "dur": 424
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 4483,
+    "dur": 390
+   },
+   {
+    "url": "https://api.weather.gov/alerts/active",
+    "start": 179,
+    "dur": 270
+   },
+   {
+    "url": "https://api.weather.gov/stations/KTMB/observations/latest",
+    "start": 2228,
+    "dur": 228
+   }
+  ]
+ },
+ {
+  "name": "Dallas, TX",
+  "at": "2026-10-17T09:25:45.072Z",
+  "firstViewMs": 3720,
+  "errors": [
+   "warning: Radar nowcast unavailable: Error: radar samples\n    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=Dallas%2C%20TX&lat=32.7767&lon=-96.797:1862:56)\n    at async Promise.all (index 0)\n    at async radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=Dallas%2C"
+  ],
+  "snaps": [
+   {
+    "label": "first view",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 68°F. Overnight low near 47°F.",
+    "cond": "Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "04:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 3,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 4,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 4,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 3,
+      "dry": false
+     }
+    ],
+    "spc": null,
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KDAL",
+     "ts": "2026-10-17T09:05:00+00:00",
+     "txt": "Clear"
+    }
+   },
+   {
+    "label": "+5s",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 68°F. Overnight low near 47°F.",
+    "cond": "Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "04:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 3,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 4,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 4,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 3,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KDAL",
+     "ts": "2026-10-17T09:05:00+00:00",
+     "txt": "Clear"
+    }
+   },
+   {
+    "label": "+15s",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 68°F. Overnight low near 47°F.",
+    "cond": "Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "04:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 3,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 4,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 4,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 3,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KDAL",
+     "ts": "2026-10-17T09:05:00+00:00",
+     "txt": "Clear"
+    }
+   },
+   {
+    "label": "+30s",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 68°F. Overnight low near 47°F.",
+    "cond": "Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "04:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 5,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 3,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 4,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 4,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 3,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KDAL",
+     "ts": "2026-10-17T09:05:00+00:00",
+     "txt": "Clear"
+    }
+   }
+  ],
+  "timings": [
+   {
+    "url": "https://api.weather.gov/stations/KDAL/observations",
+    "start": 228,
+    "dur": 1062
+   },
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 5123,
+    "dur": 929
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 128,
+    "dur": 520
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 129,
+    "dur": 416
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 5078,
+    "dur": 387
+   },
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 650,
+    "dur": 375
+   },
+   {
+    "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
+    "start": 3818,
+    "dur": 238
+   },
+   {
+    "url": "https://api.weather.gov/stations/KGVT/observations/latest",
+    "start": 2292,
+    "dur": 225
+   }
+  ]
+ },
+ {
+  "name": "Denver",
+  "at": "2026-10-17T09:26:19.362Z",
+  "firstViewMs": 3984,
+  "errors": [
+   "warning: Radar nowcast unavailable: Error: radar samples\n    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=Denver&lat=39.7392&lon=-104.9903:1862:56)\n    at async Promise.all (index 0)\n    at async radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=Denver&lat=39.7"
+  ],
+  "snaps": [
+   {
+    "label": "first view",
+    "narrative": "Clear tonight with a low near 35°F.",
+    "cond": "Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "03:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     }
+    ],
+    "spc": null,
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KDEN",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Clear"
+    }
+   },
+   {
+    "label": "+5s",
+    "narrative": "Clear tonight with a low near 35°F.",
+    "cond": "Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "03:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KDEN",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Clear"
+    }
+   },
+   {
+    "label": "+15s",
+    "narrative": "Clear tonight with a low near 35°F.",
+    "cond": "Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "03:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KDEN",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Clear"
+    }
+   },
+   {
+    "label": "+30s",
+    "narrative": "Clear tonight with a low near 35°F.",
+    "cond": "Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "03:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "04:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "05:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 2,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KDEN",
+     "ts": "2026-10-17T09:00:00+00:00",
+     "txt": "Clear"
+    }
+   }
+  ],
+  "timings": [
+   {
+    "url": "https://api.weather.gov/stations/KDEN/observations",
+    "start": 475,
+    "dur": 1038
+   },
+   {
+    "url": "https://data.rcc-acis.org/StnMeta",
+    "start": 5486,
+    "dur": 732
+   },
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 6449,
+    "dur": 615
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 146,
+    "dur": 506
+   },
+   {
+    "url": "https://api.weather.gov/stations/KMNH/observations/latest",
+    "start": 2530,
+    "dur": 432
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 146,
+    "dur": 404
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 5672,
+    "dur": 380
+   },
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 653,
+    "dur": 376
+   }
+  ]
+ },
+ {
+  "name": "Boston, MA",
+  "at": "2026-10-17T09:26:53.483Z",
+  "firstViewMs": 2957,
+  "errors": [
+   "error: Failed to load resource: the server responded with a status of 404 ()",
+   "error: Failed to load resource: net::ERR_TIMED_OUT"
+  ],
+  "snaps": [
+   {
+    "label": "first view",
+    "narrative": "Overcast this morning, mostly cloudy this afternoon, then clear this evening. High near 50°F. Gusts to 28 mph. Overnight low near 35°F.",
+    "cond": "Cloudy",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 18,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 17,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 94,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 95,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 11,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 94,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 5,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 92,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 5,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 91,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 3,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 86,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 40,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 76,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 71,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 66,
+      "dry": false
+     }
+    ],
+    "spc": null,
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 3.5833333333333335,
+     "lastHourMm": 0,
+     "persist": 6
+    },
+    "obs": {
+     "id": "KBOS",
+     "ts": "2026-10-17T09:05:00+00:00",
+     "txt": "Cloudy"
+    }
+   },
+   {
+    "label": "+5s",
+    "narrative": "Overcast with showers likely this morning, mostly cloudy this afternoon, then clear this evening. High near 50°F. About 0.03\" possible. Gusts to 28 mph. Overnight low near 35°F.",
+    "cond": "Cloudy",
+    "radar": {
+     "here": 20,
+     "here3": 22,
+     "passed": false,
+     "clearUpstream": true,
+     "endMin": 120,
+     "motionSrc": "steering",
+     "moving": true,
+     "mph": 58,
+     "arrive": 0,
+     "peak": 26,
+     "any": 133,
+     "ahead": [
+      20,
+      26,
+      26,
+      16,
+      14,
+      0,
+      0
+     ]
+    },
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 75,
+      "code": 80,
+      "wet": 80,
+      "thunder": 0,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 65,
+      "code": 80,
+      "wet": 80,
+      "thunder": 0,
+      "cc": 94,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 95,
+      "dry": true
+     },
+     {
+      "t": "08:00",
+      "pp": 11,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 94,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 5,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 92,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 5,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 91,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 3,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 86,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 40,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 76,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 71,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 66,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 3.5833333333333335,
+     "lastHourMm": 0,
+     "persist": 0
+    },
+    "obs": {
+     "id": "KBOS",
+     "ts": "2026-10-17T09:05:00+00:00",
+     "txt": "Cloudy"
+    }
+   },
+   {
+    "label": "+15s",
+    "narrative": "Overcast with showers likely this morning, mostly cloudy this afternoon, then clear this evening. High near 50°F. About 0.03\" possible. Gusts to 28 mph. Overnight low near 35°F.",
+    "cond": "Cloudy",
+    "radar": {
+     "here": 20,
+     "here3": 22,
+     "passed": false,
+     "clearUpstream": true,
+     "endMin": 120,
+     "motionSrc": "steering",
+     "moving": true,
+     "mph": 58,
+     "arrive": 0,
+     "peak": 26,
+     "any": 133,
+     "ahead": [
+      20,
+      26,
+      26,
+      16,
+      14,
+      0,
+      0
+     ]
+    },
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 75,
+      "code": 80,
+      "wet": 80,
+      "thunder": 0,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 65,
+      "code": 80,
+      "wet": 80,
+      "thunder": 0,
+      "cc": 94,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 95,
+      "dry": true
+     },
+     {
+      "t": "08:00",
+      "pp": 11,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 94,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 5,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 92,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 5,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 91,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 3,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 86,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 40,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 76,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 71,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 66,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 3.5833333333333335,
+     "lastHourMm": 0,
+     "persist": 0
+    },
+    "obs": {
+     "id": "KBOS",
+     "ts": "2026-10-17T09:05:00+00:00",
+     "txt": "Cloudy"
+    }
+   },
+   {
+    "label": "+30s",
+    "narrative": "Overcast with showers likely this morning, mostly cloudy this afternoon, then clear this evening. High near 50°F. About 0.03\" possible. Gusts to 28 mph. Overnight low near 35°F.",
+    "cond": "Cloudy",
+    "radar": {
+     "here": 20,
+     "here3": 22,
+     "passed": false,
+     "clearUpstream": true,
+     "endMin": 120,
+     "motionSrc": "steering",
+     "moving": true,
+     "mph": 58,
+     "arrive": 0,
+     "peak": 26,
+     "any": 133,
+     "ahead": [
+      20,
+      26,
+      26,
+      16,
+      14,
+      0,
+      0
+     ]
+    },
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "05:00",
+      "pp": 75,
+      "code": 80,
+      "wet": 80,
+      "thunder": 0,
+      "cc": 96,
+      "dry": false
+     },
+     {
+      "t": "06:00",
+      "pp": 65,
+      "code": 80,
+      "wet": 80,
+      "thunder": 0,
+      "cc": 94,
+      "dry": false
+     },
+     {
+      "t": "07:00",
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 95,
+      "dry": true
+     },
+     {
+      "t": "08:00",
+      "pp": 11,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 94,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 8,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 93,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 5,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 92,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 5,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 91,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 3,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 86,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 1,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 40,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 76,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 71,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 3,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 66,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": "rain",
+     "endedAgo": 3.5833333333333335,
+     "lastHourMm": 0,
+     "persist": 0
+    },
+    "obs": {
+     "id": "KBOS",
+     "ts": "2026-10-17T09:05:00+00:00",
+     "txt": "Cloudy"
+    }
+   }
+  ],
+  "timings": [
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 529,
+    "dur": 30098
+   },
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 4983,
+    "dur": 1347
+   },
+   {
+    "url": "https://api.weather.gov/stations/KBOS/observations",
+    "start": 292,
+    "dur": 877
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 132,
+    "dur": 415
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 132,
+    "dur": 396
+   },
+   {
+    "url": "https://api.weather.gov/alerts/active",
+    "start": 182,
+    "dur": 383
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 4882,
+    "dur": 359
+   },
+   {
+    "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
+    "start": 3046,
+    "dur": 342
+   }
+  ]
+ }
+]
