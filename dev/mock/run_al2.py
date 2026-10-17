@@ -84,7 +84,7 @@ async def main():
             elif 'chart' in u and u.endswith('.js'): await route.fulfill(status=200, content_type='application/javascript', body=STUB)
             else: await route.fulfill(status=404, body='', headers=H)
         await pg.route('**/*', lambda r: asyncio.ensure_future(handle(r)) if not r.request.url.startswith('file:') else asyncio.ensure_future(r.continue_()))
-        await pg.goto('file:///mnt/user-data/outputs/skyline.html'); await pg.wait_for_timeout(5000)
+        await pg.goto('file:///mnt/user-data/outputs/skyline.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875'); await pg.wait_for_timeout(5000)
         await pg.add_style_tag(content='.topbar{position:static!important}')
         async def shot(name):
             await pg.wait_for_timeout(300)

@@ -82,7 +82,7 @@ async def main():
             elif 'chart' in u and u.endswith('.js'): await route.fulfill(status=200, content_type='application/javascript', body=STUB)
             else: await route.fulfill(status=404, body='', headers=H)
         await pg.route('**/*', lambda r: asyncio.ensure_future(handle(r)) if not r.request.url.startswith('file:') else asyncio.ensure_future(r.continue_()))
-        await pg.goto('file:///mnt/user-data/outputs/skyline.html'); await pg.wait_for_timeout(5000)
+        await pg.goto('file:///mnt/user-data/outputs/skyline.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875'); await pg.wait_for_timeout(5000)
         print(await pg.evaluate("[currentLoc.lat,currentLoc.lon,nwsOffice, JSON.stringify(spcData && {days:spcData.days, mds:spcData.mds.map(m=>[m.num,m.concerning,m.watchProb,String(m.end)]), texts:spcData.texts.length, winter:spcData.winter})]"))
         print(await pg.evaluate("document.getElementById('alertsList').innerText"))
         await pg.evaluate("toggleAFD()"); await pg.wait_for_timeout(800)

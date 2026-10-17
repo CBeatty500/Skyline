@@ -1501,12 +1501,12 @@ _r("""            const v = { T, D, bT, bD, cur, trend };""", """            for
 _r("""(bestBetResults || []).slice(0, 3).map(b => b.bestMax).join(',')}`;
             if (_adjCache""", """(bestBetResults || []).slice(0, 3).map(b => b.bestMax).join(',')}|${regionalAdj ? regionalAdj.at : 0}`;
             if (_adjCache""")
-out = out.replace("""                if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.msg);""", """                if (regionalInfo && regionalInfo.msg) parts.splice(1, 0, regionalInfo.msg);
-                if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.msg);""", 1)
-_r("""            if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.msg);
+out = out.replace("""""", """                if (regionalInfo && regionalInfo.msg) parts.splice(1, 0, regionalInfo.msg);
+""", 1)
+_r("""
             $h('heroNarrative').innerText = parts.join(' ');
             $h('heroNarrLbl').innerText = 'Today';""", """            if (regionalInfo && regionalInfo.msg) parts.splice(1, 0, regionalInfo.msg);
-            if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.msg);
+
             $h('heroNarrative').innerText = parts.join(' ');
             $h('heroNarrLbl').innerText = 'Today';""")
 
@@ -1603,6 +1603,10 @@ out = out[:_a] + r"""        // first hour after the current precipitation ends 
             if (!radarNow || radarNow.endMin == null || Date.now() - radarNow.t > 25 * 60e3) return null;
             const t = new Date(Math.round((radarNow.t + radarNow.endMin * 60e3) / 9e5) * 9e5);
             if (t - Date.now() < 10 * 60e3) return 'ending';
+            if (!radarNow.timeSure || radarNow.endMin > 90) {   // not sure enough for a clock time: part of the day
+                const hr = +t.toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: ensembleData.timezone }) % 24;
+                return 'ending ' + (hr < 5 ? 'overnight' : hr < 12 ? 'this morning' : hr < 17 ? 'this afternoon' : hr < 21 ? 'this evening' : 'tonight');
+            }
             return 'ending around ' + t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: ensembleData.timezone });
         }
         function moreText(p, when) {
@@ -1718,8 +1722,8 @@ _r("""                renderDashboard();
                 renderDiscussion();
                 try { radarAutoOpen(false); } catch (e) {}
                 aqP.then(""")
-_r("""                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };""",
-   """                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };
+_r("""                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin, timeSure: rn.timeSure };""",
+   """                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin, timeSure: rn.timeSure };
                 setTimeout(() => { try { radarAutoOpen(true); } catch (e) {} }, 0);""")
 # ---- period wording: precipitation ranges near the end, full wind sentence (hero today / tonight and the outlook rows) ----
 _r("""snowfall,wind_gusts_10m&daily=weather_code""", """snowfall,wind_gusts_10m,wind_direction_10m&daily=weather_code""")
@@ -1729,14 +1733,14 @@ out = out[:_a] + open('/home/claude/period_text.js').read() + out[_a:]
 _r("""                if (ni.nowcast && ni.nowcast.wet) { const mt = moreText(ni.laterPP, 'tonight'); if (mt) parts.push(mt); }
                 else if (precipExpected(ni.pp, ni.rain + ni.snow)) parts.push(`${ni.pp}% chance of precipitation${ni.rain >= 0.05 ? `, about ${formatPrecip(ni.rain)}` : ''}${ni.snow >= 0.05 ? ` (${formatSnow(ni.snow)} of snow)` : ''}.`);
                 else if (ni.pp >= 20) parts.push(`A ${ni.pp}% chance of a passing shower.`);
-                if (ni.gust >= 40) parts.push(`Gusts to ${formatSpeed(ni.gust)}.`);""", """                { const tsg = tonightSegs(ni); periodExtras(tsg).forEach(x => parts.push(x)); }""")
+                if (ni.gust >= 40) parts.push(`Gusts to ${formatSpeed(ni.gust)}.`);""", """                { const tsg = tonightSegs(ni); periodExtras(tsg, radarInfo && radarInfo.arrive).forEach(x => parts.push(x)); }""")
 # today
 _r("""                if (bb.bestPrecip >= 0.25 && bb.laterProb >= 40) parts.push(`About ${formatPrecip(bb.bestPrecip)} more today.`);
                 if (bb.laterProb != null) { const mt = moreText(bb.laterProb, 'later today'); if (mt) parts.push(mt); }""", "")
 _r("""                if (/shower|rain|storm|snow|drizzle|sleet|mix/i.test(ph) && bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} possible.`);
             }
             if (bb.bestGust >= 40) parts.push(`Gusts to ${formatSpeed(bb.bestGust)}.`);""", """            }
-            periodExtras(todaySegs()).forEach(x => parts.push(x));""")
+            periodExtras(todaySegs(), radarInfo && radarInfo.arrive).forEach(x => parts.push(x));""")
 # outlook rows
 _r("""                const amt = periodAmount(s, e);
                 if (ph.wet && amt >= 2.5) bits.push(`About ${formatPrecip(amt)} possible.`);
@@ -1804,3 +1808,19 @@ _r(""".rec-btn { background: none;""", """.home-btn { width: 32px; height: 32px;
 .home-btn:hover { color: #e2e8f0; border-color: rgba(255,255,255,.3); }
 .home-btn.on { color: #1a1205; background: linear-gradient(135deg, #ffc062, #ff7a59); border-color: transparent; }
 .rec-btn { background: none;""")
+# ---- the opening sentence describes the sky; the one precipitation sentence carries chance, amount and timing ----
+_r("""                if (wetH) {
+                    wetAll = true; codeAll = Math.max(codeAll, code);
+                    const kind = code >= 95 ? (thunderOK && wpp < 80 ? 'showers and thunderstorms' : 'thunderstorms') : sn >= 0.5 ? 'snow showers' : 'showers';
+                    const widespread = wetH >= Math.max(2, n / 2);
+                    if (wpp >= 80 && widespread) state = code >= 95 ? 'thunderstorms' : sn >= 0.5 ? 'snow' : 'rain';
+                    else if (wpp >= 60) state = `${sky} with ${kind} likely`;
+                    else state = `${sky} with a ${Math.round(wpp / 10) * 10}% chance of ${kind}`;
+                }""", """                if (wetH) { wetAll = true; codeAll = Math.max(codeAll, code); }   // precipitation is described once, in the precipitation sentence""")
+_r("""                if (wetH) {
+                    const kind = code >= 95 ? (spcThunderAt(Date.now()) && wpp < 80 ? 'showers and thunderstorms' : 'thunderstorms') : sn >= 0.5 ? 'snow showers' : 'showers';
+                    const widespread = wetH >= Math.max(2, n / 2);
+                    if (wpp >= 80 && widespread) state = code >= 95 ? 'thunderstorms' : sn >= 0.5 ? 'snow' : 'rain';
+                    else if (wpp >= 60) state = `${sky} with ${kind} likely`;
+                    else state = `${sky} with a ${Math.round(wpp / 10) * 10}% chance of ${kind}`;
+                }""", "")

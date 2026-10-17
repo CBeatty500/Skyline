@@ -26,10 +26,10 @@
         }
         function ptSeg(s, e) {
             const h = ensembleData.hourly, ok = v => v !== null && v !== undefined && !isNaN(v);
-            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0;   // (pp / wet may be raised below when precipitation is falling now)
+            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0, ts = false;   // (pp / wet may be raised below when precipitation is falling now)
             for (let j = s; j < e && j < h.time.length; j++) {
                 if (ok(h.precipitation_probability[j])) pp = Math.max(pp, h.precipitation_probability[j]);
-                if (hourWetCode(j)) wet++;
+                { const wc = hourWetCode(j); if (wc) wet++; if (wc >= 95) ts = true; }
                 if (h.snowfall && ok(h.snowfall[j])) snowCm += h.snowfall[j];
                 if (ok(h.temperature_2m[j])) { tsum += h.temperature_2m[j]; tn++; }
             }
@@ -40,25 +40,36 @@
                 if (nc && nc.wet) { pp = 100; wet = Math.max(wet, 1); const hrs = Math.max(1, Math.min(e, rainEndIdx()) - cur); amt = Math.max(amt, (nc.lastHourMm || 0.3) * hrs * 0.7, 0.2); }
             }
             const tm = tn ? tsum / tn : 5, adj = adjustSnow(amt, snowCm, tm, tm);
-            return { pp, wet, amt, snow: adj.snow, rain: adj.rain, date: h.time[Math.min(s, h.time.length - 1)].slice(0, 10) };
+            return { pp, wet, ts, amt, snow: adj.snow, rain: adj.rain, date: h.time[Math.min(s, h.time.length - 1)].slice(0, 10) };
         }
-        // segs: [[label, startIdx, endIdx], ...] with labels such as 'this morning' or 'after midnight'
-        function periodPrecipSentence(segs) {
-            const out = []; let said = false;
+        // segs: [[label, startIdx, endIdx], ...]. One sentence: chance, amount (only when confident) and timing (a clock time
+        // only when radar tracked the echoes well, otherwise the part of the day).
+        // 'A 70% chance of a trace to 0.05" of rain around 7:30 AM, then a 40% chance this evening.'
+        function periodPrecipSentence(segs, arrive) {
+            const out = []; let said = false, lastWhat = null;
+            const hIdx = ensembleData.hourly.time;
             segs.forEach(([label, s, e]) => {
                 if (e - s < 1) return;
                 const g = ptSeg(s, e);
                 if (g.pp < 40 || (g.amt < 0.1 && !g.wet)) return;   // below 40% the text says nothing about precipitation (matches the icons)
-                if (g.wet && g.amt < 0.3) g.amt = 0.3;   // the text calls this part wet, so it always gets an amount
-                const sp = ptSpread(g.date) || { lo: 0.5, hi: 1.8 };
-                const isSnow = g.snow >= 0.5 && g.snow >= g.rain / 10;
+                if (g.wet && g.amt < 0.3) g.amt = 0.3;
+                const spread = ptSpread(g.date), sp = spread || { lo: 0.5, hi: 1.8 };
+                const isSnow = g.snow >= 0.5 && g.snow >= g.rain / 10, what = isSnow ? 'snow' : g.ts ? 'rain with thunderstorms' : 'rain';
                 const best = isSnow ? g.snow : g.amt;
-                const r = ptRange(best * sp.lo * (g.pp < 60 ? 0 : 1), best * sp.hi + (isSnow ? 0.5 : 0.5), isSnow);
-                const what = isSnow ? 'snow' : 'rain', add = said ? 'an additional ' : '';
-                if (g.pp >= 60 && g.wet) out.push(`${add}${r.text} of ${what} ${label}`);
-                else if (g.pp >= 30) out.push(`a chance of ${what} ${label} with ${add}${r.upTo === r.text ? r.text : 'up to ' + r.upTo} possible`);
-                else out.push(`a slight chance of ${what} ${label} with the potential for ${add}${r.upTo}`);
-                said = true;
+                const r = ptRange(best * sp.lo * (g.pp < 60 ? 0 : 1), best * sp.hi + 0.5, isSnow);
+                const confident = g.pp >= 60 || (spread && spread.hi <= 1.6);
+                // timing: a clock time only when radar is sure and the arrival falls in this part of the day
+                let when = label;
+                if (arrive && arrive.sure) {
+                    const ms0 = hourMs(s), ms1 = hourMs(Math.min(e, hIdx.length - 1)) + 36e5;
+                    if (arrive.t >= ms0 - 30 * 60e3 && arrive.t < ms1) when = 'around ' + new Date(Math.round(arrive.t / 9e5) * 9e5).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: ensembleData.timezone });
+                }
+                const pct = Math.round(g.pp / 10) * 10, ofWhat = lastWhat === what ? '' : ` of ${what}`;
+                let piece;
+                if (g.pp >= 90) piece = confident ? `${said ? 'an additional ' : ''}${r.text} of ${what} ${when}` : `${what} ${when}`;
+                else if (confident) piece = `a ${pct}% chance of ${said ? 'an additional ' : ''}${r.text} of ${what} ${when}`;
+                else piece = `a ${pct}% chance${ofWhat} ${when}`;
+                out.push(piece); said = true; lastWhat = what;
             });
             if (!out.length) return '';
             const t = out.join(', then ');
@@ -90,18 +101,18 @@
             const dirW = x => x.dir == null || x.steady < 0.5 ? null : PT_DIRS[Math.round(x.dir / 45) % 8];
             const A = W.find(notable) || W[0];
             const dA = dirW(A);
-            let t = `${dA ? `Winds from the ${dA}` : 'Variable winds'} at ${rng(A)}${gust(A)}`;
+            let t = `${dA ? dA[0].toUpperCase() + dA.slice(1) + ' winds' : 'Variable winds'} ${rng(A)}${gust(A)}`;
             const hiA = Math.ceil(A.hi * k / 5) * 5;
             for (const B of W.slice(W.indexOf(A) + 1)) {   // the first later part of the period that is clearly different
                 const dB = dirW(B), diff = A.dir != null && B.dir != null ? Math.abs(((B.dir - A.dir + 540) % 360) - 180) : 0, hiB = Math.ceil(B.hi * k / 5) * 5;
                 if (B.hi < 6) { t += `, becoming calm ${B.label}`; break; }
-                if (dB && dA && diff >= 67.5) { t += `, becoming ${dB} ${B.label}${hiB !== hiA ? ` at ${rng(B)}` : ''}`; break; }
+                if (dB && dA && diff >= 67.5) { t += `, becoming ${dB} ${B.label}${hiB !== hiA ? ` ${rng(B)}` : ''}`; break; }
                 if (hiB <= hiA - 10) { t += `, diminishing to ${rng(B)} ${B.label}`; break; }
                 if (hiB >= hiA + 10) { t += `, increasing to ${rng(B)}${gust(B)} ${B.label}`; break; }
             }
             return t + '.';
         }
-        function periodExtras(segs) { return [periodPrecipSentence(segs), periodWindSentence(segs)].filter(Boolean); }
+        function periodExtras(segs, arrive) { return [periodPrecipSentence(segs, arrive), periodWindSentence(segs)].filter(Boolean); }
         // the rest of today (from now) and tonight, as labelled segments
         function todaySegs() {
             const h = ensembleData.hourly, d0 = ensembleData.daily.time[0], first = h.time.findIndex(t => t.startsWith(d0)), cur = hourlyStart();

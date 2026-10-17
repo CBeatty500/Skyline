@@ -83,7 +83,9 @@
             const ue = regionalAdj.up.t[k];
             if (ue == null || Math.sign(ue) !== Math.sign(m) || Math.abs(ue) < 1.6) { regionalInfo.msg = null; return; }
             const deg = Math.round(Math.abs(ue) * (isImperial ? 1.8 : 1));
-            regionalInfo.msg = `${m < 0 ? 'Colder' : 'Warmer'} air arrives from the ${from} by about ${when}.`;   // the forecast itself, not the analysis
+            const hr = +new Date(Date.now() + (k + 1) * 36e5).toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: ensembleData.timezone }) % 24;
+            const part = hr < 5 ? 'overnight' : hr < 12 ? 'this morning' : hr < 17 ? 'this afternoon' : hr < 21 ? 'this evening' : 'tonight';
+            regionalInfo.msg = `${m < 0 ? 'Colder' : 'Warmer'} air moves in from the ${from} ${part}.`;   // timing by part of the day: the estimate is not precise to the hour
         }
         // added to the hourly temperature / dewpoint after the observation correction (hours after the analysis)
         function regionalDelta(f, j) {

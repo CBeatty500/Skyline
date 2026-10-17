@@ -1,3 +1,4 @@
+                if (regionalInfo && regionalInfo.msg) parts.splice(1, 0, regionalInfo.msg);
 <!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
@@ -1478,14 +1479,7 @@ body.no-data #sectionNav { display: none; }
                 }
                 const sky = skyCondition(cl.length ? cl.reduce((x, y) => x + y, 0) / cl.length : null, day >= n / 2).text.toLowerCase();
                 let state = sky;
-                if (wetH) {
-                    wetAll = true; codeAll = Math.max(codeAll, code);
-                    const kind = code >= 95 ? (thunderOK && wpp < 80 ? 'showers and thunderstorms' : 'thunderstorms') : sn >= 0.5 ? 'snow showers' : 'showers';
-                    const widespread = wetH >= Math.max(2, n / 2);
-                    if (wpp >= 80 && widespread) state = code >= 95 ? 'thunderstorms' : sn >= 0.5 ? 'snow' : 'rain';
-                    else if (wpp >= 60) state = `${sky} with ${kind} likely`;
-                    else state = `${sky} with a ${Math.round(wpp / 10) * 10}% chance of ${kind}`;
-                }
+                if (wetH) { wetAll = true; codeAll = Math.max(codeAll, code); }   // precipitation is described once, in the precipitation sentence
                 const last = parts[parts.length - 1];
                 if (last && last.state === state) last.labels.push(label);
                 else parts.push({ state, labels: [label] });
@@ -1981,7 +1975,8 @@ body.no-data #sectionNav { display: none; }
             let any = 0; for (let i = 0; i < N * N; i++) if (B[i] >= 20) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 100) any++; }
             let arrive = null; for (let t = 0; t <= 180; t += 10) if (ahead(t) >= 20) { arrive = t; break; }
             const speedKmh = Math.hypot(vx * kmX, vy * kmY) * 60;
-            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), passed, clearUpstream, endMin, motionSrc, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
+            const timeSure = motionSrc === 'radar' && !!(m30 && m30.s >= 0.5);   // exact times only when the echoes were tracked well
+            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), passed, clearUpstream, endMin, motionSrc, timeSure, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
         }
         function applyRadarNowcast(rn) {
             const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
@@ -2020,13 +2015,13 @@ body.no-data #sectionNav { display: none; }
             } catch (e) {}
             // one line for the forecast text, only for precipitation on the way (rain overhead is handled by current conditions)
             radarInfo = null;
-            if (rn.motionSrc === 'radar' && rn.arrive !== null && rn.arrive >= 15 && rn.arrive <= 150) {
+            if (rn.arrive !== null && rn.arrive >= 15 && rn.arrive <= 150) {
                 const tz = ensembleData.timezone;
                 const when = new Date(Math.round((Date.now() + rn.arrive * 60e3) / 9e5) * 9e5).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
                 const snowy = (() => { const c = getCurrentConditions(); return c && c.temp != null && c.temp <= 0.5; })();
                 const th0 = typeof thunderAt === 'function' ? thunderAt(hourlyStart() + 1) : null, tsOK = rn.peak >= 50 && ((th0 != null && th0 >= 15) || (typeof spcThunderAt === 'function' && spcThunderAt(Date.now())));
                 const what = snowy ? (rn.peak >= 30 ? 'Snow' : 'Light snow') : tsOK ? 'Thunderstorms' : rn.peak >= 40 ? 'Heavy rain' : rn.peak >= 30 ? 'Rain' : 'Light rain';
-                radarInfo = { msg: `${what} arriving around ${when}.` };
+                radarInfo = { msg: null, arrive: { t: Date.now() + rn.arrive * 60e3, sure: rn.timeSure && rn.arrive <= 90, what } };   // used by the precipitation sentence
             }
         }
         async function loadRadar(token, lat, lon) {
@@ -2034,7 +2029,7 @@ body.no-data #sectionNav { display: none; }
             try {
                 const rn = await radarNowcast(+lat, +lon);
                 if (token !== fetchToken) return;
-                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };
+                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin, timeSure: rn.timeSure };
                 setTimeout(() => { try { radarAutoOpen(true); } catch (e) {} }, 0);
                 if (applyRadarNowcast._st) saveRadarState({ ...applyRadarNowcast._st, now: radarNow, info: radarInfo });
                 window._lastRadar = { here: rn.here, here3: rn.here3, passed: rn.passed, clearUpstream: rn.clearUpstream, endMin: rn.endMin, motionSrc: rn.motionSrc, moving: rn.moving, mph: Math.round(rn.speedKmh * 0.621), arrive: rn.arrive, peak: rn.peak, any: rn.any, ahead: [0, 30, 60, 90, 120, 150, 180].map(t => rn.ahead(t)) };   // diagnostics
@@ -2399,7 +2394,9 @@ body.no-data #sectionNav { display: none; }
             const ue = regionalAdj.up.t[k];
             if (ue == null || Math.sign(ue) !== Math.sign(m) || Math.abs(ue) < 1.6) { regionalInfo.msg = null; return; }
             const deg = Math.round(Math.abs(ue) * (isImperial ? 1.8 : 1));
-            regionalInfo.msg = `${m < 0 ? 'Colder' : 'Warmer'} air arrives from the ${from} by about ${when}.`;   // the forecast itself, not the analysis
+            const hr = +new Date(Date.now() + (k + 1) * 36e5).toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: ensembleData.timezone }) % 24;
+            const part = hr < 5 ? 'overnight' : hr < 12 ? 'this morning' : hr < 17 ? 'this afternoon' : hr < 21 ? 'this evening' : 'tonight';
+            regionalInfo.msg = `${m < 0 ? 'Colder' : 'Warmer'} air moves in from the ${from} ${part}.`;   // timing by part of the day: the estimate is not precise to the hour
         }
         // added to the hourly temperature / dewpoint after the observation correction (hours after the analysis)
         function regionalDelta(f, j) {
@@ -2423,6 +2420,10 @@ body.no-data #sectionNav { display: none; }
             if (!radarNow || radarNow.endMin == null || Date.now() - radarNow.t > 25 * 60e3) return null;
             const t = new Date(Math.round((radarNow.t + radarNow.endMin * 60e3) / 9e5) * 9e5);
             if (t - Date.now() < 10 * 60e3) return 'ending';
+            if (!radarNow.timeSure || radarNow.endMin > 90) {   // not sure enough for a clock time: part of the day
+                const hr = +t.toLocaleString('en-US', { hour: 'numeric', hour12: false, timeZone: ensembleData.timezone }) % 24;
+                return 'ending ' + (hr < 5 ? 'overnight' : hr < 12 ? 'this morning' : hr < 17 ? 'this afternoon' : hr < 21 ? 'this evening' : 'tonight');
+            }
             return 'ending around ' + t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: ensembleData.timezone });
         }
         function moreText(p, when) {
@@ -2779,10 +2780,10 @@ body.no-data #sectionNav { display: none; }
         }
         function ptSeg(s, e) {
             const h = ensembleData.hourly, ok = v => v !== null && v !== undefined && !isNaN(v);
-            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0;   // (pp / wet may be raised below when precipitation is falling now)
+            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0, ts = false;   // (pp / wet may be raised below when precipitation is falling now)
             for (let j = s; j < e && j < h.time.length; j++) {
                 if (ok(h.precipitation_probability[j])) pp = Math.max(pp, h.precipitation_probability[j]);
-                if (hourWetCode(j)) wet++;
+                { const wc = hourWetCode(j); if (wc) wet++; if (wc >= 95) ts = true; }
                 if (h.snowfall && ok(h.snowfall[j])) snowCm += h.snowfall[j];
                 if (ok(h.temperature_2m[j])) { tsum += h.temperature_2m[j]; tn++; }
             }
@@ -2793,25 +2794,36 @@ body.no-data #sectionNav { display: none; }
                 if (nc && nc.wet) { pp = 100; wet = Math.max(wet, 1); const hrs = Math.max(1, Math.min(e, rainEndIdx()) - cur); amt = Math.max(amt, (nc.lastHourMm || 0.3) * hrs * 0.7, 0.2); }
             }
             const tm = tn ? tsum / tn : 5, adj = adjustSnow(amt, snowCm, tm, tm);
-            return { pp, wet, amt, snow: adj.snow, rain: adj.rain, date: h.time[Math.min(s, h.time.length - 1)].slice(0, 10) };
+            return { pp, wet, ts, amt, snow: adj.snow, rain: adj.rain, date: h.time[Math.min(s, h.time.length - 1)].slice(0, 10) };
         }
-        // segs: [[label, startIdx, endIdx], ...] with labels such as 'this morning' or 'after midnight'
-        function periodPrecipSentence(segs) {
-            const out = []; let said = false;
+        // segs: [[label, startIdx, endIdx], ...]. One sentence: chance, amount (only when confident) and timing (a clock time
+        // only when radar tracked the echoes well, otherwise the part of the day).
+        // 'A 70% chance of a trace to 0.05" of rain around 7:30 AM, then a 40% chance this evening.'
+        function periodPrecipSentence(segs, arrive) {
+            const out = []; let said = false, lastWhat = null;
+            const hIdx = ensembleData.hourly.time;
             segs.forEach(([label, s, e]) => {
                 if (e - s < 1) return;
                 const g = ptSeg(s, e);
                 if (g.pp < 40 || (g.amt < 0.1 && !g.wet)) return;   // below 40% the text says nothing about precipitation (matches the icons)
-                if (g.wet && g.amt < 0.3) g.amt = 0.3;   // the text calls this part wet, so it always gets an amount
-                const sp = ptSpread(g.date) || { lo: 0.5, hi: 1.8 };
-                const isSnow = g.snow >= 0.5 && g.snow >= g.rain / 10;
+                if (g.wet && g.amt < 0.3) g.amt = 0.3;
+                const spread = ptSpread(g.date), sp = spread || { lo: 0.5, hi: 1.8 };
+                const isSnow = g.snow >= 0.5 && g.snow >= g.rain / 10, what = isSnow ? 'snow' : g.ts ? 'rain with thunderstorms' : 'rain';
                 const best = isSnow ? g.snow : g.amt;
-                const r = ptRange(best * sp.lo * (g.pp < 60 ? 0 : 1), best * sp.hi + (isSnow ? 0.5 : 0.5), isSnow);
-                const what = isSnow ? 'snow' : 'rain', add = said ? 'an additional ' : '';
-                if (g.pp >= 60 && g.wet) out.push(`${add}${r.text} of ${what} ${label}`);
-                else if (g.pp >= 30) out.push(`a chance of ${what} ${label} with ${add}${r.upTo === r.text ? r.text : 'up to ' + r.upTo} possible`);
-                else out.push(`a slight chance of ${what} ${label} with the potential for ${add}${r.upTo}`);
-                said = true;
+                const r = ptRange(best * sp.lo * (g.pp < 60 ? 0 : 1), best * sp.hi + 0.5, isSnow);
+                const confident = g.pp >= 60 || (spread && spread.hi <= 1.6);
+                // timing: a clock time only when radar is sure and the arrival falls in this part of the day
+                let when = label;
+                if (arrive && arrive.sure) {
+                    const ms0 = hourMs(s), ms1 = hourMs(Math.min(e, hIdx.length - 1)) + 36e5;
+                    if (arrive.t >= ms0 - 30 * 60e3 && arrive.t < ms1) when = 'around ' + new Date(Math.round(arrive.t / 9e5) * 9e5).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: ensembleData.timezone });
+                }
+                const pct = Math.round(g.pp / 10) * 10, ofWhat = lastWhat === what ? '' : ` of ${what}`;
+                let piece;
+                if (g.pp >= 90) piece = confident ? `${said ? 'an additional ' : ''}${r.text} of ${what} ${when}` : `${what} ${when}`;
+                else if (confident) piece = `a ${pct}% chance of ${said ? 'an additional ' : ''}${r.text} of ${what} ${when}`;
+                else piece = `a ${pct}% chance${ofWhat} ${when}`;
+                out.push(piece); said = true; lastWhat = what;
             });
             if (!out.length) return '';
             const t = out.join(', then ');
@@ -2843,18 +2855,18 @@ body.no-data #sectionNav { display: none; }
             const dirW = x => x.dir == null || x.steady < 0.5 ? null : PT_DIRS[Math.round(x.dir / 45) % 8];
             const A = W.find(notable) || W[0];
             const dA = dirW(A);
-            let t = `${dA ? `Winds from the ${dA}` : 'Variable winds'} at ${rng(A)}${gust(A)}`;
+            let t = `${dA ? dA[0].toUpperCase() + dA.slice(1) + ' winds' : 'Variable winds'} ${rng(A)}${gust(A)}`;
             const hiA = Math.ceil(A.hi * k / 5) * 5;
             for (const B of W.slice(W.indexOf(A) + 1)) {   // the first later part of the period that is clearly different
                 const dB = dirW(B), diff = A.dir != null && B.dir != null ? Math.abs(((B.dir - A.dir + 540) % 360) - 180) : 0, hiB = Math.ceil(B.hi * k / 5) * 5;
                 if (B.hi < 6) { t += `, becoming calm ${B.label}`; break; }
-                if (dB && dA && diff >= 67.5) { t += `, becoming ${dB} ${B.label}${hiB !== hiA ? ` at ${rng(B)}` : ''}`; break; }
+                if (dB && dA && diff >= 67.5) { t += `, becoming ${dB} ${B.label}${hiB !== hiA ? ` ${rng(B)}` : ''}`; break; }
                 if (hiB <= hiA - 10) { t += `, diminishing to ${rng(B)} ${B.label}`; break; }
                 if (hiB >= hiA + 10) { t += `, increasing to ${rng(B)}${gust(B)} ${B.label}`; break; }
             }
             return t + '.';
         }
-        function periodExtras(segs) { return [periodPrecipSentence(segs), periodWindSentence(segs)].filter(Boolean); }
+        function periodExtras(segs, arrive) { return [periodPrecipSentence(segs, arrive), periodWindSentence(segs)].filter(Boolean); }
         // the rest of today (from now) and tonight, as labelled segments
         function todaySegs() {
             const h = ensembleData.hourly, d0 = ensembleData.daily.time[0], first = h.time.findIndex(t => t.startsWith(d0)), cur = hourlyStart();
@@ -2893,13 +2905,7 @@ body.no-data #sectionNav { display: none; }
                 }
                 const sky = skyCondition(cl.length ? cl.reduce((x, y) => x + y, 0) / cl.length : null, day >= n / 2).text.toLowerCase();
                 let state = sky;
-                if (wetH) {
-                    const kind = code >= 95 ? (spcThunderAt(Date.now()) && wpp < 80 ? 'showers and thunderstorms' : 'thunderstorms') : sn >= 0.5 ? 'snow showers' : 'showers';
-                    const widespread = wetH >= Math.max(2, n / 2);
-                    if (wpp >= 80 && widespread) state = code >= 95 ? 'thunderstorms' : sn >= 0.5 ? 'snow' : 'rain';
-                    else if (wpp >= 60) state = `${sky} with ${kind} likely`;
-                    else state = `${sky} with a ${Math.round(wpp / 10) * 10}% chance of ${kind}`;
-                }
+
                 const last = parts[parts.length - 1];
                 if (last && last.state === state) last.labels.push(label.replace('this ', ''));
                 else parts.push({ state, labels: [label] });
@@ -6785,9 +6791,8 @@ body.no-data #sectionNav { display: none; }
                 if (ni.high !== null) { $h('heroHi').innerText = formatTemp(ni.high); $h('heroHiLbl').innerText = 'Rising to'; }
                 const parts = [ni.nowcast && ni.nowcast.wet ? `${NOWCAST_WORD[ni.nowcast.kind]} ${rainEndText() || 'falling now'}; low tonight near ${formatTemp(ni.low)}.` : `${(t => t[0] + t.slice(1).toLowerCase())(ni.cond.text.split(', ')[0])} tonight with a low near ${formatTemp(ni.low)}.`];
                 if (ni.high !== null) parts.push(`Temperatures rise to around ${formatTemp(ni.high)} before sunrise.`);
-                { const tsg = tonightSegs(ni); periodExtras(tsg).forEach(x => parts.push(x)); }
+                { const tsg = tonightSegs(ni); periodExtras(tsg, radarInfo && radarInfo.arrive).forEach(x => parts.push(x)); }
                 if (rf.high && rf.high.type === 'set') parts.push(rf.high.tie ? 'Today tied the daily record high.' : 'Today set a new daily record high.');
-                if (regionalInfo && regionalInfo.msg) parts.splice(1, 0, regionalInfo.msg);
                 if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.msg);
                 $h('heroNarrative').innerText = parts.join(' ');
                 $h('heroNarrLbl').innerText = 'Tonight';
@@ -6806,12 +6811,12 @@ body.no-data #sectionNav { display: none; }
                 const ph = restOfDayPhrase() || '';
                 parts.push(`${restOfDayPhrase() || cond.text.split(', ')[0] + ' for the rest of today'}. High near ${formatTemp(bb.bestMax)}.`);
             }
-            periodExtras(todaySegs()).forEach(x => parts.push(x));
+            periodExtras(todaySegs(), radarInfo && radarInfo.arrive).forEach(x => parts.push(x));
             parts.push(`Overnight low near ${formatTemp(bb.bestMin)}.`);
             if (rf.high && rf.high.type === 'set') parts.push(rf.high.tie ? 'The daily record high has been tied.' : 'A new daily record high has been set.');
             else if (rf.high && rf.high.type === 'record') parts.push('Record high territory.');
-            if (regionalInfo && regionalInfo.msg) parts.splice(1, 0, regionalInfo.msg);
-            if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.msg);
+            if (radarInfo && radarInfo.msg) parts.splice(1, 0, radarInfo.msg);            if (regionalInfo && regionalInfo.msg) parts.splice(1, 0, regionalInfo.msg);
+
             $h('heroNarrative').innerText = parts.join(' ');
             $h('heroNarrLbl').innerText = 'Today';
         }

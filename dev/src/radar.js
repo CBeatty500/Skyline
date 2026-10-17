@@ -124,7 +124,8 @@
             let any = 0; for (let i = 0; i < N * N; i++) if (B[i] >= 20) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 100) any++; }
             let arrive = null; for (let t = 0; t <= 180; t += 10) if (ahead(t) >= 20) { arrive = t; break; }
             const speedKmh = Math.hypot(vx * kmX, vy * kmY) * 60;
-            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), passed, clearUpstream, endMin, motionSrc, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
+            const timeSure = motionSrc === 'radar' && !!(m30 && m30.s >= 0.5);   // exact times only when the echoes were tracked well
+            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), passed, clearUpstream, endMin, motionSrc, timeSure, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
         }
         function applyRadarNowcast(rn) {
             const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
@@ -163,13 +164,13 @@
             } catch (e) {}
             // one line for the forecast text, only for precipitation on the way (rain overhead is handled by current conditions)
             radarInfo = null;
-            if (rn.motionSrc === 'radar' && rn.arrive !== null && rn.arrive >= 15 && rn.arrive <= 150) {
+            if (rn.arrive !== null && rn.arrive >= 15 && rn.arrive <= 150) {
                 const tz = ensembleData.timezone;
                 const when = new Date(Math.round((Date.now() + rn.arrive * 60e3) / 9e5) * 9e5).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
                 const snowy = (() => { const c = getCurrentConditions(); return c && c.temp != null && c.temp <= 0.5; })();
                 const th0 = typeof thunderAt === 'function' ? thunderAt(hourlyStart() + 1) : null, tsOK = rn.peak >= 50 && ((th0 != null && th0 >= 15) || (typeof spcThunderAt === 'function' && spcThunderAt(Date.now())));
                 const what = snowy ? (rn.peak >= 30 ? 'Snow' : 'Light snow') : tsOK ? 'Thunderstorms' : rn.peak >= 40 ? 'Heavy rain' : rn.peak >= 30 ? 'Rain' : 'Light rain';
-                radarInfo = { msg: `${what} arriving around ${when}.` };
+                radarInfo = { msg: null, arrive: { t: Date.now() + rn.arrive * 60e3, sure: rn.timeSure && rn.arrive <= 90, what } };   // used by the precipitation sentence
             }
         }
         async function loadRadar(token, lat, lon) {
@@ -177,7 +178,7 @@
             try {
                 const rn = await radarNowcast(+lat, +lon);
                 if (token !== fetchToken) return;
-                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };
+                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin, timeSure: rn.timeSure };
                 if (applyRadarNowcast._st) saveRadarState({ ...applyRadarNowcast._st, now: radarNow, info: radarInfo });
                 window._lastRadar = { here: rn.here, here3: rn.here3, passed: rn.passed, clearUpstream: rn.clearUpstream, endMin: rn.endMin, motionSrc: rn.motionSrc, moving: rn.moving, mph: Math.round(rn.speedKmh * 0.621), arrive: rn.arrive, peak: rn.peak, any: rn.any, ahead: [0, 30, 60, 90, 120, 150, 180].map(t => rn.ahead(t)) };   // diagnostics
                 applyRadarNowcast(rn);

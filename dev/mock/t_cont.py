@@ -4,7 +4,7 @@ async def main():
     async with async_playwright() as p:
         b=await p.chromium.launch(); pg=await b.new_page()
         errs=[]; pg.on('pageerror', lambda e: errs.append(str(e)))
-        await pg.goto('file:///mnt/user-data/outputs/skyline.html'); await pg.wait_for_timeout(800)
+        await pg.goto('file:///mnt/user-data/outputs/skyline.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875'); await pg.wait_for_timeout(800)
         r=await pg.evaluate("""()=>{
           localStorage.clear(); currentLoc={lat:39.04,lon:-77.49,name:'A'};
           const mk=(p,mx)=>[{date:'2026-10-16',remaining:true,bestMax:mx,bestMin:10,bestPrecip:p,bestRain:p,bestSnow:0,precipProb:51,bestWind:12,bestGust:25},{date:'2026-10-17',bestMax:15,bestMin:5,bestPrecip:0,bestRain:0,bestSnow:0,precipProb:10,bestWind:10,bestGust:20}];

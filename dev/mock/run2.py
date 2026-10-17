@@ -33,7 +33,7 @@ async def main():
             elif 'chart' in u and u.endswith('.js'): await route.fulfill(status=200, content_type='application/javascript', body=STUB)
             else: await route.fulfill(status=404, body='', headers={'access-control-allow-origin':'*'})
         await pg.route('**/*', lambda r: asyncio.ensure_future(handle(r)) if not r.request.url.startswith('file:') else asyncio.ensure_future(r.continue_()))
-        await pg.goto('file:///mnt/user-data/outputs/skyline.html'); await pg.wait_for_timeout(4000)
+        await pg.goto('file:///mnt/user-data/outputs/skyline.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875'); await pg.wait_for_timeout(4000)
         print(await pg.evaluate("[document.getElementById('dashboardContent').className, document.getElementById('toastMessage') && document.getElementById('toastMessage').innerText]"))
         await pg.evaluate("document.getElementById('precipChart').scrollIntoView()"); await pg.wait_for_timeout(800)
         await pg.locator('#precipChart').locator('xpath=ancestor::div[contains(@class,"grid")][1]').screenshot(path='charts.png')

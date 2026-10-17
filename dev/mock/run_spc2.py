@@ -82,7 +82,7 @@ async def main():
             elif 'chart' in u and u.endswith('.js'): await route.fulfill(status=200, content_type='application/javascript', body=STUB)
             else: await route.fulfill(status=404, body='', headers=H)
         await pg.route('**/*', lambda r: asyncio.ensure_future(handle(r)) if not r.request.url.startswith('file:') else asyncio.ensure_future(r.continue_()))
-        await pg.goto('file:///mnt/user-data/outputs/skyline.html'); await pg.wait_for_timeout(5000)
+        await pg.goto('file:///mnt/user-data/outputs/skyline.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875'); await pg.wait_for_timeout(5000)
         print(await pg.evaluate("[currentLoc.lat,currentLoc.lon,nwsOffice, JSON.stringify(spcData && {days:spcData.days, mds:spcData.mds.map(m=>[m.num,m.concerning,m.watchProb,String(m.end)]), texts:spcData.texts.length, winter:spcData.winter})]"))
         print(await pg.evaluate("document.getElementById('heroNarrative').innerText"))
         print(await pg.evaluate("(()=>{const h=ensembleData.hourly,c=hourlyStart();const f=h.time.findIndex(t=>t.startsWith(ensembleData.daily.time[0]));window.hourlyStart=()=>f+8;for(let j=f+14;j<f+19;j++){h.precipitation_probability[j]=55;h.weather_code[j]=3;h.precipitation[j]=1.5;}computeBestBetPredictions();applyRemainingToday();renderHero();renderHourlySlider();return [c,f,restOfDayPhrase(),[...document.querySelectorAll('#hourlyContainer i.fa-solid')].map(i=>i.className.split(' ')[1]).join(',')]})()"))
