@@ -1,0 +1,20 @@
+name: Probe
+on: workflow_dispatch
+permissions:
+  contents: write
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          IS=https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer
+          B="-8984000,4590000,-8270000,4860000"
+          { echo "== json png32"; curl -s "$IS/exportImage?bbox=$B&bboxSR=3857&imageSR=3857&size=1100,420&format=png32&transparent=true&interpolation=RSP_NearestNeighbor&f=json" | head -c 800; echo
+            echo "== json png"; curl -s "$IS/exportImage?bbox=$B&bboxSR=3857&imageSR=3857&size=1100,420&format=png&transparent=true&f=json" | head -c 800; echo
+            H=$(curl -s "$IS/exportImage?bbox=$B&bboxSR=3857&imageSR=3857&size=1100,420&format=png&transparent=true&f=json" | python3 -c "import json,sys;print(json.load(sys.stdin).get('href',''))")
+            echo "== href $H"; curl -s -o /dev/null -w "%{http_code} %{content_type}\n" -D - "$H" | head -20
+            echo "== image direct headers"; curl -s -o /dev/null -D - "$IS/exportImage?bbox=$B&bboxSR=3857&imageSR=3857&size=1100,420&format=png32&transparent=true&f=image" -H "Origin: https://cbeatty500.github.io" | head -20
+          } > data/probe.txt 2>&1
+          git config user.name skyline-bot; git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add data/probe.txt; git commit -m probe; git pull --rebase -q origin main; git push -q
