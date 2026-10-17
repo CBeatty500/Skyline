@@ -1,13 +1,6 @@
-desk warning: Radar nowcast unavailable: Error: radar samples
-    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1900:60)
-    at async Promise.all (
-desk error: Failed to load resource: the server responded with a status of 400 ()
-desk bounds {"map":[38.1,-80.7166,39.9771,-74.2566],"radar":[38.1,-80.7166,39.9771,-74.2566],"time":"Radar unavailable"}
-desk looping false frames 0
-desk error: Failed to load resource: the server responded with a status of 400 ()
-desk after resize looping false frames 0 Radar unavailable
-phone error: Failed to load resource: the server responded with a status of 400 ()
-phone bounds {"map":[37.4923,-79.2114,40.5639,-75.7617],"radar":[37.4923,-79.2114,40.5639,-75.7617],"time":"Radar unavailable"}
-phone looping false frames 0
-phone error: Failed to load resource: the server responded with a status of 400 ()
-phone after resize looping false frames 0 Radar unavailable
+desk bounds {"map":[38.1,-80.7166,39.9771,-74.2566],"radar":[38.1,-80.7166,39.9771,-74.2566],"time":"1:54 PM EDT"}
+desk looping true frames 7
+desk after resize looping true frames 7 5:16 AM EDT
+phone bounds {"map":[37.4923,-79.2114,40.5639,-75.7617],"radar":[37.4923,-79.2114,40.5639,-75.7617],"time":"5:52 AM EDT"}
+phone looping true frames 7
+phone after resize looping true frames 7 5:22 AM EDT
