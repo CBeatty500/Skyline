@@ -107,7 +107,7 @@ CH = dict(temp=_cut('<!-- Hourly Temp Multi-Model Chart -->', '<!-- Raw Model Co
 for _k, _v in CH.items(): assert _v.count('<div') == _v.count('</div>'), (_k, _v.count('<div'), _v.count('</div>'))
 QUICK = open('/home/claude/quick_view.html').read()
 MODEL_HTML = open('/home/claude/model_analysis.html').read()
-main = f'''<main class="wrap pb-16 pt-3 sm:pt-5 space-y-5">
+main = f'''<main class="wrap pb-16 pt-3 sm:pt-4 space-y-5">
 {B['hero'].split(chr(10))[0] and ''}
         <div id="toastContainer" role="status" aria-live="polite" class="toast-float hidden glass-panel border-l-4 border-amber-500 p-4 rounded-xl flex justify-between items-center text-sm shadow-xl">
             <div class="flex items-center gap-3"><i class="fa-solid fa-circle-exclamation text-amber-400 text-lg"></i><span id="toastMessage" class="text-slate-200">System Notification</span></div>
@@ -260,6 +260,10 @@ body.no-data .rail-sep { display: none; }
 #placesToggle[aria-expanded="true"] .pl-chev { transform: rotate(180deg); }
 @media (min-width: 1024px) { .place-chips { display: flex; } #placesToggle { display: none; } }
 @media (max-width: 639px) { .navpill { padding: 4px 8px; } #sectionNav { gap: 0; } }
+/* top of the forecast: no inherited gap above it, a short gap before the alerts */
+#dashboardContent { margin-top: 0 !important; }
+#dashboardContent > #topAlertSlot { margin-top: .75rem; }
+#dashboardContent > #topAlertSlot:empty { margin-top: 0; }
 .rail-label { font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--mute); margin-right: 4px; }
 .chip { padding: 4px 12px; border-radius: 999px; background: rgba(255,255,255,.08); border: 1px solid var(--line); font-size: 12px; color: var(--ink); white-space: nowrap; }
 .chip:hover { background: rgba(255,255,255,.16); }

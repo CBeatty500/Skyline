@@ -188,13 +188,14 @@
         async function loadRadar(token, lat, lon) {
             if (!nwsOffice || !spcInConus(lat, lon)) { radarInfo = null; return; }
             try {
-                const rn = await radarNowcast(+lat, +lon);
+                const k = `${(+lat).toFixed(3)},${(+lon).toFixed(3)}`, pre = window._radarPre;
+                const rn = await (pre && pre.k === k && Date.now() - pre.at < 120e3 ? pre.p : radarNowcast(+lat, +lon));   // started with the forecast request
                 if (token !== fetchToken) return;
                 radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin, timeSure: rn.timeSure };
-                if (applyRadarNowcast._st) saveRadarState({ ...applyRadarNowcast._st, now: radarNow, info: radarInfo });
                 window._lastRadar = { here: rn.here, here3: rn.here3, passed: rn.passed, clearUpstream: rn.clearUpstream, endMin: rn.endMin, motionSrc: rn.motionSrc, moving: rn.moving, mph: Math.round(rn.speedKmh * 0.621), arrive: rn.arrive, peak: rn.peak, any: rn.any, ahead: [0, 30, 60, 90, 120, 150, 180].map(t => rn.ahead(t)) };   // diagnostics
                 applyRadarNowcast(rn);
                 radarNow.drizzle = !!rn.drizzle; radarNow.any = rn.any || 0;
+                if (applyRadarNowcast._st) saveRadarState({ ...applyRadarNowcast._st, now: radarNow, info: radarInfo });   // this run's result, for a quick reload
                 if (window._lastRadar) { window._lastRadar.drizzle = radarNow.drizzle; window._lastRadar.lightFrac = Math.round((rn.lightFrac || 0) * 100) / 100; }
                 recomputeForecast();
             } catch (e) { console.warn('Radar nowcast unavailable:', e); }

@@ -1920,3 +1920,8 @@ out = out[:_a] + """        function togglePlaces(force) {
 _r("""                <div class="flex flex-wrap items-center gap-2">
                     <span id="nwsStatusBadge\"""", """                <div class="hidden">
                     <span id="nwsStatusBadge\"""")
+
+# ---- radar samples start downloading with the forecast request, so the radar result is ready about when the page first draws ----
+_r("""            const lat = currentLoc.lat.toFixed(4), lon = currentLoc.lon.toFixed(4);""", """            const lat = currentLoc.lat.toFixed(4), lon = currentLoc.lon.toFixed(4);
+            try { if (spcInConus(+lat, +lon)) { const p = radarNowcast(+lat, +lon); p.catch(() => {}); window._radarPre = { k: `${(+lat).toFixed(3)},${(+lon).toFixed(3)}`, at: Date.now(), p }; } } catch (e) {}""")
+_r("""            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-blue-500 pl-4 py-1">""", """            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-blue-500 pl-4 py-0.5">""")

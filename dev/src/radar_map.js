@@ -206,6 +206,9 @@
                 rmAutoDone = true; rmAutoAt = Date.now();
                 setSecOpen(cfg, rainNowOrToday(), false);
             } else if (final && Date.now() - rmAutoAt < 60e3 && cfg._panel.classList.contains('collapsed') && rainNowOrToday()) {
-                setSecOpen(cfg, true, false);   // radar arriving moments later found precipitation overhead
+                // radar arriving moments later found precipitation: open without moving what the visitor is looking at
+                const above = cfg._panel.getBoundingClientRect().bottom < 0, h0 = document.documentElement.scrollHeight;
+                setSecOpen(cfg, true, false);
+                if (above) window.scrollBy(0, document.documentElement.scrollHeight - h0);
             }
         }
