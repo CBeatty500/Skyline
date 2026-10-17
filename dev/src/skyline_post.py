@@ -59,3 +59,19 @@ for _a, _b in [
 out = out.replace(' · ', ', ').replace('&middot;', ',')
 _left = [m.start() for m in _re2.finditer('·', out)]
 print('middle dots left:', len(_left), [out[max(0, i - 40):i + 10] for i in _left[:6]])
+# ---- brand: Best Bet Weather (file and repository names stay "skyline" until the site goes public) ----
+for _a, _b in [
+    ('<title>Skyline Weather</title>', '<title>Best Bet Weather</title>'),
+    ('content="Skyline: a meteorologist\'s weather dashboard with live station observations, an observation-corrected multi-model forecast, and official climate records."',
+     'content="Best Bet Weather: every forecast model weighed against live observations, radar and the National Weather Service, then verified against what actually happened."'),
+    ('content="Skyline Weather"', 'content="Best Bet Weather"'),
+    ('aria-label="Skyline"', 'aria-label="Best Bet Weather"'),
+    ('<span class="brand-name hidden sm:inline">Skyline</span>', '<span class="brand-name hidden sm:inline">Best Bet Weather</span>'),
+    ('>Skyline: NOAA', '>Best Bet Weather: NOAA'),
+    ('– Skyline Weather`', '– Best Bet Weather`'),
+    ('Let Skyline pick the station again', 'Let the app pick the station again'),
+]:
+    assert _a in out, _a[:60]
+    out = out.replace(_a, _b)
+_i = out.index('</style>')
+out = out[:_i] + '\n@media (max-width: 1023px) { .brand-name { display: none !important; } }\n' + out[_i:]

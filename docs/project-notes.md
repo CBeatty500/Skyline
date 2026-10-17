@@ -1,5 +1,7 @@
 # Skyline project notes
 
+The app is branded **Best Bet Weather** (short form Wx) since Oct 17. File, repository and site names stay "skyline" until the owner buys a domain and hosts it publicly; then rename the repo, Pages and Netlify together.
+
 Everything a new session needs to continue the work. The owner is a meteorologist; measured data matters most.
 
 ## Where things live
