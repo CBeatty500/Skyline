@@ -19,7 +19,7 @@ _r("""            if (/overcast/.test(s)) return mk('fa-cloud', 'text-slate-400'
 
 # ---- location line: compact, sits beside the city name ----
 _r("document.getElementById('displayLocationMeta').innerText = `Lat: ${currentLoc.lat.toFixed(4)}° | Lon: ${currentLoc.lon.toFixed(4)}° | Elevation: ${Math.round((currentLoc.ele || 0) * 3.28084).toLocaleString()} ft (${Math.round(currentLoc.ele || 0)} m)`;",
-   "document.getElementById('displayLocationMeta').innerText = `Lat: ${currentLoc.lat.toFixed(4)}° ${String.fromCharCode(183)} Lon: ${currentLoc.lon.toFixed(4)}° ${String.fromCharCode(183)} Elev: ${Math.round((currentLoc.ele || 0) * 3.28084).toLocaleString()} ft (${Math.round(currentLoc.ele || 0)} m)`;")
+   "document.getElementById('displayLocationMeta').innerText = `Lat: ${currentLoc.lat.toFixed(4)}° ${String.fromCharCode(183)} Lon: ${currentLoc.lon.toFixed(4)}° ${String.fromCharCode(183)} Elev: ${isImperial ? Math.round((currentLoc.ele || 0) * 3.28084).toLocaleString() + ' ft' : Math.round(currentLoc.ele || 0).toLocaleString() + ' m'}`;")
 
 # ---- per-day model consensus (spread of the model highs and lows) ----
 _r("""                const acc = {};
