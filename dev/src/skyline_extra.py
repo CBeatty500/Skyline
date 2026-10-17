@@ -1879,3 +1879,18 @@ _r("""            if (parts.length === 1) return `${cap(parts[0].state)} for the
             if (wSum) { const b2 = parts.map(p => `${p.state} ${p.labels.length > 1 ? p.labels.slice(0, -1).join(', ') + ' and ' + p.labels.slice(-1) : p.labels[0]}`);
                 return cap(b2.length > 2 ? b2.slice(0, -1).join(', ') + ', then ' + b2.slice(-1) : b2.join(', then ')).replace(/, then (becoming|less windy)/g, ', $1') + '. ' + wSum.replace(/\.$/, ''); }""")
 _r("""            return { text, wet: wetAll };""", """            return { text: wSum ? text + '. ' + wSum.replace(/\.$/, '') : text, wet: wetAll };""")
+
+# ---- search placeholder fits the box: the full wording only when there is room ----
+_a = out.index('        function restOfDayPhrase() {')
+out = out[:_a] + """        function fitSearchPh() {
+            const i = document.getElementById('cityInput'); if (!i) return;
+            const full = 'Search any city in the world', short = 'Search any city';
+            const c = document.createElement('canvas').getContext('2d'), cs = getComputedStyle(i);
+            c.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+            const room = i.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - 4;
+            i.placeholder = [full, short, 'Search a city', 'Search'].find(t => c.measureText(t).width <= room) || 'Search';
+        }
+        fitSearchPh();
+        window.addEventListener('resize', fitSearchPh);
+        try { document.fonts && document.fonts.ready.then(fitSearchPh); } catch (e) {}
+""" + out[_a:]

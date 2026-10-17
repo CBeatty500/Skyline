@@ -3116,6 +3116,17 @@ body.no-data #sectionNav { display: none; }
                 out.push({ type: 'warning', tag: src, title: 'Tropical Development Area', text: `This location is inside an area the hurricane center is watching: ${v.area.p7} chance of a tropical cyclone forming within 7 days${nhcPct(v.area.p2) ? ` (${v.area.p2} within 2 days)` : ''}.`, links: [{ label: 'Tropical weather outlook', href: 'https://www.nhc.noaa.gov/gtwo.php' }] });
             return out;
         }
+        function fitSearchPh() {
+            const i = document.getElementById('cityInput'); if (!i) return;
+            const full = 'Search any city in the world', short = 'Search any city';
+            const c = document.createElement('canvas').getContext('2d'), cs = getComputedStyle(i);
+            c.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+            const room = i.clientWidth - (parseFloat(cs.paddingLeft) || 0) - (parseFloat(cs.paddingRight) || 0) - 4;
+            i.placeholder = [full, short, 'Search a city', 'Search'].find(t => c.measureText(t).width <= room) || 'Search';
+        }
+        fitSearchPh();
+        window.addEventListener('resize', fitSearchPh);
+        try { document.fonts && document.fonts.ready.then(fitSearchPh); } catch (e) {}
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
             const h = ensembleData.hourly, d = ensembleData.daily, cur = hourlyStart();
