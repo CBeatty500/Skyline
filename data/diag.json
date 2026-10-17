@@ -1,6 +1,6 @@
 {
- "at": "2026-10-17T09:08:59.433Z",
- "firstViewMs": 5875,
+ "at": "2026-10-17T09:16:51.444Z",
+ "firstViewMs": 3911,
  "errors": [],
  "snaps": [
   {
@@ -123,67 +123,46 @@
    "nowcast": {
     "wet": false,
     "kind": "rain",
-    "endedAgo": 0.25,
+    "endedAgo": 0.3333333333333333,
     "lastHourMm": 0,
-    "persist": 51
+    "persist": 48
    },
    "obs": {
     "id": "KIAD",
-    "ts": "2026-10-17T08:50:00+00:00",
+    "ts": "2026-10-17T08:55:00+00:00",
     "txt": "Cloudy"
    }
   },
   {
    "label": "+5s",
-   "narrative": "Overcast with thunderstorms likely this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. About 0.07\" possible. Overnight low near 37°F.",
+   "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. Overnight low near 37°F.",
    "cond": "Cloudy",
-   "radar": {
-    "here": 0,
-    "here3": 0,
-    "passed": false,
-    "clearUpstream": false,
-    "endMin": null,
-    "motionSrc": "steering",
-    "moving": true,
-    "mph": 44,
-    "arrive": 20,
-    "peak": 70,
-    "any": 78,
-    "ahead": [
-     0,
-     70,
-     70,
-     0,
-     70,
-     70,
-     0
-    ]
-   },
+   "radar": null,
    "radarInfo": null,
    "hours": [
     {
      "t": "05:00",
-     "pp": 90,
-     "code": 95,
-     "wet": 95,
+     "pp": 39,
+     "code": 1,
+     "wet": 0,
      "thunder": 0,
      "cc": 77,
      "dry": false
     },
     {
      "t": "06:00",
-     "pp": 80,
-     "code": 95,
-     "wet": 95,
+     "pp": 31,
+     "code": 3,
+     "wet": 0,
      "thunder": 0,
      "cc": 100,
      "dry": false
     },
     {
      "t": "07:00",
-     "pp": 65,
-     "code": 95,
-     "wet": 95,
+     "pp": 26,
+     "code": 3,
+     "wet": 0,
      "thunder": 0,
      "cc": 100,
      "dry": false
@@ -279,67 +258,46 @@
    "nowcast": {
     "wet": false,
     "kind": "rain",
-    "endedAgo": 0.25,
+    "endedAgo": 0.3333333333333333,
     "lastHourMm": 0,
-    "persist": 51
+    "persist": 48
    },
    "obs": {
     "id": "KIAD",
-    "ts": "2026-10-17T08:50:00+00:00",
+    "ts": "2026-10-17T08:55:00+00:00",
     "txt": "Cloudy"
    }
   },
   {
    "label": "+15s",
-   "narrative": "Overcast with thunderstorms likely this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. About 0.07\" possible. Overnight low near 37°F.",
+   "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. Overnight low near 37°F.",
    "cond": "Cloudy",
-   "radar": {
-    "here": 0,
-    "here3": 0,
-    "passed": false,
-    "clearUpstream": false,
-    "endMin": null,
-    "motionSrc": "steering",
-    "moving": true,
-    "mph": 44,
-    "arrive": 20,
-    "peak": 70,
-    "any": 78,
-    "ahead": [
-     0,
-     70,
-     70,
-     0,
-     70,
-     70,
-     0
-    ]
-   },
+   "radar": null,
    "radarInfo": null,
    "hours": [
     {
      "t": "05:00",
-     "pp": 90,
-     "code": 95,
-     "wet": 95,
+     "pp": 39,
+     "code": 1,
+     "wet": 0,
      "thunder": 0,
      "cc": 77,
      "dry": false
     },
     {
      "t": "06:00",
-     "pp": 80,
-     "code": 95,
-     "wet": 95,
+     "pp": 31,
+     "code": 3,
+     "wet": 0,
      "thunder": 0,
      "cc": 100,
      "dry": false
     },
     {
      "t": "07:00",
-     "pp": 65,
-     "code": 95,
-     "wet": 95,
+     "pp": 26,
+     "code": 3,
+     "wet": 0,
      "thunder": 0,
      "cc": 100,
      "dry": false
@@ -435,67 +393,46 @@
    "nowcast": {
     "wet": false,
     "kind": "rain",
-    "endedAgo": 0.25,
+    "endedAgo": 0.3333333333333333,
     "lastHourMm": 0,
-    "persist": 51
+    "persist": 48
    },
    "obs": {
     "id": "KIAD",
-    "ts": "2026-10-17T08:50:00+00:00",
+    "ts": "2026-10-17T08:55:00+00:00",
     "txt": "Cloudy"
    }
   },
   {
    "label": "+30s",
-   "narrative": "Overcast with thunderstorms likely this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. About 0.07\" possible. Overnight low near 37°F.",
+   "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. High near 55°F. Overnight low near 37°F.",
    "cond": "Cloudy",
-   "radar": {
-    "here": 0,
-    "here3": 0,
-    "passed": false,
-    "clearUpstream": false,
-    "endMin": null,
-    "motionSrc": "steering",
-    "moving": true,
-    "mph": 44,
-    "arrive": 20,
-    "peak": 70,
-    "any": 78,
-    "ahead": [
-     0,
-     70,
-     70,
-     0,
-     70,
-     70,
-     0
-    ]
-   },
+   "radar": null,
    "radarInfo": null,
    "hours": [
     {
      "t": "05:00",
-     "pp": 90,
-     "code": 95,
-     "wet": 95,
+     "pp": 39,
+     "code": 1,
+     "wet": 0,
      "thunder": 0,
      "cc": 77,
      "dry": false
     },
     {
      "t": "06:00",
-     "pp": 80,
-     "code": 95,
-     "wet": 95,
+     "pp": 31,
+     "code": 3,
+     "wet": 0,
      "thunder": 0,
      "cc": 100,
      "dry": false
     },
     {
      "t": "07:00",
-     "pp": 65,
-     "code": 95,
-     "wet": 95,
+     "pp": 26,
+     "code": 3,
+     "wet": 0,
      "thunder": 0,
      "cc": 100,
      "dry": false
@@ -591,13 +528,13 @@
    "nowcast": {
     "wet": false,
     "kind": "rain",
-    "endedAgo": 0.25,
+    "endedAgo": 0.3333333333333333,
     "lastHourMm": 0,
-    "persist": 51
+    "persist": 48
    },
    "obs": {
     "id": "KIAD",
-    "ts": "2026-10-17T08:50:00+00:00",
+    "ts": "2026-10-17T08:55:00+00:00",
     "txt": "Cloudy"
    }
   }
@@ -605,153 +542,153 @@
  "timings": [
   {
    "url": "https://www.ncei.noaa.gov/access/services/data/v1",
-   "start": 7733,
-   "dur": 2974
+   "start": 6946,
+   "dur": 1417
   },
   {
    "url": "https://api.weather.gov/stations/KIAD/observations",
-   "start": 682,
-   "dur": 896
-  },
-  {
-   "url": "https://www.ncei.noaa.gov/access/services/data/v1",
-   "start": 6346,
-   "dur": 775
+   "start": 613,
+   "dur": 903
   },
   {
    "url": "https://data.rcc-acis.org/StnData",
-   "start": 6345,
-   "dur": 691
+   "start": 5386,
+   "dur": 540
+  },
+  {
+   "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+   "start": 5198,
+   "dur": 508
   },
   {
    "url": "https://api.open-meteo.com/v1/forecast",
-   "start": 453,
-   "dur": 657
-  },
-  {
-   "url": "https://api.open-meteo.com/v1/forecast",
-   "start": 453,
-   "dur": 657
-  },
-  {
-   "url": "https://mesonet.agron.iastate.edu/geojson/network/NWSCLI.geojson",
-   "start": 1600,
-   "dur": 609
+   "start": 196,
+   "dur": 393
   },
   {
    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
-   "start": 1111,
-   "dur": 606
+   "start": 577,
+   "dur": 384
   },
   {
-   "url": "https://mesonet.agron.iastate.edu/json/cli.py",
-   "start": 2495,
-   "dur": 531
+   "url": "https://api.open-meteo.com/v1/forecast",
+   "start": 196,
+   "dur": 378
   },
   {
-   "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
-   "start": 6025,
-   "dur": 411
+   "url": "https://www.ncei.noaa.gov/access/services/data/v1",
+   "start": 5387,
+   "dur": 348
   },
   {
-   "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
-   "start": 6026,
-   "dur": 370
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/17/query",
-   "start": 4522,
-   "dur": 317
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/1/query",
-   "start": 4522,
-   "dur": 297
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/9/query",
-   "start": 4522,
-   "dur": 290
+   "url": "https://api.weather.gov/gridpoints/LWX/80,76/stations",
+   "start": 249,
+   "dur": 341
   },
   {
    "url": "https://data.rcc-acis.org/StnMeta",
-   "start": 2358,
-   "dur": 285
-  },
-  {
-   "url": "https://api.open-meteo.com/v1/elevation",
-   "start": 2219,
-   "dur": 274
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer",
-   "start": 4525,
-   "dur": 267
-  },
-  {
-   "url": "https://data.rcc-acis.org/StnData",
-   "start": 2645,
-   "dur": 264
-  },
-  {
-   "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
-   "start": 6023,
-   "dur": 263
-  },
-  {
-   "url": "https://api.weather.gov/gridpoints/LWX/80,76",
-   "start": 531,
-   "dur": 192
-  },
-  {
-   "url": "https://api.weather.gov/gridpoints/LWX/80,76/forecast",
-   "start": 530,
-   "dur": 176
-  },
-  {
-   "url": "https://mesonet.agron.iastate.edu/json/cli.py",
-   "start": 2494,
-   "dur": 164
-  },
-  {
-   "url": "https://raw.githubusercontent.com/CBeatty500/Skyline/main/data/learning.json",
-   "start": 157,
-   "dur": 148
+   "start": 5104,
+   "dur": 276
   },
   {
    "url": "https://mesonet.agron.iastate.edu/cgi-bin/afos/retrieve.py",
-   "start": 4523,
-   "dur": 146
+   "start": 2478,
+   "dur": 226
   },
   {
-   "url": "https://api.open-meteo.com/v1/forecast",
-   "start": 7715,
-   "dur": 143
+   "url": "https://api.weather.gov/alerts/active",
+   "start": 248,
+   "dur": 224
   },
   {
-   "url": "https://api.open-meteo.com/v1/forecast",
-   "start": 6022,
-   "dur": 140
+   "url": "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/9/query",
+   "start": 2477,
+   "dur": 220
   },
   {
-   "url": "https://api.weather.gov/stations/KFDK/observations/latest",
-   "start": 4527,
-   "dur": 139
+   "url": "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/17/query",
+   "start": 2478,
+   "dur": 211
+  },
+  {
+   "url": "https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/1/query",
+   "start": 2477,
+   "dur": 203
   },
   {
    "url": "https://api.open-meteo.com/v1/elevation",
-   "start": 2218,
-   "dur": 138
+   "start": 5007,
+   "dur": 187
   },
   {
-   "url": "https://api.weather.gov/stations/KCGS/observations/latest",
-   "start": 4528,
-   "dur": 135
+   "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+   "start": 5197,
+   "dur": 184
   },
   {
-   "url": "https://api.weather.gov/stations/KHEF/observations/latest",
-   "start": 4527,
-   "dur": 134
+   "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer",
+   "start": 2480,
+   "dur": 181
+  },
+  {
+   "url": "https://mesonet.agron.iastate.edu/geojson/network/NWSCLI.geojson",
+   "start": 4156,
+   "dur": 140
+  },
+  {
+   "url": "https://mesonet.agron.iastate.edu/api/1/daily.json",
+   "start": 6949,
+   "dur": 132
+  },
+  {
+   "url": "https://api.weather.gov/stations/KRSP/observations/latest",
+   "start": 2484,
+   "dur": 122
+  },
+  {
+   "url": "https://api.weather.gov/stations/KHWY/observations/latest",
+   "start": 2483,
+   "dur": 118
+  },
+  {
+   "url": "https://raw.githubusercontent.com/CBeatty500/Skyline/main/data/learning.json",
+   "start": 166,
+   "dur": 105
+  },
+  {
+   "url": "https://api.open-meteo.com/v1/forecast",
+   "start": 3998,
+   "dur": 98
+  },
+  {
+   "url": "https://api.open-meteo.com/v1/elevation",
+   "start": 5006,
+   "dur": 96
+  },
+  {
+   "url": "https://fonts.googleapis.com/css2",
+   "start": 20,
+   "dur": 75
+  },
+  {
+   "url": "https://fonts.googleapis.com/css2",
+   "start": 20,
+   "dur": 73
+  },
+  {
+   "url": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+   "start": 20,
+   "dur": 72
+  },
+  {
+   "url": "https://data.rcc-acis.org/StnData",
+   "start": 5385,
+   "dur": 72
+  },
+  {
+   "url": "https://api.weather.gov/stations/KGAI/observations/latest",
+   "start": 2482,
+   "dur": 71
   }
  ]
 }
