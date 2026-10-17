@@ -194,7 +194,7 @@
         function rainNowOrToday() {
             try {
                 const nc = obsNowcast(); if (nc && nc.wet) return true;
-                if (radarNow && (radarNow.z || 0) >= 20 && Date.now() - radarNow.t < 25 * 60e3) return true;
+                if (radarNow && Date.now() - radarNow.t < 25 * 60e3 && ((radarNow.z || 0) >= 20 || radarNow.drizzle || (radarNow.any || 0) >= 5)) return true;   // overhead, drizzle, or rain within ~60 miles
                 const h = ensembleData.hourly, cur = hourlyStart(), day = h.time[cur].slice(0, 10);
                 for (let j = cur; j < h.time.length && h.time[j].startsWith(day); j++) if (hourWetCode(j) > 0) return true;
             } catch (e) {}
@@ -205,7 +205,7 @@
             if (!rmAutoDone) {   // first view of this visit: the forecast decides (not saved, so it is decided fresh each visit)
                 rmAutoDone = true; rmAutoAt = Date.now();
                 setSecOpen(cfg, rainNowOrToday(), false);
-            } else if (final && Date.now() - rmAutoAt < 30e3 && cfg._panel.classList.contains('collapsed') && rainNowOrToday()) {
+            } else if (final && Date.now() - rmAutoAt < 60e3 && cfg._panel.classList.contains('collapsed') && rainNowOrToday()) {
                 setSecOpen(cfg, true, false);   // radar arriving moments later found precipitation overhead
             }
         }

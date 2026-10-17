@@ -1447,12 +1447,16 @@ _r("""            return r;
             const wetTxt = /rain|shower|drizzle|snow|sleet|thunder|storm|freezing|ice pellets|flurr/i;
             const z = radarNow.z || 0;   // the location's own sample, not neighbouring cells
             // the station still reports precipitation, but newer radar shows the location clear with nothing on the way
-            if (z < 15 && r.text && wetTxt.test(r.text) && radarNow.clearAhead && nwsObs && nwsObs.timestamp && radarNow.t - Date.parse(nwsObs.timestamp) > 10 * 60e3) {
+            if (z < 15 && !radarNow.drizzle && r.text && wetTxt.test(r.text) && radarNow.clearAhead && nwsObs && nwsObs.timestamp && radarNow.t - Date.parse(nwsObs.timestamp) > 10 * 60e3) {
                 const amt = (r.layers || []).reduce((m, l) => Math.max(m, { FEW: 1, SCT: 2, BKN: 3, OVC: 4, VV: 4 }[l.amount] || 0), 0);
                 const day = r.isDay === 1 || r.isDay === true;
                 r.text = amt >= 4 || !amt ? 'Cloudy' : amt === 3 ? 'Mostly Cloudy' : amt === 2 ? 'Partly Cloudy' : (day ? 'Mostly Sunny' : 'Mostly Clear');
                 r.code = amt >= 4 || !amt ? 3 : amt === 3 ? 3 : 2; r.wx = []; r.radarWx = true;
                 return;
+            }
+            if (z < 20 && radarNow.drizzle && !(r.text && wetTxt.test(r.text))) {   // light echoes overhead in a saturated layer
+                const frz = r.temp !== null && r.temp !== undefined && r.temp <= 0.5;
+                r.text = frz ? 'Flurries' : 'Light Drizzle'; r.code = frz ? 71 : 51; r.radarWx = true; return;
             }
             if (z < 20 || (r.text && wetTxt.test(r.text))) return;
             const snow = r.temp !== null && r.temp !== undefined && r.temp <= 0.5;

@@ -123,9 +123,11 @@
             const clearUpstream = moving && (g(B, C, C) < 15 || endMin != null) && after < 20;
             let any = 0; for (let i = 0; i < N * N; i++) if (B[i] >= 20) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 100) any++; }
             let arrive = null; for (let t = 0; t <= 180; t += 10) if (ahead(t) >= 20) { arrive = t; break; }
+            // light echoes (10-19 dBZ) covering the area around the location: drizzle or sprinkles when the low levels are moist
+            let ln = 0, lt = 0; for (let i = 0; i < N * N; i++) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 25) { lt++; if (B[i] >= 10) ln++; } }
             const speedKmh = Math.hypot(vx * kmX, vy * kmY) * 60;
             const timeSure = motionSrc === 'radar' && !!(m30 && m30.s >= 0.5);   // exact times only when the echoes were tracked well
-            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), passed, clearUpstream, endMin, motionSrc, timeSure, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
+            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), lightFrac: lt ? ln / lt : 0, passed, clearUpstream, endMin, motionSrc, timeSure, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
         }
         function applyRadarNowcast(rn) {
             const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
@@ -134,6 +136,12 @@
             const cur = hourlyStart(), ct = ensembleData.current && ensembleData.current.time;
             const mm = ct ? (parseInt(ct.slice(14, 16)) || 0) : 0;
             const P = [90, 80, 65, 50];
+            // drizzle: light echoes over most of the nearby area, a nearly saturated surface layer (temperature - dewpoint <= 5 C)
+            // and a cloudy sky. Echoes that dry air is evaporating on the way down do not count.
+            const spread = (() => { try { const t = nwsObs && nwsObs.temperature && nwsObs.temperature.value, d = nwsObs && nwsObs.dewpoint && nwsObs.dewpoint.value; return t != null && d != null ? t - d : null; } catch (e) { return null; } })();
+            const cc0 = h.cloud_cover ? h.cloud_cover[cur] : null;
+            rn.drizzle = (rn.here3 || 0) >= 12 && (rn.lightFrac || 0) >= 0.4 && (spread == null || spread <= 5) && (cc0 == null || cc0 >= 60);
+            const tNow = (() => { try { return nwsObs && nwsObs.temperature ? nwsObs.temperature.value : null; } catch (e) { return null; } })();
             for (let k = 0; k <= 3; k++) {
                 const j = cur + k; if (j >= h.time.length) break;
                 const t0 = Math.max(0, k * 60 - mm), t1 = k * 60 - mm + 60;
@@ -146,6 +154,10 @@
                     const thunderOK = z >= 50 && ((th != null && th >= 15) || (typeof spcThunderAt === 'function' && spcThunderAt(Date.now() + k * 36e5)));
                     if (thunderOK) h.weather_code[j] = Math.max(wc, 95);
                     else if (!(wc >= 51 && wc <= 94)) h.weather_code[j] = z >= 40 ? 82 : z >= 30 ? 81 : 80;   // showers by intensity
+                } else if (rn.drizzle && k <= 2 && z >= 10) {
+                    h.precipitation_probability[j] = Math.max(pp, [55, 45, 40][k]);
+                    const wc = h.weather_code[j] || 0;
+                    if (!(wc >= 51 && wc <= 94)) h.weather_code[j] = tNow != null && tNow <= 0.5 ? 71 : 51;   // light drizzle (flurries when freezing)
                 } else if (rn.passed && k <= 2) {
                     h.precipitation_probability[j] = Math.min(pp, 20);
                     radarDry[j] = true;
@@ -182,6 +194,8 @@
                 if (applyRadarNowcast._st) saveRadarState({ ...applyRadarNowcast._st, now: radarNow, info: radarInfo });
                 window._lastRadar = { here: rn.here, here3: rn.here3, passed: rn.passed, clearUpstream: rn.clearUpstream, endMin: rn.endMin, motionSrc: rn.motionSrc, moving: rn.moving, mph: Math.round(rn.speedKmh * 0.621), arrive: rn.arrive, peak: rn.peak, any: rn.any, ahead: [0, 30, 60, 90, 120, 150, 180].map(t => rn.ahead(t)) };   // diagnostics
                 applyRadarNowcast(rn);
+                radarNow.drizzle = !!rn.drizzle; radarNow.any = rn.any || 0;
+                if (window._lastRadar) { window._lastRadar.drizzle = radarNow.drizzle; window._lastRadar.lightFrac = Math.round((rn.lightFrac || 0) * 100) / 100; }
                 recomputeForecast();
             } catch (e) { console.warn('Radar nowcast unavailable:', e); }
         }

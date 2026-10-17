@@ -2042,9 +2042,11 @@ body.no-data #sectionNav { display: none; }
             const clearUpstream = moving && (g(B, C, C) < 15 || endMin != null) && after < 20;
             let any = 0; for (let i = 0; i < N * N; i++) if (B[i] >= 20) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 100) any++; }
             let arrive = null; for (let t = 0; t <= 180; t += 10) if (ahead(t) >= 20) { arrive = t; break; }
+            // light echoes (10-19 dBZ) covering the area around the location: drizzle or sprinkles when the low levels are moist
+            let ln = 0, lt = 0; for (let i = 0; i < N * N; i++) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 25) { lt++; if (B[i] >= 10) ln++; } }
             const speedKmh = Math.hypot(vx * kmX, vy * kmY) * 60;
             const timeSure = motionSrc === 'radar' && !!(m30 && m30.s >= 0.5);   // exact times only when the echoes were tracked well
-            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), passed, clearUpstream, endMin, motionSrc, timeSure, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
+            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), lightFrac: lt ? ln / lt : 0, passed, clearUpstream, endMin, motionSrc, timeSure, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
         }
         function applyRadarNowcast(rn) {
             const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
@@ -2053,6 +2055,12 @@ body.no-data #sectionNav { display: none; }
             const cur = hourlyStart(), ct = ensembleData.current && ensembleData.current.time;
             const mm = ct ? (parseInt(ct.slice(14, 16)) || 0) : 0;
             const P = [90, 80, 65, 50];
+            // drizzle: light echoes over most of the nearby area, a nearly saturated surface layer (temperature - dewpoint <= 5 C)
+            // and a cloudy sky. Echoes that dry air is evaporating on the way down do not count.
+            const spread = (() => { try { const t = nwsObs && nwsObs.temperature && nwsObs.temperature.value, d = nwsObs && nwsObs.dewpoint && nwsObs.dewpoint.value; return t != null && d != null ? t - d : null; } catch (e) { return null; } })();
+            const cc0 = h.cloud_cover ? h.cloud_cover[cur] : null;
+            rn.drizzle = (rn.here3 || 0) >= 12 && (rn.lightFrac || 0) >= 0.4 && (spread == null || spread <= 5) && (cc0 == null || cc0 >= 60);
+            const tNow = (() => { try { return nwsObs && nwsObs.temperature ? nwsObs.temperature.value : null; } catch (e) { return null; } })();
             for (let k = 0; k <= 3; k++) {
                 const j = cur + k; if (j >= h.time.length) break;
                 const t0 = Math.max(0, k * 60 - mm), t1 = k * 60 - mm + 60;
@@ -2065,6 +2073,10 @@ body.no-data #sectionNav { display: none; }
                     const thunderOK = z >= 50 && ((th != null && th >= 15) || (typeof spcThunderAt === 'function' && spcThunderAt(Date.now() + k * 36e5)));
                     if (thunderOK) h.weather_code[j] = Math.max(wc, 95);
                     else if (!(wc >= 51 && wc <= 94)) h.weather_code[j] = z >= 40 ? 82 : z >= 30 ? 81 : 80;   // showers by intensity
+                } else if (rn.drizzle && k <= 2 && z >= 10) {
+                    h.precipitation_probability[j] = Math.max(pp, [55, 45, 40][k]);
+                    const wc = h.weather_code[j] || 0;
+                    if (!(wc >= 51 && wc <= 94)) h.weather_code[j] = tNow != null && tNow <= 0.5 ? 71 : 51;   // light drizzle (flurries when freezing)
                 } else if (rn.passed && k <= 2) {
                     h.precipitation_probability[j] = Math.min(pp, 20);
                     radarDry[j] = true;
@@ -2102,6 +2114,8 @@ body.no-data #sectionNav { display: none; }
                 if (applyRadarNowcast._st) saveRadarState({ ...applyRadarNowcast._st, now: radarNow, info: radarInfo });
                 window._lastRadar = { here: rn.here, here3: rn.here3, passed: rn.passed, clearUpstream: rn.clearUpstream, endMin: rn.endMin, motionSrc: rn.motionSrc, moving: rn.moving, mph: Math.round(rn.speedKmh * 0.621), arrive: rn.arrive, peak: rn.peak, any: rn.any, ahead: [0, 30, 60, 90, 120, 150, 180].map(t => rn.ahead(t)) };   // diagnostics
                 applyRadarNowcast(rn);
+                radarNow.drizzle = !!rn.drizzle; radarNow.any = rn.any || 0;
+                if (window._lastRadar) { window._lastRadar.drizzle = radarNow.drizzle; window._lastRadar.lightFrac = Math.round((rn.lightFrac || 0) * 100) / 100; }
                 recomputeForecast();
             } catch (e) { console.warn('Radar nowcast unavailable:', e); }
         }
@@ -2805,7 +2819,7 @@ body.no-data #sectionNav { display: none; }
         function rainNowOrToday() {
             try {
                 const nc = obsNowcast(); if (nc && nc.wet) return true;
-                if (radarNow && (radarNow.z || 0) >= 20 && Date.now() - radarNow.t < 25 * 60e3) return true;
+                if (radarNow && Date.now() - radarNow.t < 25 * 60e3 && ((radarNow.z || 0) >= 20 || radarNow.drizzle || (radarNow.any || 0) >= 5)) return true;   // overhead, drizzle, or rain within ~60 miles
                 const h = ensembleData.hourly, cur = hourlyStart(), day = h.time[cur].slice(0, 10);
                 for (let j = cur; j < h.time.length && h.time[j].startsWith(day); j++) if (hourWetCode(j) > 0) return true;
             } catch (e) {}
@@ -2816,7 +2830,7 @@ body.no-data #sectionNav { display: none; }
             if (!rmAutoDone) {   // first view of this visit: the forecast decides (not saved, so it is decided fresh each visit)
                 rmAutoDone = true; rmAutoAt = Date.now();
                 setSecOpen(cfg, rainNowOrToday(), false);
-            } else if (final && Date.now() - rmAutoAt < 30e3 && cfg._panel.classList.contains('collapsed') && rainNowOrToday()) {
+            } else if (final && Date.now() - rmAutoAt < 60e3 && cfg._panel.classList.contains('collapsed') && rainNowOrToday()) {
                 setSecOpen(cfg, true, false);   // radar arriving moments later found precipitation overhead
             }
         }
@@ -2848,10 +2862,10 @@ body.no-data #sectionNav { display: none; }
         }
         function ptSeg(s, e) {
             const h = ensembleData.hourly, ok = v => v !== null && v !== undefined && !isNaN(v);
-            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0, ts = false;   // (pp / wet may be raised below when precipitation is falling now)
+            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0, ts = false, drz = 0;   // (pp / wet may be raised below when precipitation is falling now)
             for (let j = s; j < e && j < h.time.length; j++) {
                 if (ok(h.precipitation_probability[j])) pp = Math.max(pp, h.precipitation_probability[j]);
-                { const wc = hourWetCode(j); if (wc) wet++; if (wc >= 95) ts = true; }
+                { const wc = hourWetCode(j); if (wc) wet++; if (wc >= 95) ts = true; if (wc >= 51 && wc <= 57) drz++; }
                 if (h.snowfall && ok(h.snowfall[j])) snowCm += h.snowfall[j];
                 if (ok(h.temperature_2m[j])) { tsum += h.temperature_2m[j]; tn++; }
             }
@@ -2862,7 +2876,7 @@ body.no-data #sectionNav { display: none; }
                 if (nc && nc.wet) { pp = 100; wet = Math.max(wet, 1); const hrs = Math.max(1, Math.min(e, rainEndIdx()) - cur); amt = Math.max(amt, (nc.lastHourMm || 0.3) * hrs * 0.7, 0.2); }
             }
             const tm = tn ? tsum / tn : 5, adj = adjustSnow(amt, snowCm, tm, tm);
-            return { pp, wet, ts, amt, snow: adj.snow, rain: adj.rain, date: h.time[Math.min(s, h.time.length - 1)].slice(0, 10) };
+            return { pp, wet, ts, drz: wet > 0 && drz === wet, amt, snow: adj.snow, rain: adj.rain, date: h.time[Math.min(s, h.time.length - 1)].slice(0, 10) };
         }
         // segs: [[label, startIdx, endIdx], ...]. One sentence: chance, amount (only when confident) and timing (a clock time
         // only when radar tracked the echoes well, otherwise the part of the day).
@@ -2877,10 +2891,10 @@ body.no-data #sectionNav { display: none; }
                 if (g.pp < 40 || (g.amt < 0.1 && !g.wet)) return;   // below 40% the text says nothing about precipitation (matches the icons)
                 if (g.wet && g.amt < 0.3) g.amt = 0.3;
                 const spread = ptSpread(g.date), sp = spread || { lo: 0.5, hi: 1.8 };
-                const isSnow = g.snow >= 0.5 && g.snow >= g.rain / 10, what = isSnow ? 'snow' : g.ts ? 'rain with thunderstorms' : 'rain';
+                const isSnow = g.snow >= 0.5 && g.snow >= g.rain / 10, what = isSnow ? 'snow' : g.ts ? 'rain with thunderstorms' : g.drz ? 'drizzle' : 'rain';
                 const best = isSnow ? g.snow : g.amt;
                 const r = ptRange(best * sp.lo * (g.pp < 60 ? 0 : 1), best * sp.hi + 0.5, isSnow);
-                const confident = g.pp >= 60 || (spread && spread.hi <= 1.6);
+                const confident = what !== 'drizzle' && (g.pp >= 60 || (spread && spread.hi <= 1.6));   // drizzle: no amounts
                 // timing: a clock time only when radar is sure and the arrival falls in this part of the day
                 let when = label;
                 if (arrive && arrive.sure) {
@@ -5485,12 +5499,16 @@ body.no-data #sectionNav { display: none; }
             const wetTxt = /rain|shower|drizzle|snow|sleet|thunder|storm|freezing|ice pellets|flurr/i;
             const z = radarNow.z || 0;   // the location's own sample, not neighbouring cells
             // the station still reports precipitation, but newer radar shows the location clear with nothing on the way
-            if (z < 15 && r.text && wetTxt.test(r.text) && radarNow.clearAhead && nwsObs && nwsObs.timestamp && radarNow.t - Date.parse(nwsObs.timestamp) > 10 * 60e3) {
+            if (z < 15 && !radarNow.drizzle && r.text && wetTxt.test(r.text) && radarNow.clearAhead && nwsObs && nwsObs.timestamp && radarNow.t - Date.parse(nwsObs.timestamp) > 10 * 60e3) {
                 const amt = (r.layers || []).reduce((m, l) => Math.max(m, { FEW: 1, SCT: 2, BKN: 3, OVC: 4, VV: 4 }[l.amount] || 0), 0);
                 const day = r.isDay === 1 || r.isDay === true;
                 r.text = amt >= 4 || !amt ? 'Cloudy' : amt === 3 ? 'Mostly Cloudy' : amt === 2 ? 'Partly Cloudy' : (day ? 'Mostly Sunny' : 'Mostly Clear');
                 r.code = amt >= 4 || !amt ? 3 : amt === 3 ? 3 : 2; r.wx = []; r.radarWx = true;
                 return;
+            }
+            if (z < 20 && radarNow.drizzle && !(r.text && wetTxt.test(r.text))) {   // light echoes overhead in a saturated layer
+                const frz = r.temp !== null && r.temp !== undefined && r.temp <= 0.5;
+                r.text = frz ? 'Flurries' : 'Light Drizzle'; r.code = frz ? 71 : 51; r.radarWx = true; return;
             }
             if (z < 20 || (r.text && wetTxt.test(r.text))) return;
             const snow = r.temp !== null && r.temp !== undefined && r.temp <= 0.5;

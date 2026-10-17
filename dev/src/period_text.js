@@ -26,10 +26,10 @@
         }
         function ptSeg(s, e) {
             const h = ensembleData.hourly, ok = v => v !== null && v !== undefined && !isNaN(v);
-            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0, ts = false;   // (pp / wet may be raised below when precipitation is falling now)
+            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0, ts = false, drz = 0;   // (pp / wet may be raised below when precipitation is falling now)
             for (let j = s; j < e && j < h.time.length; j++) {
                 if (ok(h.precipitation_probability[j])) pp = Math.max(pp, h.precipitation_probability[j]);
-                { const wc = hourWetCode(j); if (wc) wet++; if (wc >= 95) ts = true; }
+                { const wc = hourWetCode(j); if (wc) wet++; if (wc >= 95) ts = true; if (wc >= 51 && wc <= 57) drz++; }
                 if (h.snowfall && ok(h.snowfall[j])) snowCm += h.snowfall[j];
                 if (ok(h.temperature_2m[j])) { tsum += h.temperature_2m[j]; tn++; }
             }
@@ -40,7 +40,7 @@
                 if (nc && nc.wet) { pp = 100; wet = Math.max(wet, 1); const hrs = Math.max(1, Math.min(e, rainEndIdx()) - cur); amt = Math.max(amt, (nc.lastHourMm || 0.3) * hrs * 0.7, 0.2); }
             }
             const tm = tn ? tsum / tn : 5, adj = adjustSnow(amt, snowCm, tm, tm);
-            return { pp, wet, ts, amt, snow: adj.snow, rain: adj.rain, date: h.time[Math.min(s, h.time.length - 1)].slice(0, 10) };
+            return { pp, wet, ts, drz: wet > 0 && drz === wet, amt, snow: adj.snow, rain: adj.rain, date: h.time[Math.min(s, h.time.length - 1)].slice(0, 10) };
         }
         // segs: [[label, startIdx, endIdx], ...]. One sentence: chance, amount (only when confident) and timing (a clock time
         // only when radar tracked the echoes well, otherwise the part of the day).
@@ -55,10 +55,10 @@
                 if (g.pp < 40 || (g.amt < 0.1 && !g.wet)) return;   // below 40% the text says nothing about precipitation (matches the icons)
                 if (g.wet && g.amt < 0.3) g.amt = 0.3;
                 const spread = ptSpread(g.date), sp = spread || { lo: 0.5, hi: 1.8 };
-                const isSnow = g.snow >= 0.5 && g.snow >= g.rain / 10, what = isSnow ? 'snow' : g.ts ? 'rain with thunderstorms' : 'rain';
+                const isSnow = g.snow >= 0.5 && g.snow >= g.rain / 10, what = isSnow ? 'snow' : g.ts ? 'rain with thunderstorms' : g.drz ? 'drizzle' : 'rain';
                 const best = isSnow ? g.snow : g.amt;
                 const r = ptRange(best * sp.lo * (g.pp < 60 ? 0 : 1), best * sp.hi + 0.5, isSnow);
-                const confident = g.pp >= 60 || (spread && spread.hi <= 1.6);
+                const confident = what !== 'drizzle' && (g.pp >= 60 || (spread && spread.hi <= 1.6));   // drizzle: no amounts
                 // timing: a clock time only when radar is sure and the arrival falls in this part of the day
                 let when = label;
                 if (arrive && arrive.sure) {
