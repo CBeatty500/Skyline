@@ -63,7 +63,7 @@ print('middle dots left:', len(_left), [out[max(0, i - 40):i + 10] for i in _lef
 for _a, _b in [
     ('<title>Skyline Weather</title>', '<title>Best Bet Weather</title>'),
     ('content="Skyline: a meteorologist\'s weather dashboard with live station observations, an observation-corrected multi-model forecast, and official climate records."',
-     'content="Best Bet Weather: every forecast model weighed against live observations, radar and the National Weather Service, then verified against what actually happened."'),
+     'content="Best Bet Weather. The forecast you can bet on. Smart money on the sky."'),
     ('content="Skyline Weather"', 'content="Best Bet Weather"'),
     ('aria-label="Skyline"', 'aria-label="Best Bet Weather"'),
     ('<span class="brand-name hidden sm:inline">Skyline</span>', '<span class="brand-name hidden sm:inline">Best Bet Weather</span>'),
