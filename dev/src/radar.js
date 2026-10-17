@@ -155,7 +155,7 @@
                     if (thunderOK) h.weather_code[j] = Math.max(wc, 95);
                     else if (!(wc >= 51 && wc <= 94)) h.weather_code[j] = z >= 40 ? 82 : z >= 30 ? 81 : 80;   // showers by intensity
                 } else if (rn.drizzle && k <= 2 && z >= 10) {
-                    h.precipitation_probability[j] = Math.max(pp, [55, 45, 40][k]);
+                    h.precipitation_probability[j] = Math.max(pp, [50, 40, 40][k]);
                     const wc = h.weather_code[j] || 0;
                     if (!(wc >= 51 && wc <= 94)) h.weather_code[j] = tNow != null && tNow <= 0.5 ? 71 : 51;   // light drizzle (flurries when freezing)
                 } else if (rn.passed && k <= 2) {

@@ -67,7 +67,9 @@
                 }
                 const pct = Math.round(g.pp / 10) * 10, ofWhat = lastWhat === what ? '' : ` of ${what}`;
                 let piece;
-                if (g.pp >= 90) piece = confident ? `${said ? 'an additional ' : ''}${r.text} of ${what} ${when}` : `${what} ${when}`;
+                const cur0 = hourlyStart(), drzNow = what === 'drizzle' && s <= cur0 && cur0 < e && radarNow && radarNow.drizzle && Date.now() - radarNow.t < 25 * 60e3;
+                if (drzNow) piece = `patchy drizzle ${when}`;   // falling now: no chance, just when
+                else if (g.pp >= 90) piece = confident ? `${said ? 'an additional ' : ''}${r.text} of ${what} ${when}` : `${what} ${when}`;
                 else if (confident) piece = `${an(pct)} ${pct}% chance of ${said ? 'an additional ' : ''}${r.text} of ${what} ${when}`;
                 else piece = `${an(pct)} ${pct}% chance${ofWhat} ${when}`;
                 out.push(piece); said = true; lastWhat = what;

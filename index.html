@@ -2074,7 +2074,7 @@ body.no-data #sectionNav { display: none; }
                     if (thunderOK) h.weather_code[j] = Math.max(wc, 95);
                     else if (!(wc >= 51 && wc <= 94)) h.weather_code[j] = z >= 40 ? 82 : z >= 30 ? 81 : 80;   // showers by intensity
                 } else if (rn.drizzle && k <= 2 && z >= 10) {
-                    h.precipitation_probability[j] = Math.max(pp, [55, 45, 40][k]);
+                    h.precipitation_probability[j] = Math.max(pp, [50, 40, 40][k]);
                     const wc = h.weather_code[j] || 0;
                     if (!(wc >= 51 && wc <= 94)) h.weather_code[j] = tNow != null && tNow <= 0.5 ? 71 : 51;   // light drizzle (flurries when freezing)
                 } else if (rn.passed && k <= 2) {
@@ -2903,7 +2903,9 @@ body.no-data #sectionNav { display: none; }
                 }
                 const pct = Math.round(g.pp / 10) * 10, ofWhat = lastWhat === what ? '' : ` of ${what}`;
                 let piece;
-                if (g.pp >= 90) piece = confident ? `${said ? 'an additional ' : ''}${r.text} of ${what} ${when}` : `${what} ${when}`;
+                const cur0 = hourlyStart(), drzNow = what === 'drizzle' && s <= cur0 && cur0 < e && radarNow && radarNow.drizzle && Date.now() - radarNow.t < 25 * 60e3;
+                if (drzNow) piece = `patchy drizzle ${when}`;   // falling now: no chance, just when
+                else if (g.pp >= 90) piece = confident ? `${said ? 'an additional ' : ''}${r.text} of ${what} ${when}` : `${what} ${when}`;
                 else if (confident) piece = `${an(pct)} ${pct}% chance of ${said ? 'an additional ' : ''}${r.text} of ${what} ${when}`;
                 else piece = `${an(pct)} ${pct}% chance${ofWhat} ${when}`;
                 out.push(piece); said = true; lastWhat = what;
