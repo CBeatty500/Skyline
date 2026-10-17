@@ -6,7 +6,7 @@ const places = (process.env.PLACES || '39.0437,-77.4875,Ashburn, VA').split(';')
 const browser = await chromium.launch();
 const results = [];
 for (const [lat, lon, name] of places) { try {
-const page = await browser.newPage();
+const page = await browser.newPage({ viewport: { width: 390, height: 844 } });
 const errors = []; page.on('pageerror', e => errors.push(String(e))); page.on('console', m => { if (['warning', 'error'].includes(m.type())) errors.push(m.type() + ': ' + m.text().slice(0, 300)); });
 const t0 = Date.now();
 await page.goto(`file://${path.join(process.cwd(), 'index.html')}?city=${encodeURIComponent(name)}&lat=${lat}&lon=${lon}`, { timeout: 60000 });
@@ -26,6 +26,12 @@ const snap = async label => page.evaluate(lbl => {
 }, label);
 const snaps = [await snap('first view')];
 for (const s of [5, 15, 30]) { await page.waitForTimeout(s * 1000 - (s === 5 ? 0 : s === 15 ? 5000 : 15000)); snaps.push(await snap(`+${s}s`)); }
+if (process.env.RELOAD) {   // a returning visitor: same browser storage, page loaded again
+  await page.reload({ timeout: 60000 });
+  await page.waitForFunction(() => typeof bestBetResults !== 'undefined' && bestBetResults.length > 0 && !document.getElementById('dashboardContent').classList.contains('hidden'), null, { timeout: 90000 });
+  snaps.push(await snap('reload first view'));
+  await page.waitForTimeout(8000); snaps.push(await snap('reload +8s'));
+}
 const timings = await page.evaluate(() => performance.getEntriesByType('resource').map(r => ({ url: r.name.replace(/\?.*/, '').slice(0, 110), start: Math.round(r.startTime), dur: Math.round(r.duration) })).sort((a, b) => b.dur - a.dur).slice(0, 30));
 results.push({ name, at: new Date().toISOString(), firstViewMs: firstView, errors, snaps, timings: timings.slice(0, 8) });
 await page.close();
