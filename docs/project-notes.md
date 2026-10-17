@@ -1,6 +1,6 @@
 # Skyline project notes
 
-The app is branded **Best Bet Weather** (short form Wx) since Oct 17. File, repository and site names stay "skyline" until the owner buys a domain and hosts it publicly; then rename the repo, Pages and Netlify together.
+The app is branded **Best Bet Weather** (short form Wx) since Oct 17. Tagline: "The forecast you can bet on." Logo: a betting chip with a sky inside (sun behind a cloud), logo.svg in the repo; header mark, favicon and apple-touch-icon.png use it. File, repository and site names stay "skyline" until the owner buys a domain and hosts it publicly; then rename the repo, Pages and Netlify together.
 
 Everything a new session needs to continue the work. The owner is a meteorologist; measured data matters most.
 
@@ -16,6 +16,7 @@ Everything a new session needs to continue the work. The owner is a meteorologis
 - Measured / official data only, no API keys.
 - Minimal text. No middle dots except in the "Lat · Lon · Elev" line. No subjective dewpoint descriptors.
 - Forecast continuity between loads. Summary text must match the hourly icons. Never mention rain that already ended.
+- Regularly check layout at phone to desktop widths (390-1280 px: nothing cut off, no sideways scroll) and page efficiency (first view under 3 s, no wasted requests).
 - Thoroughness over speed: check changes on live data (Diagnose / Screenshot workflows) whenever it makes the page better, unless the owner asks for something quick.
 - Think before posting: nothing physically implausible (e.g. warming to the day's high after sunset, 77 mph radar motion).
 
