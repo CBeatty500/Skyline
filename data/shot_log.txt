@@ -1,6 +1,9 @@
 desk bounds {"map":[38.1,-80.7166,39.9771,-74.2566],"radar":[38.1,-80.7166,39.9771,-74.2566],"time":"5:52 AM EDT"}
 desk looping true frames 7
 desk after resize looping true frames 7 5:12 AM EDT
-phone bounds {"map":[37.4923,-79.2114,40.5639,-75.7617],"radar":[37.4923,-79.2114,40.5639,-75.7617],"time":"1:54 PM EDT"}
-phone looping true frames 7
-phone after resize looping true frames 7 5:22 AM EDT
+phone error: Failed to load resource: the server responded with a status of 503 (Service Unavailable)
+phone error: Failed to load resource: the server responded with a status of 503 (Service Unavailable)
+phone error: Fetch operational data failed: Error: HTTP 503
+    at getJSON (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1220:91)
+    at async fetchForecastData
+phone: TimeoutError: page.waitForFunction: Timeout 90000ms exceeded.
