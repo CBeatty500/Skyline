@@ -28,10 +28,14 @@
             });
         }
         async function openRadarMap() {
+            try { await openRadarMapInner(); } catch (e) { console.warn('Radar map failed', e); }
+        }
+        async function openRadarMapInner() {
             const el = document.getElementById('radarMap'); if (!el || !currentLoc) return;
             if (!window.L) await Promise.all([rmLoad('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css', true), rmLoad('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js')]);
             if (!RM.map) {
-                RM.map = L.map(el, { zoomControl: true, attributionControl: true, preferCanvas: true, minZoom: 4, maxZoom: 11 });
+                RM.map = L.map(el, { zoomControl: true, attributionControl: true, preferCanvas: true, minZoom: 4, maxZoom: 11 }).setView([+currentLoc.lat, +currentLoc.lon], 8);
+                RM.center = [+currentLoc.lat, +currentLoc.lon];
                 ['rmBase', 'rmRadar', 'rmLines', 'rmWarn', 'rmLabels'].forEach((p, i) => { RM.map.createPane(p).style.zIndex = 200 + i * 50; });
                 RM.map.getPane('rmLabels').style.pointerEvents = 'none'; RM.map.getPane('rmLines').style.pointerEvents = 'none';
                 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { pane: 'rmBase', maxZoom: 16, attribution: 'Esri, NOAA/NWS, US Census, IEM' }).addTo(RM.map);
@@ -40,7 +44,7 @@
                 RM.map.on('moveend', () => { radarMapStop(); radarMapDraw(); });
                 rmCounties();
             }
-            radarMapCenter(true);
+            radarMapCenter(false);
             setTimeout(() => { RM.map.invalidateSize(); radarMapDraw(); }, 60);
         }
         function radarMapCenter(force) {
