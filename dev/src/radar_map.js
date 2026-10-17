@@ -184,3 +184,23 @@
                 RM.warnLayer = layer.addTo(RM.map);
             } catch (e) { console.warn('Warnings unavailable', e); }
         }
+        // at start-up: open the radar when precipitation is falling or expected later today, otherwise keep it closed
+        let rmAutoDone = false, rmAutoAt = 0;
+        function rainNowOrToday() {
+            try {
+                const nc = obsNowcast(); if (nc && nc.wet) return true;
+                if (radarNow && (radarNow.z || 0) >= 20 && Date.now() - radarNow.t < 25 * 60e3) return true;
+                const h = ensembleData.hourly, cur = hourlyStart(), day = h.time[cur].slice(0, 10);
+                for (let j = cur; j < h.time.length && h.time[j].startsWith(day); j++) if (hourWetCode(j) > 0) return true;
+            } catch (e) {}
+            return false;
+        }
+        function radarAutoOpen(final) {
+            const cfg = SECTIONS.find(s => s.key === 'radar'); if (!cfg || !cfg._panel) return;
+            if (!rmAutoDone) {   // first view of this visit: the forecast decides (not saved, so it is decided fresh each visit)
+                rmAutoDone = true; rmAutoAt = Date.now();
+                setSecOpen(cfg, rainNowOrToday(), false);
+            } else if (final && Date.now() - rmAutoAt < 30e3 && cfg._panel.classList.contains('collapsed') && rainNowOrToday()) {
+                setSecOpen(cfg, true, false);   // radar arriving moments later found precipitation overhead
+            }
+        }

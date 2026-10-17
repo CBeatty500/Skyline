@@ -1711,3 +1711,13 @@ _r("""                if (nwsOffice) loadRadar(token, lat, lon);
 """, """                if (nwsOffice) loadRadar(token, lat, lon);
                 if (typeof RM !== 'undefined' && RM.map) { radarMapCenter(true); if (document.getElementById('rmWarn').checked) radarMapWarnings(true); }
 """)
+# ---- radar section opens at start-up when precipitation is falling or expected later today ----
+_r("""                renderDashboard();
+                renderDiscussion();
+                aqP.then(""", """                renderDashboard();
+                renderDiscussion();
+                try { radarAutoOpen(false); } catch (e) {}
+                aqP.then(""")
+_r("""                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };""",
+   """                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };
+                setTimeout(() => { try { radarAutoOpen(true); } catch (e) {} }, 0);""")
