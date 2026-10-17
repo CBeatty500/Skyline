@@ -41,5 +41,7 @@
                             <tbody id="dailyRecordsTableBody" class="font-mono"></tbody>
                         </table>
                     </div>
+                    <button type="button" id="obs24Toggle" class="dc-tt mt-3" aria-expanded="false" onclick="toggleObs24()"><span class="text-xs font-bold text-slate-200 uppercase tracking-wider"><i class="fa-solid fa-clock-rotate-left text-sky-300 mr-1.5"></i>Past 24 hours</span><span class="text-[11px] text-slate-400 font-mono ml-auto mr-2" id="obs24Hint">Show hourly observations</span><i class="fa-solid fa-chevron-down text-slate-400 dc-tt-chev"></i></button>
+                    <div id="obs24Wrap" class="hidden overflow-x-auto -mx-1 px-1 mt-2"></div>
                     <span id="rSquaredValue" hidden></span><span id="stdErrValue" hidden></span>
                 </div>

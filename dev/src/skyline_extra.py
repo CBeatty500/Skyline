@@ -1626,3 +1626,34 @@ _r("""                parts.push(`${NOWCAST_WORD[nc.kind]} falling now, with a h
    """                parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`);
                 if (bb.bestPrecip >= 0.25 && bb.laterProb >= 40) parts.push(`About ${formatPrecip(bb.bestPrecip)} more today.`);
                 if (bb.laterProb != null) { const mt = moreText(bb.laterProb, 'later today'); if (mt) parts.push(mt); }""")
+# ---- a forecast card's chance and icon come from its own periods, so the card and its period icons always agree ----
+_r("""                const cond = ni ? ni.cond : dailyCondition(bb);
+                const pv = ni ? { precipProb: ni.pp, bestRain: ni.rain, bestSnow: ni.snow, bestWind: ni.wind } : bb;   // values shown on the card""",
+   """                let cond = ni ? ni.cond : dailyCondition(bb);
+                const pv = ni ? { precipProb: ni.pp, bestRain: ni.rain, bestSnow: ni.snow, bestWind: ni.wind } : { ...bb };   // values shown on the card
+                {
+                    const segs = ((ni ? tonightPeriods() : periodsFor(i)) || []).filter(p => p && !p.past);
+                    if (segs.length) {
+                        const sp = Math.round(Math.max(...segs.map(p => p.pp || 0)));
+                        const wetSeg = segs.find(p => WET_ICONS.includes(p.cond.icon));
+                        pv.precipProb = sp;
+                        if (wetSeg && !WET_ICONS.includes(cond.icon)) cond = wetSeg.cond;
+                        else if (!wetSeg && WET_ICONS.includes(cond.icon))
+                            cond = ni ? segs.reduce((a, b) => (b.pp || 0) > (a.pp || 0) ? b : a).cond : dailyCondition({ ...bb, precipProb: sp, thunder: 0 });
+                    }
+                }""")
+# with fresh radar, radar decides whether more is coming; the redevelopment guess is only for places without radar
+_r("""                                  persist: radarNow && radarNow.clearAhead && Date.now() - radarNow.t < 20 * 60e3 ? 20   // radar: nothing on the way""",
+   """                                  persist: radarNow && Date.now() - radarNow.t < 25 * 60e3 ? (radarNow.clearAhead ? 0 : 20)   // radar decides what is on the way""")
+_r("""            const pp = ni ? ni.pp : b.precipProb, rain = ni ? ni.rain : b.bestRain, snow = ni ? ni.snow : b.bestSnow;""",
+   """            let pp = ni ? ni.pp : b.precipProb; const rain = ni ? ni.rain : b.bestRain, snow = ni ? ni.snow : b.bestSnow;
+            { const segs = ((ni ? tonightPeriods() : periodsFor(i)) || []).filter(p => p && !p.past); if (segs.length) pp = Math.round(Math.max(...segs.map(p => p.pp || 0))); }   // same chance as the card""")
+# ---- past 24 hours of hourly station reports (Observed Climate) ----
+_a = out.index('        function restOfDayPhrase() {')
+out = out[:_a] + open('/home/claude/obs24.js').read() + out[_a:]
+_r("""            renderClimateAnalytics();
+
+            // Render Hourly & Precip Charts""", """            renderClimateAnalytics();
+            try { renderObs24(); } catch (e) {}
+
+            // Render Hourly & Precip Charts""")
