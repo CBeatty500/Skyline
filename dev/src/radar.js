@@ -33,15 +33,20 @@
             }
             return bd < 40 * 40 ? Math.round(best) : 0;   // not on the radar colour path (map features, artefacts)
         }
+        // samples in chunks (large requests are sometimes refused), each retried once
         async function radarFrame(pts, t) {
-            const body = new URLSearchParams({ geometry: JSON.stringify({ points: pts, spatialReference: { wkid: 4326 } }), geometryType: 'esriGeometryMultipoint', returnFirstValueOnly: 'true', interpolation: 'RSP_NearestNeighbor', f: 'json' });
-            if (t) body.set('time', String(t));
-            const r = await fetch(`${RADAR_IS}/getSamples`, { method: 'POST', body });
-            if (!r.ok) throw new Error('radar HTTP ' + r.status);
-            const j = await r.json();
-            if (!j || !Array.isArray(j.samples)) throw new Error('radar samples');
             const out = new Array(pts.length).fill(0);
-            j.samples.forEach(s => { const i = s.locationId != null ? s.locationId : null; if (i != null && i < out.length) out[i] = rgbToDbz(s.value); });
+            for (let k = 0; k < pts.length; k += 400) {
+                const chunk = pts.slice(k, k + 400);
+                const body = new URLSearchParams({ geometry: JSON.stringify({ points: chunk, spatialReference: { wkid: 4326 } }), geometryType: 'esriGeometryMultipoint', returnFirstValueOnly: 'true', interpolation: 'RSP_NearestNeighbor', f: 'json' });
+                if (t) body.set('time', String(t));
+                let j = null;
+                for (let a = 0; a < 2 && !(j && Array.isArray(j.samples)); a++) {
+                    try { const r = await fetch(`${RADAR_IS}/getSamples`, { method: 'POST', body }); j = r.ok ? await r.json() : null; } catch (e) { j = null; }
+                }
+                if (!j || !Array.isArray(j.samples)) throw new Error('radar samples');
+                j.samples.forEach(s => { const i = s.locationId != null ? s.locationId : null; if (i != null && i < chunk.length) out[k + i] = rgbToDbz(s.value); });
+            }
             return out;
         }
         async function radarNowcast(lat, lon) {
