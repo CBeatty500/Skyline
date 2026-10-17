@@ -2065,6 +2065,19 @@ body.no-data #sectionNav { display: none; }
                 const best = await sharedEntryFor(currentLoc.lat, currentLoc.lon);
                 if (best && best.corr && (best.total || 0) >= learnState.total) learnState = { buckets: best.buckets, corr: best.corr, total: best.total, shared: true, updated: best.updated };
             } catch (e) {}
+            // nationwide daily corrections (US): the full nationwide value with no local cases, fading as local cases grow
+            try {
+                const sh = await sharedLearning(), nat = sh && sh.national && sh.national.daily;
+                if (nat && typeof nwsOffice !== 'undefined' && nwsOffice) {
+                    const corr = {};
+                    LEARN_LEADS.forEach(L => {
+                        const c = learnState.corr[L] || { max: 0, min: 0, pp: 1 }, n = nat[L] || { max: 0, min: 0, pp: 1 }, b = (learnState.buckets && learnState.buckets[L]) || {};
+                        corr[L] = { ...c, max: (c.max || 0) + (n.max || 0) * 6 / ((b.nMax || 0) + 6), min: (c.min || 0) + (n.min || 0) * 6 / ((b.nMin || 0) + 6),
+                                    pp: (c.pp || 1) * (1 + ((n.pp || 1) - 1) * 10 / ((b.nP || 0) + 10)) };
+                    });
+                    learnState = { ...learnState, corr, nationwide: true };
+                }
+            } catch (e) {}
         }
         // apply learned corrections (leads 1+ for highs; tonight's low counts as lead 0)
         function applyLearning() {
@@ -2119,8 +2132,24 @@ body.no-data #sectionNav { display: none; }
             h._learnF = null;
         }
         function hourMs(j) { const h = ensembleData.hourly; return Date.parse(h.time[j] + ':00Z') - (ensembleData.utc_offset_seconds || 0) * 1000; }
-        function applyHourlyLearning(entry) {
-            hourlyLearn = entry && entry.hourly && entry.hourly.corr ? { ...entry.hourly, name: entry.name, km: entry.km } : null;
+        // the city's own corrections, leaning on the nationwide ones while the city has few cases (none: nationwide only, US)
+        function mergedHourlyCorr(entry, nat) {
+            const city = entry && entry.hourly && entry.hourly.corr ? entry.hourly : null;
+            if (!city && !nat) return null;
+            const keys = new Set([...Object.keys((city && city.corr) || {}), ...Object.keys(nat || {})]), out = {};
+            keys.forEach(k => {
+                const c = (city && city.corr[k]) || { t: 0, td: 0, cc: 0, ws: 1, wg: 1, pp: 1 }, n = (nat && nat[k]) || { t: 0, td: 0, cc: 0, ws: 1, wg: 1, pp: 1 };
+                const cell = (city && city.cells && city.cells[k]) || {};
+                const kf = (v, m = 24) => { const w = cell[v] && cell[v].w ? cell[v].w : 0; return m / (w + m); };   // nationwide share fades as the city's own cases grow
+                out[k] = { t: (c.t || 0) + (n.t || 0) * kf('t'), td: (c.td || 0) + (n.td || 0) * kf('td'), cc: (c.cc || 0) + (n.cc || 0) * kf('cc'),
+                           ws: (c.ws || 1) * (1 + ((n.ws || 1) - 1) * kf('ws')), wg: (c.wg || 1) * (1 + ((n.wg || 1) - 1) * kf('wg')), pp: (c.pp || 1) * (1 + ((n.pp || 1) - 1) * kf('pp', 48)) };
+            });
+            return out;
+        }
+        function applyHourlyLearning(entry, nat) {
+            const useNat = nat && typeof nwsOffice !== 'undefined' && nwsOffice ? nat : null;   // nationwide corrections come from US stations
+            const corr = mergedHourlyCorr(entry, useNat);
+            hourlyLearn = corr ? { ...((entry && entry.hourly) || {}), corr, name: entry && entry.name, km: entry && entry.km, nationwide: !!useNat, cityOnly: !useNat, nationalOnly: !(entry && entry.hourly && entry.hourly.corr) } : null;
             const h = ensembleData && ensembleData.hourly;
             if (!h || !hourlyLearn || NOLEARN) return;
             const now = Date.now(), ok = v => v !== null && v !== undefined && !isNaN(v);
@@ -2146,6 +2175,10 @@ body.no-data #sectionNav { display: none; }
         }
         function hourlyLearningHTML() {
             if (!hourlyLearn) return '<div class="text-xs text-slate-400">No hourly verification for this location yet. It is checked several times a day for the tracked cities.</div>';
+            if (hourlyLearn.nationalOnly) {
+                const act = Object.entries(hourlyLearn.corr).filter(([, c]) => c.t || c.td || c.cc || c.ws !== 1 || c.wg !== 1 || c.pp !== 1);
+                return `<div class="text-xs text-slate-300">Not a tracked city: nationwide corrections apply (errors shared by most tracked cities). ${act.length ? act.map(([k, c]) => `${k.replace('|d', ' day').replace('|n', ' night')} h: ${[c.t ? `temp ${(c.t * (isImperial ? 1.8 : 1)).toFixed(1)}°` : '', c.td ? `dew ${(c.td * (isImperial ? 1.8 : 1)).toFixed(1)}°` : '', c.cc ? `cloud ${Math.round(c.cc)}%` : '', c.ws !== 1 ? `wind ×${c.ws.toFixed(2)}` : '', c.wg !== 1 ? `gust ×${c.wg.toFixed(2)}` : '', c.pp !== 1 ? `rain chance ×${c.pp.toFixed(2)}` : ''].filter(Boolean).join(', ')}`).join('; ') + '.' : 'None active yet.'}</div>`;
+            }
             const dU = isImperial ? 1.8 : 1, u = isImperial ? '°F' : '°C';
             const f = x => x == null ? '--' : `${x > 0 ? '+' : x < 0 ? '−' : ''}${Math.abs(x * dU).toFixed(1)}${u}`;
             const pct = x => x == null ? '--' : `${x > 0 ? '+' : x < 0 ? '−' : ''}${Math.abs(Math.round(x))}%`;
@@ -2171,8 +2204,9 @@ body.no-data #sectionNav { display: none; }
         async function loadHourlyLearning(token, lat, lon) {
             try {
                 const e = await sharedEntryFor(lat, lon);
+                const sh = await sharedLearning();
                 if (token !== fetchToken) return;
-                applyHourlyLearning(e);
+                applyHourlyLearning(e, sh && sh.national ? sh.national.hourly : null);
                 if (hourlyLearn && !NOLEARN) recomputeForecast();
             } catch (e) { hourlyLearn = null; }
         }

@@ -27,6 +27,7 @@ Open-Meteo (forecast, individual models, elevation; multi-point for regional ana
 - Precipitation falling now: the text gives when it ends (radar) and the chance of MORE afterwards ('Rain ending around 9:00 PM; ... Then a 20% chance of a passing shower.'), never a 100% for the whole period. When echoes can't be tracked, the 700 mb model wind steers them; nothing upstream after the current rain caps the next two hours at 30%.
 - Forecast text states the forecast, not the analysis: no 'Radar:' or station commentary (e.g. 'Rain arriving around 9:00 PM.', 'Colder air arrives from the northwest by about 10 PM.').
 - SPC: Day 1-3 risks, mesoscale discussions, thunder chances (thunder.js, spc.js).
+- Nationwide corrections (learning.national): errors shared by 75%+ of at least 8 tracked cities (median, 70%, capped at half the city limits). Untracked US places get them in full; tracked cities blend from nationwide toward their own as their cases grow.
 - Learning: daily (highs, lows, rain chance, rain amount by lead) and hourly (temperature, dewpoint, wind, gust, cloud, rain chance by lead and day / night), shrunk and capped corrections from the shared verification (and on-device daily learning).
 - Day / night per hour from actual sunrise / sunset (sun shown if up at that hour).
 - Hourly precipitation icon only at 40%+ chance (the icon follows the number shown); below that the sky icon.

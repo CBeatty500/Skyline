@@ -233,6 +233,31 @@ async function doLocation(loc) {
 const queue = locs.slice();
 await Promise.all([0, 1, 2].map(async w => { await sleep(w * 3000); while (queue.length) await doLocation(queue.shift()); }));
 await browser.close();
+// ---------- nationwide corrections: only errors that most tracked cities share (same sign at 75%+ of at least 8 cities) ----------
+{
+  const med = a => { const b = a.slice().sort((x, y) => x - y), m = Math.floor(b.length / 2); return b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2; };
+  const agree = (vals, center) => vals.length >= 8 && Math.max(vals.filter(v => v > center).length, vals.filter(v => v < center).length) / vals.length >= 0.75;
+  const cities = Object.values(learning.locations);
+  const hc = {}, hcells = new Set();
+  cities.forEach(L => Object.keys((L.hourly && L.hourly.cells) || {}).forEach(k => hcells.add(k)));
+  hcells.forEach(k => {
+    const add = (v, cap) => { const vals = cities.map(L => L.hourly && L.hourly.cells[k] && L.hourly.cells[k][v]).filter(x => x && x.w >= 12).map(x => x.s / x.w);
+      return agree(vals, 0) ? +Math.max(-cap, Math.min(cap, -0.7 * med(vals))).toFixed(2) : 0; };
+    const ratio = v => { const vals = cities.map(L => L.hourly && L.hourly.cells[k] && L.hourly.cells[k][v]).filter(x => x && x.w >= 12 && x.f > 0).map(x => x.o / x.f);
+      return agree(vals, 1) ? +Math.max(0.88, Math.min(1.12, 1 + 0.7 * (med(vals) - 1))).toFixed(3) : 1; };
+    const ppv = cities.map(L => L.hourly && L.hourly.cells[k] && L.hourly.cells[k].pp).filter(x => x && x.w >= 24).map(x => (x.o / x.w + 0.05) / (x.p / x.w + 0.05));
+    hc[k] = { t: add('t', 1.5), td: add('td', 1.5), cc: add('cc', 10), ws: ratio('ws'), wg: ratio('wg'), pp: agree(ppv, 1) ? +Math.max(0.88, Math.min(1.12, 1 + 0.7 * (med(ppv) - 1))).toFixed(3) : 1 };
+  });
+  const dc = {};
+  LEADS.forEach(Lk => {
+    const bs = cities.map(L => L.buckets && L.buckets[Lk]).filter(Boolean);
+    const one = (nKey, bKey) => { const vals = bs.filter(b => b[nKey] >= 5).map(b => b[bKey]); return agree(vals, 0) ? +Math.max(-1.5, Math.min(1.5, -0.7 * med(vals))).toFixed(2) : 0; };
+    const ppv = bs.filter(b => b.nP >= 10 && b.ppMean != null).map(b => (b.wetFreq + 0.05) / (b.ppMean + 0.05));
+    dc[Lk] = { max: one('nMax', 'bMax'), min: one('nMin', 'bMin'), pp: agree(ppv, 1) ? +Math.max(0.88, Math.min(1.12, 1 + 0.7 * (med(ppv) - 1))).toFixed(3) : 1, pr: 1 };
+  });
+  learning.national = { hourly: hc, daily: dc, cities: cities.length, updated: new Date().toISOString() };
+  console.log('national hourly corrections active:', Object.entries(hc).filter(([, c]) => c.t || c.td || c.cc || c.ws !== 1 || c.wg !== 1 || c.pp !== 1).map(([k]) => k).join(', ') || 'none yet');
+}
 learning.updated = new Date().toISOString();
 fs.writeFileSync(path.join(root, 'data/snapshots.json'), JSON.stringify(snaps));
 fs.writeFileSync(path.join(root, 'data/hourly_snaps.json'), JSON.stringify(hsnaps));

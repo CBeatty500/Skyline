@@ -103,6 +103,19 @@
                 const best = await sharedEntryFor(currentLoc.lat, currentLoc.lon);
                 if (best && best.corr && (best.total || 0) >= learnState.total) learnState = { buckets: best.buckets, corr: best.corr, total: best.total, shared: true, updated: best.updated };
             } catch (e) {}
+            // nationwide daily corrections (US): the full nationwide value with no local cases, fading as local cases grow
+            try {
+                const sh = await sharedLearning(), nat = sh && sh.national && sh.national.daily;
+                if (nat && typeof nwsOffice !== 'undefined' && nwsOffice) {
+                    const corr = {};
+                    LEARN_LEADS.forEach(L => {
+                        const c = learnState.corr[L] || { max: 0, min: 0, pp: 1 }, n = nat[L] || { max: 0, min: 0, pp: 1 }, b = (learnState.buckets && learnState.buckets[L]) || {};
+                        corr[L] = { ...c, max: (c.max || 0) + (n.max || 0) * 6 / ((b.nMax || 0) + 6), min: (c.min || 0) + (n.min || 0) * 6 / ((b.nMin || 0) + 6),
+                                    pp: (c.pp || 1) * (1 + ((n.pp || 1) - 1) * 10 / ((b.nP || 0) + 10)) };
+                    });
+                    learnState = { ...learnState, corr, nationwide: true };
+                }
+            } catch (e) {}
         }
         // apply learned corrections (leads 1+ for highs; tonight's low counts as lead 0)
         function applyLearning() {
