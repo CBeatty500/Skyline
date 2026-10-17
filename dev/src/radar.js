@@ -138,6 +138,7 @@
                 const rn = await radarNowcast(+lat, +lon);
                 if (token !== fetchToken) return;
                 radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };
+                window._lastRadar = { here: rn.here, here3: rn.here3, passed: rn.passed, clearUpstream: rn.clearUpstream, endMin: rn.endMin, motionSrc: rn.motionSrc, moving: rn.moving, mph: Math.round(rn.speedKmh * 0.621), arrive: rn.arrive, peak: rn.peak, any: rn.any, ahead: [0, 30, 60, 90, 120, 150, 180].map(t => rn.ahead(t)) };   // diagnostics
                 applyRadarNowcast(rn);
                 recomputeForecast();
             } catch (e) { console.warn('Radar nowcast unavailable:', e); }
