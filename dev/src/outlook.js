@@ -88,8 +88,7 @@
                 const ph = phraseForSegments(p.segs);
                 if (!ph) return '';
                 const b = bestBetResults[p.k];
-                const bits = [ph.text + '.'];
-                if (b) bits.push(p.night ? `Low near ${formatTemp(b.bestMin)}.` : `High near ${formatTemp(b.full ? b.full.bestMax : b.bestMax)}.`);
+                const bits = [b ? withHigh(ph.text, p.night ? `low near ${formatTemp(b.bestMin)}` : `high near ${formatTemp(b.full ? b.full.bestMax : b.bestMax)}`) : ph.text + '.'];
                 const amt = periodAmount(s, e);
                 if (ph.wet && amt >= 2.5) bits.push(`About ${formatPrecip(amt)} possible.`);
                 const sv = ph.wet && /thunder/.test(ph.text) ? thunderRisk(s, e) : null;

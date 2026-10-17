@@ -537,7 +537,7 @@ js = r'''
                 if (bb.laterProb != null) parts.push(`Once it ends, ${bb.laterProb}% chance of more later today.`);
             } else {
                 const ph = restOfDayPhrase() || '';
-                parts.push(`${restOfDayPhrase() || cond.text.split(' · ')[0] + ' for the rest of today'}. High near ${formatTemp(bb.bestMax)}.`);
+                parts.push(withHigh(restOfDayPhrase() || cond.text.split(' · ')[0] + ' for the rest of today', `high near ${formatTemp(bb.bestMax)}`));
                 if (/shower|rain|storm|snow|drizzle|sleet|mix/i.test(ph) && bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} possible.`);
             }
             if (bb.bestGust >= 40) parts.push(`Gusts to ${formatSpeed(bb.bestGust)}.`);

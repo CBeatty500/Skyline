@@ -1625,8 +1625,7 @@ body.no-data #sectionNav { display: none; }
                 const ph = phraseForSegments(p.segs);
                 if (!ph) return '';
                 const b = bestBetResults[p.k];
-                const bits = [ph.text + '.'];
-                if (b) bits.push(p.night ? `Low near ${formatTemp(b.bestMin)}.` : `High near ${formatTemp(b.full ? b.full.bestMax : b.bestMax)}.`);
+                const bits = [b ? withHigh(ph.text, p.night ? `low near ${formatTemp(b.bestMin)}` : `high near ${formatTemp(b.full ? b.full.bestMax : b.bestMax)}`) : ph.text + '.'];
                 const sv = ph.wet && /thunder/.test(ph.text) ? thunderRisk(s, e) : null;
                 if (sv) bits.push(sv.n >= 3 ? 'Severe storms possible.' : 'A few storms could be severe.');
                 bits.push(...periodExtras(p.segs.map(([l, a, b]) => [l, a, b])));
@@ -3086,6 +3085,11 @@ body.no-data #sectionNav { display: none; }
             if (i === 0 && k === L.length - 1) return `${Wc}.`;
             if (i === 0) return k === 0 ? `${Wc} ${L[0].label}.` : `${Wc} through ${L[k].label}.`;
             return `Becoming ${W} ${L[i].label}.`;
+        }
+        // '... then clear this evening. Breezy' + 'high near 53' -> '... then clear this evening. Breezy, with a high near 53.'
+        function withHigh(phrase, hi) {
+            const m = String(phrase).match(/^(.*)\. (Breezy|Windy|Very windy)\.?$/);
+            return m ? `${m[1]}. ${m[2]}, with a ${hi}.` : `${phrase}. ${hi[0].toUpperCase() + hi.slice(1)}.`;
         }
         // ---------- Tropical cyclones: National Hurricane Center / Central Pacific Hurricane Center ----------
         // One identify request: forecast cones that include the location, the 5-day wind speed probabilities there
@@ -7126,7 +7130,7 @@ body.no-data #sectionNav { display: none; }
 
             } else {
                 const ph = restOfDayPhrase() || '';
-                parts.push(`${restOfDayPhrase() || cond.text.split(', ')[0] + ' for the rest of today'}. High near ${formatTemp(bb.bestMax)}.`);
+                parts.push(withHigh(restOfDayPhrase() || cond.text.split(', ')[0] + ' for the rest of today', `high near ${formatTemp(bb.bestMax)}`));
             }
             periodExtras(todaySegs(), radarInfo && radarInfo.arrive).forEach(x => parts.push(x));
             parts.push(`Overnight low near ${formatTemp(bb.bestMin)}.`);

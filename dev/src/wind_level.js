@@ -99,3 +99,8 @@
             if (i === 0) return k === 0 ? `${Wc} ${L[0].label}.` : `${Wc} through ${L[k].label}.`;
             return `Becoming ${W} ${L[i].label}.`;
         }
+        // '... then clear this evening. Breezy' + 'high near 53' -> '... then clear this evening. Breezy, with a high near 53.'
+        function withHigh(phrase, hi) {
+            const m = String(phrase).match(/^(.*)\. (Breezy|Windy|Very windy)\.?$/);
+            return m ? `${m[1]}. ${m[2]}, with a ${hi}.` : `${phrase}. ${hi[0].toUpperCase() + hi.slice(1)}.`;
+        }
