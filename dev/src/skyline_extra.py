@@ -1721,3 +1721,28 @@ _r("""                renderDashboard();
 _r("""                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };""",
    """                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };
                 setTimeout(() => { try { radarAutoOpen(true); } catch (e) {} }, 0);""")
+# ---- period wording: precipitation ranges near the end, full wind sentence (hero today / tonight and the outlook rows) ----
+_r("""snowfall,wind_gusts_10m&daily=weather_code""", """snowfall,wind_gusts_10m,wind_direction_10m&daily=weather_code""")
+_a = out.index('        function restOfDayPhrase() {')
+out = out[:_a] + open('/home/claude/period_text.js').read() + out[_a:]
+# tonight
+_r("""                if (ni.nowcast && ni.nowcast.wet) { const mt = moreText(ni.laterPP, 'tonight'); if (mt) parts.push(mt); }
+                else if (precipExpected(ni.pp, ni.rain + ni.snow)) parts.push(`${ni.pp}% chance of precipitation${ni.rain >= 0.05 ? `, about ${formatPrecip(ni.rain)}` : ''}${ni.snow >= 0.05 ? ` (${formatSnow(ni.snow)} of snow)` : ''}.`);
+                else if (ni.pp >= 20) parts.push(`A ${ni.pp}% chance of a passing shower.`);
+                if (ni.gust >= 40) parts.push(`Gusts to ${formatSpeed(ni.gust)}.`);""", """                { const tsg = tonightSegs(ni); periodExtras(tsg).forEach(x => parts.push(x)); }""")
+# today
+_r("""                if (bb.bestPrecip >= 0.25 && bb.laterProb >= 40) parts.push(`About ${formatPrecip(bb.bestPrecip)} more today.`);
+                if (bb.laterProb != null) { const mt = moreText(bb.laterProb, 'later today'); if (mt) parts.push(mt); }""", "")
+_r("""                if (/shower|rain|storm|snow|drizzle|sleet|mix/i.test(ph) && bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} possible.`);
+            }
+            if (bb.bestGust >= 40) parts.push(`Gusts to ${formatSpeed(bb.bestGust)}.`);""", """            }
+            periodExtras(todaySegs()).forEach(x => parts.push(x));""")
+# outlook rows
+_r("""                const amt = periodAmount(s, e);
+                if (ph.wet && amt >= 2.5) bits.push(`About ${formatPrecip(amt)} possible.`);
+                const sv = ph.wet && /thunder/.test(ph.text) ? thunderRisk(s, e) : null;
+                if (sv) bits.push(sv.n >= 3 ? 'Severe storms possible.' : 'A few storms could be severe.');
+                const g = periodGust(s, e);
+                if (g >= 40) bits.push(`Gusts to ${formatSpeed(g)}.`);""", """                const sv = ph.wet && /thunder/.test(ph.text) ? thunderRisk(s, e) : null;
+                if (sv) bits.push(sv.n >= 3 ? 'Severe storms possible.' : 'A few storms could be severe.');
+                bits.push(...periodExtras(p.segs.map(([l, a, b]) => [l, a, b])));""")
