@@ -3068,6 +3068,25 @@ body.no-data #sectionNav { display: none; }
             const k = isImperial ? 0.621371 : 1, w = windHourKmh(j);
             return `<span class="hwind ${WIND_TAG_CLS[lv]}" title="${WIND_WORD[lv]}"><i class="fa-solid fa-wind"></i> ${w != null ? Math.round(w * k) + (isImperial ? ' mph' : '') : ''}</span>`;
         }
+        // 'Now' cell: the observed wind
+        function nowWindTag(cc) {
+            if (!cc || cc.wind == null || isNaN(cc.wind)) return '';
+            let lv = windLevelOf(cc.wind); try { if (windAlertAt(Date.now())) lv = 3; } catch (e) {}
+            if (!lv) return '';
+            const k = isImperial ? 0.621371 : 1;
+            return `<span class="hwind ${WIND_TAG_CLS[lv]}" title="${WIND_WORD[lv]}"><i class="fa-solid fa-wind"></i> ${Math.round(cc.wind * k)}${isImperial ? ' mph' : ''}</span>`;
+        }
+        // wind for a period said on its own (used when precipitation is falling and the sky sentence is skipped):
+        // 'Breezy.' / 'Breezy this morning.' / 'Breezy through this afternoon.' / 'Becoming windy this evening.'
+        function windSentence(segs) {
+            const L = segs.filter(([, s, e]) => e - s >= 1).map(([label, s, e]) => ({ label, lv: windLevel(s, e) }));
+            const i = L.findIndex(x => x.lv > 0); if (i < 0) return '';
+            let k = i; while (k + 1 < L.length && L[k + 1].lv === L[i].lv) k++;
+            const W = WIND_WORD[L[i].lv], Wc = W[0].toUpperCase() + W.slice(1);
+            if (i === 0 && k === L.length - 1) return `${Wc}.`;
+            if (i === 0) return k === 0 ? `${Wc} ${L[0].label}.` : `${Wc} through ${L[k].label}.`;
+            return `Becoming ${W} ${L[i].label}.`;
+        }
         // ---------- Tropical cyclones: National Hurricane Center / Central Pacific Hurricane Center ----------
         // One identify request: forecast cones that include the location, the 5-day wind speed probabilities there
         // (34 / 50 / 64 kt), and any 7-day development area. Covers the Atlantic, East and Central Pacific basins.
@@ -5897,7 +5916,7 @@ body.no-data #sectionNav { display: none; }
                         <i class="fa-solid ${cond.icon} text-xl my-2 ${cond.color}"></i>
                         <span class="text-xs font-bold text-white font-mono">${formatTemp(j === s ? (ccH && ccH.temp !== null ? ccH.temp : h.temperature_2m[j]) : (adjH && adjH.T[j] !== null ? adjH.T[j] : h.temperature_2m[j]))}</span>
                         <span class="text-[10px] font-mono mt-1 ${pp >= 10 ? 'text-blue-300' : 'text-transparent'}"><i class="fa-solid fa-droplet"></i> ${pp !== null ? pp : 0}%</span>
-                        ${(t => t != null && t >= 15 ? `<span class="text-[10px] font-mono text-amber-300"><i class="fa-solid fa-bolt"></i> ${Math.round(t)}%</span>` : '')(thunderAt(j))}${j === s ? '' : hourWindTag(j)}
+                        ${(t => t != null && t >= 15 ? `<span class="text-[10px] font-mono text-amber-300"><i class="fa-solid fa-bolt"></i> ${Math.round(t)}%</span>` : '')(thunderAt(j))}${j === s ? nowWindTag(ccH) : hourWindTag(j)}
                     </div>`;
             }
             container.innerHTML = html;
@@ -7085,6 +7104,7 @@ body.no-data #sectionNav { display: none; }
                 hiW.style.display = ni.high !== null ? '' : 'none';
                 if (ni.high !== null) { $h('heroHi').innerText = formatTemp(ni.high); $h('heroHiLbl').innerText = 'Rising to'; }
                 const parts = [ni.nowcast && ni.nowcast.wet ? `${NOWCAST_WORD[ni.nowcast.kind]} ${rainEndText() || 'falling now'}; low tonight near ${formatTemp(ni.low)}.` : `${(t => t[0] + t.slice(1).toLowerCase())((() => { const ts = tonightSegs(ni); return windPhrase(ni.cond.text.split(', ')[0], ts[0][1], ts[ts.length - 1][2]); })())} tonight with a low near ${formatTemp(ni.low)}.`];
+                if (ni.nowcast && ni.nowcast.wet) { const ws = windSentence(tonightSegs(ni)); if (ws) parts.push(ws); }
                 if (ni.high !== null) parts.push(`Temperatures rise to around ${formatTemp(ni.high)} before sunrise.`);
                 { const tsg = tonightSegs(ni); periodExtras(tsg, radarInfo && radarInfo.arrive).forEach(x => parts.push(x)); }
                 if (rf.high && rf.high.type === 'set') parts.push(rf.high.tie ? 'Today tied the daily record high.' : 'Today set a new daily record high.');
@@ -7101,6 +7121,7 @@ body.no-data #sectionNav { display: none; }
             const cond = dailyCondition(bb), parts = [], nc = bb.nowcast;
             if (nc && nc.wet) {
                 parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`);
+                { const ws = windSentence(todaySegs()); if (ws) parts.push(ws); }
 
             } else {
                 const ph = restOfDayPhrase() || '';

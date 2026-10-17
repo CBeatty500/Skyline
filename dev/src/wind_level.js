@@ -80,3 +80,22 @@
             const k = isImperial ? 0.621371 : 1, w = windHourKmh(j);
             return `<span class="hwind ${WIND_TAG_CLS[lv]}" title="${WIND_WORD[lv]}"><i class="fa-solid fa-wind"></i> ${w != null ? Math.round(w * k) + (isImperial ? ' mph' : '') : ''}</span>`;
         }
+        // 'Now' cell: the observed wind
+        function nowWindTag(cc) {
+            if (!cc || cc.wind == null || isNaN(cc.wind)) return '';
+            let lv = windLevelOf(cc.wind); try { if (windAlertAt(Date.now())) lv = 3; } catch (e) {}
+            if (!lv) return '';
+            const k = isImperial ? 0.621371 : 1;
+            return `<span class="hwind ${WIND_TAG_CLS[lv]}" title="${WIND_WORD[lv]}"><i class="fa-solid fa-wind"></i> ${Math.round(cc.wind * k)}${isImperial ? ' mph' : ''}</span>`;
+        }
+        // wind for a period said on its own (used when precipitation is falling and the sky sentence is skipped):
+        // 'Breezy.' / 'Breezy this morning.' / 'Breezy through this afternoon.' / 'Becoming windy this evening.'
+        function windSentence(segs) {
+            const L = segs.filter(([, s, e]) => e - s >= 1).map(([label, s, e]) => ({ label, lv: windLevel(s, e) }));
+            const i = L.findIndex(x => x.lv > 0); if (i < 0) return '';
+            let k = i; while (k + 1 < L.length && L[k + 1].lv === L[i].lv) k++;
+            const W = WIND_WORD[L[i].lv], Wc = W[0].toUpperCase() + W.slice(1);
+            if (i === 0 && k === L.length - 1) return `${Wc}.`;
+            if (i === 0) return k === 0 ? `${Wc} ${L[0].label}.` : `${Wc} through ${L[k].label}.`;
+            return `Becoming ${W} ${L[i].label}.`;
+        }

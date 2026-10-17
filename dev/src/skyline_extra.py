@@ -1925,3 +1925,11 @@ _r("""                <div class="flex flex-wrap items-center gap-2">
 _r("""            const lat = currentLoc.lat.toFixed(4), lon = currentLoc.lon.toFixed(4);""", """            const lat = currentLoc.lat.toFixed(4), lon = currentLoc.lon.toFixed(4);
             try { if (spcInConus(+lat, +lon)) { const p = radarNowcast(+lat, +lon); p.catch(() => {}); window._radarPre = { k: `${(+lat).toFixed(3)},${(+lon).toFixed(3)}`, at: Date.now(), p }; } } catch (e) {}""")
 _r("""            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-blue-500 pl-4 py-1">""", """            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-blue-500 pl-4 py-0.5">""")
+
+# ---- wind when precipitation is falling now (no sky sentence), and the observed wind in the 'Now' hourly cell ----
+_r("""${j === s ? '' : hourWindTag(j)}""", """${j === s ? nowWindTag(ccH) : hourWindTag(j)}""")
+_r("""                parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`);""",
+   """                parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`);
+                { const ws = windSentence(todaySegs()); if (ws) parts.push(ws); }""")
+_r("""                if (ni.high !== null) parts.push(`Temperatures rise to around""", """                if (ni.nowcast && ni.nowcast.wet) { const ws = windSentence(tonightSegs(ni)); if (ws) parts.push(ws); }
+                if (ni.high !== null) parts.push(`Temperatures rise to around""")
