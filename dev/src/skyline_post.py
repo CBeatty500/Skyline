@@ -68,7 +68,7 @@ print('middle dots left:', len(_left), [out[max(0, i - 40):i + 10] for i in _lef
 for _a, _b in [
     ('<title>Skyline Weather</title>', '<title>Best Bet Weather</title>'),
     ('content="Skyline: a meteorologist\'s weather dashboard with live station observations, an observation-corrected multi-model forecast, and official climate records."',
-     'content="Best Bet Weather. A forecast you can bet on."'),
+     'content="Best Bet Weather. Know the odds before you go."'),
     ('content="Skyline Weather"', 'content="Best Bet Weather"'),
     ('aria-label="Skyline"', 'aria-label="Best Bet Weather"'),
     ('<span class="brand-name hidden sm:inline">Skyline</span>', '<span class="brand-name hidden sm:inline">Best Bet Weather</span>'),
@@ -89,8 +89,7 @@ _FAV = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox
 out = out.replace('<span class="brand-mark"><i class="fa-solid fa-cloud-sun"></i></span>', '<span class="brand-mark">' + _LOGO + '</span>', 1)
 out = _re3.sub(r'<link rel="icon" href="[^"]*">', '<link rel="icon" href="' + _FAV.replace('\\', '\\\\') + '">', out, count=1)
 assert '<i class="fa-solid fa-cloud-sun text-6xl mb-5 text-amber-300"></i>' in out
-out = out.replace('<i class="fa-solid fa-cloud-sun text-6xl mb-5 text-amber-300"></i>', '<div class="flex justify-center mb-5">' + _LOGO_BIG + '</div>', 1)
-out = out.replace('>The Best Bet Forecast.</h2>', '>Best Bet Weather</h2>', 1)
+out = out.replace('<i class="fa-solid fa-cloud-sun text-6xl mb-5 text-amber-300"></i>', _LOGO_BIG, 1)
 _i = out.index('</style>')
 out = out[:_i] + '\n.brand-mark { background: none !important; width: 38px; height: 38px; } .brand-mark svg { display: block; }\n' + out[_i:]
 

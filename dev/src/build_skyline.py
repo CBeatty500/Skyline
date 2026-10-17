@@ -112,10 +112,18 @@ main = f'''<main class="wrap pb-16 pt-5 space-y-5">
             <button onclick="closeToast()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
         </div>
 
-        <div id="statusMessage" class="text-center py-20 px-6 glass-panel">
-            <i class="fa-solid fa-cloud-sun text-6xl mb-5 text-amber-300"></i>
-            <h2 class="font-display text-[1.75rem] sm:text-4xl text-white mb-2 whitespace-nowrap">The Best Bet Forecast.</h2>
-            <p class="mx-auto text-base sm:text-lg text-slate-300 whitespace-nowrap">A forecast you can bet on.</p>
+        <div id="statusMessage" class="bb-hero">
+            <div class="bb-sky" aria-hidden="true"><span class="bb-glow"></span><span class="bb-cloud bb-c1"></span><span class="bb-cloud bb-c2"></span><span class="bb-cloud bb-c3"></span></div>
+            <div class="bb-inner">
+                <div class="bb-chip"><i class="fa-solid fa-cloud-sun text-6xl mb-5 text-amber-300"></i></div>
+                <h1 class="bb-word"><span class="bb-best">Best Bet</span><span class="bb-wx">Weather</span></h1>
+                <p class="bb-hook">Know the odds<br>before you go.</p>
+                <div class="bb-cta">
+                    <button type="button" class="bb-btn" onclick="useMyLocation()"><i class="fa-solid fa-location-crosshairs"></i>Get my forecast</button>
+                    <button type="button" class="bb-btn2" onclick="var i=document.getElementById('cityInput');i.scrollIntoView({{block:'center'}});i.focus()"><i class="fa-solid fa-magnifying-glass"></i>Search a city</button>
+                </div>
+                <ul class="bb-tags"><li><i class="fa-solid fa-percent"></i>Hourly odds</li><li><i class="fa-solid fa-satellite-dish"></i>Live radar</li><li><i class="fa-solid fa-check-double"></i>Graded daily</li></ul>
+            </div>
         </div>
 
         <div id="dashboardContent" class="hidden space-y-5">
@@ -160,6 +168,48 @@ css = r'''
 html { scroll-behavior: smooth; }
 body { font-family: 'Outfit', system-ui, sans-serif !important; color: var(--ink) !important; background: #07101f !important; padding: 0 !important; }
 .font-display, .hero-temp, h2 { font-family: 'Fraunces', Georgia, serif; }
+/* welcome hero */
+.bb-hero{position:relative;overflow:hidden;border-radius:1.75rem;padding:3.25rem 1.25rem 2.25rem;text-align:center;
+  background:radial-gradient(120% 80% at 50% 0%,#24508f 0%,#173566 45%,#0d1f42 100%);border:1px solid rgba(255,255,255,.09);
+  box-shadow:0 30px 60px -25px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,255,255,.08)}
+.bb-sky{position:absolute;inset:0;pointer-events:none}
+.bb-glow{position:absolute;left:50%;top:-6%;width:340px;height:340px;transform:translateX(-50%);border-radius:50%;
+  background:radial-gradient(circle,rgba(255,176,90,.38) 0%,rgba(255,140,90,.12) 40%,transparent 70%);animation:bbGlow 6s ease-in-out infinite}
+.bb-cloud{position:absolute;border-radius:999px;background:rgba(255,255,255,.07);filter:blur(1px)}
+.bb-cloud::before,.bb-cloud::after{content:"";position:absolute;border-radius:50%;background:inherit}
+.bb-c1{width:150px;height:38px;top:16%;left:-170px;animation:bbDrift 46s linear infinite}
+.bb-c1::before{width:62px;height:62px;left:24px;top:-30px}.bb-c1::after{width:46px;height:46px;left:74px;top:-20px}
+.bb-c2{width:110px;height:28px;top:58%;left:-130px;animation:bbDrift 62s linear -24s infinite;opacity:.8}
+.bb-c2::before{width:46px;height:46px;left:18px;top:-22px}.bb-c2::after{width:34px;height:34px;left:56px;top:-14px}
+.bb-c3{width:190px;height:44px;top:80%;left:-210px;animation:bbDrift 80s linear -50s infinite;opacity:.6}
+.bb-c3::before{width:74px;height:74px;left:30px;top:-36px}.bb-c3::after{width:56px;height:56px;left:92px;top:-26px}
+.bb-inner{position:relative;max-width:30rem;margin:0 auto}
+.bb-chip{display:flex;justify-content:center;margin-bottom:1.1rem;filter:drop-shadow(0 12px 18px rgba(0,0,0,.45))}
+.bb-chip svg{width:104px;height:104px;animation:bbToss 1.1s cubic-bezier(.2,.9,.25,1.15) both}
+.bb-word{margin:0;line-height:1;font-family:'Outfit',system-ui,sans-serif}
+.bb-best{display:block;font-weight:800;font-size:clamp(2.6rem,13vw,4.25rem);letter-spacing:-.02em;text-transform:uppercase;
+  background:linear-gradient(180deg,#ffe3a8 0%,#ffb84d 45%,#ff7a59 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 4px 14px rgba(255,140,80,.28));animation:bbRise .7s .25s ease-out both}
+.bb-wx{display:flex;align-items:center;justify-content:center;gap:.75rem;margin-top:.45rem;font-weight:500;font-size:clamp(.9rem,4vw,1.1rem);
+  letter-spacing:.55em;text-indent:.55em;text-transform:uppercase;color:#dbe7f7;animation:bbRise .7s .4s ease-out both}
+.bb-wx::before,.bb-wx::after{content:"";height:1px;width:2.2rem;background:linear-gradient(90deg,transparent,rgba(255,200,130,.7))}
+.bb-wx::after{transform:scaleX(-1)}
+.bb-hook{margin:1.6rem 0 0;font-family:'Fraunces',Georgia,serif;font-size:clamp(1.55rem,7vw,2.1rem);line-height:1.15;color:#fff;animation:bbRise .7s .55s ease-out both}
+.bb-cta{display:flex;flex-wrap:wrap;justify-content:center;gap:.7rem;margin-top:1.75rem;animation:bbRise .7s .7s ease-out both}
+.bb-btn,.bb-btn2{display:inline-flex;align-items:center;justify-content:center;min-width:13.5rem;gap:.55rem;border-radius:999px;padding:.85rem 1.4rem;font-family:'Outfit',sans-serif;font-weight:600;font-size:1rem;transition:transform .15s,box-shadow .15s,background .15s}
+.bb-btn{color:#2a1504;background:linear-gradient(135deg,#ffc062,#ff7a59);box-shadow:0 10px 24px -8px rgba(255,122,89,.7)}
+.bb-btn:hover{transform:translateY(-1px);box-shadow:0 14px 28px -8px rgba(255,122,89,.85)}
+.bb-btn2{color:#e6eefa;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18)}
+.bb-btn2:hover{background:rgba(255,255,255,.14)}
+.bb-btn:active,.bb-btn2:active{transform:scale(.97)}
+.bb-tags{display:flex;flex-wrap:wrap;justify-content:center;gap:.5rem 1.1rem;margin:1.9rem 0 0;padding:0;list-style:none;font-size:.85rem;color:#a9bddb;animation:bbRise .7s .85s ease-out both}
+.bb-tags i{color:#ffb84d;margin-right:.4rem;font-size:.8em}
+@keyframes bbToss{0%{transform:translateY(-70px) rotate(-200deg) scale(.6);opacity:0}70%{transform:translateY(4px) rotate(8deg) scale(1.03);opacity:1}100%{transform:none}}
+@keyframes bbRise{from{transform:translateY(12px);opacity:0}to{transform:none;opacity:1}}
+@keyframes bbDrift{from{transform:translateX(0)}to{transform:translateX(calc(100vw + 420px))}}
+@keyframes bbGlow{0%,100%{opacity:.85}50%{opacity:1}}
+@media (prefers-reduced-motion:reduce){.bb-hero *{animation:none!important}}
+
 .wrap { max-width: 1400px; margin: 0 auto; padding-left: 14px; padding-right: 14px; }
 @media (min-width: 768px) { .wrap { padding-left: 28px; padding-right: 28px; } }
 [id^="sec-"] { scroll-margin-top: 8.5rem; }
