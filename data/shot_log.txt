@@ -1,1 +1,3 @@
-ok
+phone warning: Radar nowcast unavailable: Error: radar not current
+    at radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1908:63)
+    at async loadRad
