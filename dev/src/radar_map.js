@@ -1,7 +1,7 @@
         // ---------- Radar map: NOAA base reflectivity mosaic, redrawn on a clean scale over county and state lines ----------
         // Each pixel of NOAA's image is converted to dBZ with the calibrated colour path (rgbToDbz), light echoes and isolated
         // specks are removed, and the rest is recoloured. Counties / states: US Census boundaries (us-atlas). Warnings: NWS.
-        const RM = { map: null, overlay: null, frames: [], loopTimer: null, warnLayer: null, counties: null, token: 0, marker: null };
+        const RM = { map: null, overlay: null, frames: [], loopTimer: null, looping: false, delay: 550, warnLayer: null, counties: null, token: 0, me: null };
         const RM_MIN_DBZ = 15;
         const RM_STOPS = [[15, [52, 96, 120]], [20, [6, 170, 70]], [25, [2, 200, 30]], [30, [0, 140, 0]], [35, [235, 225, 0]], [40, [250, 175, 0]],
             [45, [250, 110, 0]], [50, [225, 0, 0]], [55, [165, 0, 0]], [60, [240, 0, 240]], [65, [150, 60, 220]], [70, [255, 255, 255]]];
@@ -42,7 +42,8 @@
                 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', { pane: 'rmLabels', maxZoom: 16 }).addTo(RM.map);
                 RM.map.getPane('rmBase').style.filter = 'brightness(0.42) contrast(1.15)';   // near-black background
                 RM.overlay = L.imageOverlay('data:image/gif;base64,R0lGODlhAQABAAAAACw=', RM.map.getBounds(), { pane: 'rmRadar', opacity: 0.88, interactive: false }).addTo(RM.map);
-                RM.map.on('moveend', () => { radarMapStop(); radarMapDraw(); });
+                RM.map.on('moveend', () => { const was = RM.looping; radarMapStop(); RM.frames = []; radarMapDraw().then(() => { if (was) radarMapLoop(); }); });
+                RM.map.on('resize', () => {});
                 rmCounties();
             }
             radarMapCenter(false);
@@ -53,8 +54,7 @@
             if (!RM.map || !currentLoc) return;
             const ll = [+currentLoc.lat, +currentLoc.lon];
             if (force || !RM.center || RM.center[0] !== ll[0] || RM.center[1] !== ll[1]) { RM.center = ll; RM.map.setView(ll, rmZoom()); }
-            if (RM.marker) RM.marker.remove();
-            RM.marker = L.circleMarker(ll, { radius: 4, color: '#e0f2fe', weight: 2, fillColor: '#38bdf8', fillOpacity: 1, pane: 'rmLabels' }).addTo(RM.map);
+
         }
         async function rmCounties() {
             try {
@@ -71,9 +71,13 @@
             const sw = L.CRS.EPSG3857.project(b.getSouthWest()), ne = L.CRS.EPSG3857.project(b.getNorthEast());
             const w = Math.min(1400, sz.x), h = Math.round(sz.y * w / sz.x);
             const q = new URLSearchParams({ bbox: [sw.x, sw.y, ne.x, ne.y].join(','), bboxSR: '3857', imageSR: '3857', size: `${w},${h}`, format: 'png32', transparent: 'true',
-                interpolation: 'RSP_NearestNeighbor', f: 'image' });
+                interpolation: 'RSP_NearestNeighbor', f: 'json' });
             if (t) q.set('time', String(t));
-            const r = await fetch(`${RADAR_IS}/exportImage?${q}`); if (!r.ok) throw new Error('radar ' + r.status);
+            const meta = await (await fetch(`${RADAR_IS}/exportImage?${q}`)).json();   // the image and the extent it really covers
+            if (!meta || !meta.href || !meta.extent) throw new Error('radar export');
+            const ex = meta.extent, unproj = (x, y) => L.CRS.EPSG3857.unproject(L.point(x, y));
+            const realB = L.latLngBounds(unproj(ex.xmin, ex.ymin), unproj(ex.xmax, ex.ymax));
+            const r = await fetch(meta.href); if (!r.ok) throw new Error('radar ' + r.status);
             const bmp = await createImageBitmap(await r.blob());
             const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
             const cx = cv.getContext('2d'); cx.drawImage(bmp, 0, 0, w, h);
@@ -97,7 +101,7 @@
             cx.putImageData(img, 0, 0);
             let any = false; for (let i = 3; i < d.length; i += 4) if (d[i]) { any = true; break; }
             if (!any && !retry && Z.some(z => z > 0) === false && t) return rmFrame(null, b, sz, true);   // empty image for that time: ask for the latest
-            return cv.toDataURL('image/png');
+            return { url: cv.toDataURL('image/png'), bounds: realB };
         }
         function rmStamp(t) { return t ? new Date(t).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short', timeZone: (ensembleData && ensembleData.timezone) || undefined }) : ''; }
         async function radarMapDraw() {
@@ -106,38 +110,54 @@
             try {
                 const info = await (await fetch(`${RADAR_IS}?f=json`)).json();
                 const tEnd = info && info.timeInfo && info.timeInfo.timeExtent ? info.timeInfo.timeExtent[1] : null;
-                const url = await rmFrame(tEnd, b, sz);
+                const fr = await rmFrame(tEnd, b, sz);
                 if (tok !== RM.token) return;
-                RM.overlay.setUrl(url); RM.overlay.setBounds(b);
-                RM.tEnd = tEnd; RM.frames = []; RM.frameBounds = b;
+                RM.overlay.setUrl(fr.url); RM.overlay.setBounds(fr.bounds);
+                RM.tEnd = tEnd; RM.frames = [];
                 document.getElementById('rmTime').innerText = rmStamp(tEnd);
             } catch (e) { document.getElementById('rmTime').innerText = 'Radar unavailable'; }
         }
         function radarMapStop() {
             if (RM.loopTimer) { clearTimeout(RM.loopTimer); RM.loopTimer = null; }
+            RM.looping = false;
             const b = document.getElementById('rmLoop'); if (b) b.innerHTML = '<i class="fa-solid fa-play"></i>';
         }
+        function radarMapSpeed(v) { RM.delay = +v || 550; }
         async function radarMapLoop() {
             if (!RM.map) return;
-            if (RM.loopTimer) { radarMapStop(); radarMapDraw(); return; }
+            if (RM.looping) { radarMapStop(); radarMapDraw(); return; }   // the button stops a running loop
+            RM.looping = true;
             const btn = document.getElementById('rmLoop'); btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             const tok = RM.token, b = RM.map.getBounds(), sz = RM.map.getSize();
             if (!RM.frames.length && RM.tEnd) {
                 const times = [60, 50, 40, 30, 20, 10, 0].map(m => RM.tEnd - m * 60e3);
-                const urls = await Promise.all(times.map(t => rmFrame(t, b, sz).catch(() => null)));
-                if (tok !== RM.token) return;
-                RM.frames = times.map((t, i) => ({ t, url: urls[i] })).filter(f => f.url);
+                const frs = await Promise.all(times.map(t => rmFrame(t, b, sz).catch(() => null)));
+                if (tok !== RM.token || !RM.looping) return;
+                RM.frames = times.map((t, i) => frs[i] ? { t, ...frs[i] } : null).filter(Boolean);
             }
             if (!RM.frames.length) { radarMapStop(); return; }
             btn.innerHTML = '<i class="fa-solid fa-pause"></i>';
             let i = 0;
             const step = () => {
-                const f = RM.frames[i]; RM.overlay.setUrl(f.url); RM.overlay.setBounds(RM.frameBounds || b);
+                if (!RM.looping) return;
+                const f = RM.frames[i]; RM.overlay.setUrl(f.url); RM.overlay.setBounds(f.bounds);
                 document.getElementById('rmTime').innerText = rmStamp(f.t);
                 const last = i === RM.frames.length - 1; i = last ? 0 : i + 1;
-                RM.loopTimer = setTimeout(step, last ? 1600 : 550);
+                RM.loopTimer = setTimeout(step, last ? Math.max(1200, RM.delay * 2.5) : RM.delay);
             };
-            RM.frameBounds = b; step();
+            step();
+        }
+        // the device's own location, only when asked
+        function radarMapMe(on) {
+            if (RM.me) { RM.me.remove(); RM.me = null; }
+            if (!on || !RM.map) return;
+            if (!navigator.geolocation) { document.getElementById('rmMe').checked = false; return; }
+            navigator.geolocation.getCurrentPosition(p => {
+                if (!document.getElementById('rmMe').checked) return;
+                const ll = [p.coords.latitude, p.coords.longitude];
+                RM.me = L.layerGroup([L.circle(ll, { radius: Math.min(p.coords.accuracy || 0, 3000), color: '#38bdf8', weight: 1, fillOpacity: 0.12, pane: 'rmLabels' }),
+                    L.circleMarker(ll, { radius: 5, color: '#e0f2fe', weight: 2, fillColor: '#38bdf8', fillOpacity: 1, pane: 'rmLabels' })]).addTo(RM.map);
+            }, () => { document.getElementById('rmMe').checked = false; }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 120000 });
         }
         async function radarMapWarnings(on) {
             if (!RM.map) return;

@@ -7,7 +7,9 @@
                         <div id="radarMap"></div>
                         <div class="rm-ctl">
                             <label class="rm-chk"><input type="checkbox" id="rmWarn" onchange="radarMapWarnings(this.checked)"> Warnings</label>
-                            <button type="button" id="rmLoop" class="rm-btn" onclick="radarMapLoop()"><i class="fa-solid fa-play"></i></button>
+                            <label class="rm-chk"><input type="checkbox" id="rmMe" onchange="radarMapMe(this.checked)"> My location</label>
+                            <select id="rmSpeed" class="rm-btn" onchange="radarMapSpeed(this.value)" aria-label="Loop speed"><option value="1000">Slow</option><option value="550" selected>Normal</option><option value="250">Fast</option></select>
+                            <button type="button" id="rmLoop" class="rm-btn" onclick="radarMapLoop()" aria-label="Loop"><i class="fa-solid fa-play"></i></button>
                         </div>
                         <div id="rmTime" class="rm-time"></div>
                         <div class="rm-legend"><span>15</span><div class="rm-bar"></div><span>70 dBZ</span></div>
