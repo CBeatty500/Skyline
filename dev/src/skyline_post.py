@@ -21,7 +21,7 @@ out = out[:_a] + '<style id="tw">' + _css + '</style>' + out[_b:]
 assert 'cdn.tailwindcss.com' not in out and 'tailwind.config' not in out
 print('tailwind css bytes', len(_css))
 
-SITE = 'https://cbeatty500.github.io/Skyline/'
+SITE = 'https://bestbetweather.com/'
 _icon = ("data:image/svg+xml," + "%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23ffb84d'/%3E%3Cstop offset='1' stop-color='%23ff7a59'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='15' fill='url(%23g)'/%3E%3Ccircle cx='26' cy='26' r='10' fill='%231a1205'/%3E%3Cpath d='M22 48h22a9 9 0 0 0 0-18 12 12 0 0 0-22 4 7 7 0 0 0 0 14z' fill='%23fff7ec'/%3E%3C/svg%3E")
 _meta = f'''
     <meta name="description" content="Best Bet Weather. Know the odds before you go. Hour-by-hour rain odds, live radar and forecasts graded every day.">
@@ -93,3 +93,8 @@ out = out[:_i] + '\n.brand-mark { background: none !important; width: 38px; heig
 
 # the page must start with the doctype: nothing stray before it (a find-and-replace with an empty pattern would put text there)
 assert out.lstrip().startswith('<!DOCTYPE html>'), 'stray text before <!DOCTYPE html>: ' + out[:120]
+
+# ---- copyright line under the data credits ----
+_a = 'Iowa Environmental Mesonet climate reports.</footer>'
+assert out.count(_a) == 1
+out = out.replace(_a, 'Iowa Environmental Mesonet climate reports.<div class="mt-2 text-slate-500">&copy; 2026 Best Bet Weather. All rights reserved.</div></footer>', 1)
