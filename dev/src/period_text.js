@@ -10,7 +10,7 @@
                 const v = Object.keys(md).filter(k => /^precipitation_sum_/.test(k)).map(k => md[k][i]).filter(x => x != null && !isNaN(x)).sort((a, b) => a - b);
                 if (v.length < 3) return null;
                 const med = v[Math.floor(v.length / 2)]; if (!(med > 0.2)) return null;
-                return { lo: Math.max(0.15, Math.min(1, v[0] / med)), hi: Math.max(1, Math.min(3, v[v.length - 1] / med)) };
+                return { lo: Math.max(0.15, Math.min(1, v[0] / med)), hi: Math.max(1.4, Math.min(2.2, v[v.length - 1] / med)) };
             } catch (e) { return null; }
         }
         function ptRange(lowMm, highMm, snow) {
@@ -26,14 +26,20 @@
         }
         function ptSeg(s, e) {
             const h = ensembleData.hourly, ok = v => v !== null && v !== undefined && !isNaN(v);
-            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0;
+            let pp = 0, wet = 0, snowCm = 0, tsum = 0, tn = 0;   // (pp / wet may be raised below when precipitation is falling now)
             for (let j = s; j < e && j < h.time.length; j++) {
                 if (ok(h.precipitation_probability[j])) pp = Math.max(pp, h.precipitation_probability[j]);
                 if (hourWetCode(j)) wet++;
                 if (h.snowfall && ok(h.snowfall[j])) snowCm += h.snowfall[j];
                 if (ok(h.temperature_2m[j])) { tsum += h.temperature_2m[j]; tn++; }
             }
-            const amt = periodAmount(s, e), tm = tn ? tsum / tn : 5, adj = adjustSnow(amt, snowCm, tm, tm);
+            let amt = periodAmount(s, e);
+            const cur = hourlyStart();
+            if (s <= cur && cur < e) {   // precipitation falling now: this part of the period is certain, and lasts until it ends
+                const nc = obsNowcast();
+                if (nc && nc.wet) { pp = 100; wet = Math.max(wet, 1); const hrs = Math.max(1, Math.min(e, rainEndIdx()) - cur); amt = Math.max(amt, (nc.lastHourMm || 0.3) * hrs * 0.7, 0.2); }
+            }
+            const tm = tn ? tsum / tn : 5, adj = adjustSnow(amt, snowCm, tm, tm);
             return { pp, wet, amt, snow: adj.snow, rain: adj.rain, date: h.time[Math.min(s, h.time.length - 1)].slice(0, 10) };
         }
         // segs: [[label, startIdx, endIdx], ...] with labels such as 'this morning' or 'after midnight'
