@@ -1699,9 +1699,11 @@ _r(""".rec-btn { background: none;""", """#radarMap { height: 440px; background:
 @media (max-width: 767px) { #radarMap { height: 360px; } }
 .rm-ctl { position: absolute; top: 10px; right: 10px; z-index: 600; display: flex; gap: 6px; align-items: center; }
 .rm-chk, .rm-btn { background: rgba(8,16,34,.85); border: 1px solid rgba(255,255,255,.15); color: #e2e8f0; font-size: 12px; border-radius: 8px; padding: 5px 9px; display: flex; gap: 6px; align-items: center; cursor: pointer; }
-.rm-time { position: absolute; left: 10px; bottom: 10px; z-index: 600; background: rgba(8,16,34,.85); color: #e2e8f0; font: 12px ui-monospace, monospace; border-radius: 6px; padding: 3px 8px; }
-.rm-legend { position: absolute; right: 10px; bottom: 22px; z-index: 600; display: flex; align-items: center; gap: 5px; color: #cbd5e1; font: 10px ui-monospace, monospace; background: rgba(8,16,34,.85); border-radius: 6px; padding: 3px 7px; }
-.rm-bar { width: 120px; height: 7px; border-radius: 3px; background: linear-gradient(90deg, rgb(24,128,120), rgb(2,200,30) 18%, rgb(0,140,0) 27%, rgb(235,225,0) 36%, rgb(250,110,0) 55%, rgb(225,0,0) 64%, rgb(165,0,0) 73%, rgb(240,0,240) 82%, rgb(150,60,220) 91%, #fff); }
+.rm-time { position: absolute; left: 10px; bottom: 26px; z-index: 600; background: rgba(8,16,34,.85); color: #e2e8f0; font: 12px ui-monospace, monospace; border-radius: 6px; padding: 3px 8px; }
+.rm-legend { position: absolute; right: 10px; bottom: 26px; z-index: 600; display: flex; align-items: center; gap: 5px; color: #cbd5e1; font: 10px ui-monospace, monospace; background: rgba(8,16,34,.85); border-radius: 6px; padding: 3px 7px; }
+.rm-bar { width: 120px; height: 7px; border-radius: 3px; background: linear-gradient(90deg, rgb(52,96,120), rgb(2,200,30) 18%, rgb(0,140,0) 27%, rgb(235,225,0) 36%, rgb(250,110,0) 55%, rgb(225,0,0) 64%, rgb(165,0,0) 73%, rgb(240,0,240) 82%, rgb(150,60,220) 91%, #fff); }
+#radarMap .leaflet-control-attribution { font-size: 9px; background: rgba(8,16,34,.7); color: #94a3b8; }
+#radarMap .leaflet-control-attribution a { color: #94a3b8; }
 #radarMap .leaflet-popup-content-wrapper, #radarMap .leaflet-popup-tip { background: #0f172a; color: #e2e8f0; }
 .rec-btn { background: none;""")
 _r("""                if (nwsOffice) loadRadar(token, lat, lon);

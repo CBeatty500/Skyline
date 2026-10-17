@@ -3,7 +3,7 @@
         // specks are removed, and the rest is recoloured. Counties / states: US Census boundaries (us-atlas). Warnings: NWS.
         const RM = { map: null, overlay: null, frames: [], loopTimer: null, warnLayer: null, counties: null, token: 0, marker: null };
         const RM_MIN_DBZ = 15;
-        const RM_STOPS = [[15, [24, 128, 120]], [20, [6, 170, 70]], [25, [2, 200, 30]], [30, [0, 140, 0]], [35, [235, 225, 0]], [40, [250, 175, 0]],
+        const RM_STOPS = [[15, [52, 96, 120]], [20, [6, 170, 70]], [25, [2, 200, 30]], [30, [0, 140, 0]], [35, [235, 225, 0]], [40, [250, 175, 0]],
             [45, [250, 110, 0]], [50, [225, 0, 0]], [55, [165, 0, 0]], [60, [240, 0, 240]], [65, [150, 60, 220]], [70, [255, 255, 255]]];
         function rmColor(z) {
             if (z >= 70) return RM_STOPS[RM_STOPS.length - 1][1];
@@ -34,12 +34,12 @@
             const el = document.getElementById('radarMap'); if (!el || !currentLoc) return;
             if (!window.L) await Promise.all([rmLoad('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css', true), rmLoad('https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js')]);
             if (!RM.map) {
-                RM.map = L.map(el, { zoomControl: true, attributionControl: true, preferCanvas: true, minZoom: 4, maxZoom: 11 }).setView([+currentLoc.lat, +currentLoc.lon], 8);
+                RM.map = L.map(el, { zoomControl: true, attributionControl: true, preferCanvas: true, minZoom: 4, maxZoom: 11 }).setView([+currentLoc.lat, +currentLoc.lon], rmZoom());
                 RM.center = [+currentLoc.lat, +currentLoc.lon];
                 ['rmBase', 'rmRadar', 'rmLines', 'rmWarn', 'rmLabels'].forEach((p, i) => { RM.map.createPane(p).style.zIndex = 200 + i * 50; });
                 RM.map.getPane('rmLabels').style.pointerEvents = 'none'; RM.map.getPane('rmLines').style.pointerEvents = 'none';
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { pane: 'rmBase', maxZoom: 16, attribution: 'Esri, NOAA/NWS, US Census, IEM' }).addTo(RM.map);
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', { pane: 'rmLabels', maxZoom: 16 }).addTo(RM.map);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { pane: 'rmBase', maxZoom: 16, subdomains: 'abcd', attribution: '&copy; OpenStreetMap, &copy; CARTO, NOAA/NWS, US Census' }).addTo(RM.map);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', { pane: 'rmLabels', maxZoom: 16, subdomains: 'abcd' }).addTo(RM.map);
                 RM.overlay = L.imageOverlay('data:image/gif;base64,R0lGODlhAQABAAAAACw=', RM.map.getBounds(), { pane: 'rmRadar', opacity: 0.88, interactive: false }).addTo(RM.map);
                 RM.map.on('moveend', () => { radarMapStop(); radarMapDraw(); });
                 rmCounties();
@@ -47,10 +47,11 @@
             radarMapCenter(false);
             setTimeout(() => { RM.map.invalidateSize(); radarMapDraw(); }, 60);
         }
+        function rmZoom() { return window.innerWidth < 640 ? 7 : 8; }
         function radarMapCenter(force) {
             if (!RM.map || !currentLoc) return;
             const ll = [+currentLoc.lat, +currentLoc.lon];
-            if (force || !RM.center || RM.center[0] !== ll[0] || RM.center[1] !== ll[1]) { RM.center = ll; RM.map.setView(ll, 8); }
+            if (force || !RM.center || RM.center[0] !== ll[0] || RM.center[1] !== ll[1]) { RM.center = ll; RM.map.setView(ll, rmZoom()); }
             if (RM.marker) RM.marker.remove();
             RM.marker = L.circleMarker(ll, { radius: 4, color: '#e0f2fe', weight: 2, fillColor: '#38bdf8', fillOpacity: 1, pane: 'rmLabels' }).addTo(RM.map);
         }
@@ -90,12 +91,12 @@
                     keep = n >= 3;
                 }
                 if (!keep) { d[i + 3] = 0; continue; }
-                const c = rmColor(z); d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255;
+                const c = rmColor(z); d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = z < 20 ? 150 + Math.round((z - 15) * 21) : 255;   // light echoes recede
             }
             cx.putImageData(img, 0, 0);
             return cv.toDataURL('image/png');
         }
-        function rmStamp(t) { return t ? new Date(t).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short' }) : ''; }
+        function rmStamp(t) { return t ? new Date(t).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short', timeZone: (ensembleData && ensembleData.timezone) || undefined }) : ''; }
         async function radarMapDraw() {
             if (!RM.map) return;
             const tok = ++RM.token, b = RM.map.getBounds(), sz = RM.map.getSize();
@@ -153,7 +154,7 @@
                     const order = ev => /Warning/.test(ev) ? 3 : /Watch/.test(ev) ? 2 : 1;
                     feats.filter(f => !f.geometry && f.properties.geocode && f.properties.geocode.SAME).sort((a, b) => order(a.properties.event) - order(b.properties.event)).forEach(f => {
                         const shapes = f.properties.geocode.SAME.map(s => RM.counties.get(String(s).slice(-5))).filter(Boolean);
-                        if (shapes.length) L.geoJSON({ type: 'FeatureCollection', features: shapes }, { pane: 'rmWarn', style: { color: col(f.properties.event), weight: 1.2, fillColor: col(f.properties.event), fillOpacity: 0.22 } }).bindPopup(pop(f.properties)).addTo(layer);
+                        if (shapes.length) L.geoJSON({ type: 'FeatureCollection', features: shapes }, { pane: 'rmWarn', style: { color: col(f.properties.event), weight: 1.2, fillColor: col(f.properties.event), fillOpacity: 0.12 } }).bindPopup(pop(f.properties)).addTo(layer);
                     });
                 }
                 if (!document.getElementById('rmWarn').checked) return;
