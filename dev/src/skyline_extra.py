@@ -1847,11 +1847,11 @@ _r("""(ni.cond.text.split(' · ')[0])} tonight with a low near""", """((() => { 
 _r("""${cond.text}</span>${ni || !WET_ICONS.includes(cond.icon) ? '' : tstmTag(bb.thunder)}""", """${cond.text}</span>${ni || !WET_ICONS.includes(cond.icon) ? '' : tstmTag(bb.thunder)}${windTag(i, ni)}""")
 _r("""(t => t != null && t >= 15 ? `<span class="text-[10px] font-mono text-amber-300"><i class="fa-solid fa-bolt"></i> ${Math.round(t)}%</span>` : '')(thunderAt(j))}""", """(t => t != null && t >= 15 ? `<span class="text-[10px] font-mono text-amber-300"><i class="fa-solid fa-bolt"></i> ${Math.round(t)}%</span>` : '')(thunderAt(j))}${j === s ? '' : hourWindTag(j)}""")
 _r(""".rec-btn { background: none;""", """.wtag { display: inline-flex; align-items: center; gap: 4px; font: 700 10px/1.4 ui-monospace, Menlo, monospace; border-radius: 999px; padding: 1px 7px; margin-top: 2px; border: 1px solid; }
-.wtag.wl1 { color: #99f6e4; background: rgba(45,212,191,.10); border-color: rgba(45,212,191,.40); }
+.wtag.wl1 { color: #cbd5e1; background: rgba(148,163,184,.10); border-color: rgba(148,163,184,.30); }
 .wtag.wl2 { color: #fcd34d; background: rgba(245,158,11,.14); border-color: rgba(251,191,36,.45); }
 .wtag.wl3 { color: #fda4af; background: rgba(244,63,94,.16); border-color: rgba(251,113,133,.55); }
 .hwind { font: 10px ui-monospace, Menlo, monospace; margin-top: 2px; }
-.hwind.wl1 { color: #5eead4; } .hwind.wl2 { color: #fcd34d; } .hwind.wl3 { color: #fb7185; font-weight: 700; }
+.hwind.wl1 { color: #94a3b8; } .hwind.wl2 { color: #fcd34d; } .hwind.wl3 { color: #fb7185; font-weight: 700; }
 .rec-btn { background: none;""")
 
 # ---- tropical cyclones (NHC / CPHC) in the alerts ----
