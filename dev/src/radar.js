@@ -63,6 +63,18 @@
             let vx = agree ? m30.x / 30 : 0, vy = agree ? m30.y / 30 : 0;   // cells per minute (x east, y south)
             let moving = !!agree && Math.hypot(vx * kmX, vy * kmY) * 60 >= 5;
             if (Math.hypot(vx * kmX, vy * kmY) * 60 > 100) { vx = 0; vy = 0; moving = false; }   // over ~60 mph: not believable for a precipitation area
+            let motionSrc = moving ? 'radar' : null;
+            if (!moving) {
+                // echoes changing too much to track: steer them with the model wind near 10,000 ft (700 mb), which moves showers and storms
+                try {
+                    const sj = await (await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.toFixed(3)}&longitude=${lon.toFixed(3)}&hourly=wind_speed_700hPa,wind_direction_700hPa&forecast_hours=2&timezone=GMT`)).json();
+                    const ws = sj && sj.hourly && sj.hourly.wind_speed_700hPa ? sj.hourly.wind_speed_700hPa[0] : null, wd = sj && sj.hourly ? sj.hourly.wind_direction_700hPa[0] : null;
+                    if (ws != null && wd != null && ws >= 10 && ws <= 160) {
+                        const r = wd * Math.PI / 180, ue = -ws * Math.sin(r), vn = -ws * Math.cos(r);   // km/h toward east / north
+                        vx = ue / 60 / kmX; vy = -vn / 60 / kmY; moving = true; motionSrc = 'steering';
+                    }
+                } catch (e) {}
+            }
             const near = (z, r) => { let m = 0; for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) m = Math.max(m, g(B, Math.round(C + z.x) + x, Math.round(C + z.y) + y)); return m; };
             // echo at the location after t minutes = echo now at (location - v*t)
             const ahead = t => {
@@ -72,11 +84,16 @@
             // rain that has already passed: echoes just downstream of the location and none on the way
             let behind = 0; if (moving) for (let t = 10; t <= 90; t += 10) behind = Math.max(behind, near({ x: vx * t, y: vy * t }, 1));
             let upstream = 0; for (let t = 0; t <= 120; t += 10) upstream = Math.max(upstream, ahead(t));
-            const passed = moving && behind >= 30 && upstream < 20;
+            const passed = moving && behind >= 30 && upstream < 25;
+            // when the precipitation over the location ends (two clear samples in a row along the trajectory)
+            let endMin = null; if (g(B, C, C) >= 15 && moving) for (let t = 10; t <= 180; t += 10) if (ahead(t) < 15 && ahead(t + 10) < 15) { endMin = t; break; }
+            // nothing more on the way for two hours after the current precipitation ends
+            let after = 0; for (let t = endMin != null ? endMin : 0; t <= 120 + (endMin || 0); t += 10) after = Math.max(after, ahead(t));
+            const clearUpstream = moving && (g(B, C, C) < 15 || endMin != null) && after < 20;
             let any = 0; for (let i = 0; i < N * N; i++) if (B[i] >= 20) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 100) any++; }
             let arrive = null; for (let t = 0; t <= 180; t += 10) if (ahead(t) >= 20) { arrive = t; break; }
             const speedKmh = Math.hypot(vx * kmX, vy * kmY) * 60;
-            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), passed, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
+            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), passed, clearUpstream, endMin, motionSrc, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
         }
         function applyRadarNowcast(rn) {
             const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
@@ -100,11 +117,14 @@
                 } else if (rn.any === 0 && k <= 1) {
                     h.precipitation_probability[j] = Math.min(pp, 15);
                     radarDry[j] = true;
+                } else if (rn.clearUpstream && k >= 1 && k <= 2) {
+                    h.precipitation_probability[j] = Math.min(pp, 30);
+                    if (h.precipitation_probability[j] < 40) radarDry[j] = true;
                 }
             }
             // one line for the forecast text, only for precipitation on the way (rain overhead is handled by current conditions)
             radarInfo = null;
-            if (rn.moving && rn.arrive !== null && rn.arrive >= 15 && rn.arrive <= 150) {
+            if (rn.motionSrc === 'radar' && rn.arrive !== null && rn.arrive >= 15 && rn.arrive <= 150) {
                 const tz = ensembleData.timezone;
                 const when = new Date(Math.round((Date.now() + rn.arrive * 60e3) / 9e5) * 9e5).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
                 const snowy = (() => { const c = getCurrentConditions(); return c && c.temp != null && c.temp <= 0.5; })();
@@ -117,7 +137,7 @@
             try {
                 const rn = await radarNowcast(+lat, +lon);
                 if (token !== fetchToken) return;
-                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null };
+                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };
                 applyRadarNowcast(rn);
                 recomputeForecast();
             } catch (e) { console.warn('Radar nowcast unavailable:', e); }

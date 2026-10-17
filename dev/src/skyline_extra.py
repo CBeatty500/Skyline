@@ -1585,3 +1585,44 @@ _r("""            if (nowKind) return { wet: true, kind: nowKind, lastHourMm };"
             if (nowKind) return { wet: true, kind: nowKind, lastHourMm };""")
 _r("""                                  persist: Math.round(60 * Math.exp(-Math.max(0, lastWet.ago) / 1.5)) };   // showers often redevelop soon after they end""", """                                  persist: radarNow && radarNow.clearAhead && Date.now() - radarNow.t < 20 * 60e3 ? 20   // radar: nothing on the way
                                          : Math.round(60 * Math.exp(-Math.max(0, lastWet.ago) / 1.5)) };   // showers often redevelop soon after they end""")
+# ---- precipitation falling now: when it ends (radar) and the chance of MORE afterwards, never a 100% for the whole period ----
+_a = out.index('        function restOfDayPhrase() {')
+out = out[:_a] + r"""        // first hour after the current precipitation ends (radar estimate when available, else the next hour)
+        function rainEndIdx() {
+            const cur = hourlyStart(), ct = ensembleData.current && ensembleData.current.time, mm = ct ? (parseInt(ct.slice(14, 16)) || 0) : 0;
+            if (radarNow && radarNow.endMin != null && Date.now() - radarNow.t < 25 * 60e3) return cur + Math.max(1, Math.ceil((mm + radarNow.endMin + 5) / 60));
+            return cur + 1;
+        }
+        // chance of more precipitation after the current rain ends, through hour toIdx
+        function laterChance(toIdx) {
+            const h = ensembleData.hourly; let m = 0;
+            for (let j = rainEndIdx(); j <= toIdx && j < h.time.length; j++) { const v = h.precipitation_probability[j]; if (v != null && !isNaN(v)) m = Math.max(m, v); }
+            return Math.round(m);
+        }
+        function rainEndText() {
+            if (!radarNow || radarNow.endMin == null || Date.now() - radarNow.t > 25 * 60e3) return null;
+            const t = new Date(Math.round((radarNow.t + radarNow.endMin * 60e3) / 9e5) * 9e5);
+            if (t - Date.now() < 10 * 60e3) return 'ending';
+            return 'ending around ' + t.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: ensembleData.timezone });
+        }
+        function moreText(p, when) {
+            if (p < 20) return '';
+            const an = p === 8 || p === 11 || p === 18 || (p >= 80 && p < 90) ? 'an' : 'a';
+            return p <= 30 ? `Then ${an} ${p}% chance of a passing shower.` : `Then ${an} ${p}% chance of more ${when}.`;
+        }
+""" + out[_a:]
+_r("""            return { early, end, low: lo, high: rising ? hi : null, pp: Math.round(pp), rain: sn.rain, snow: sn.snow, wind, gust, cond, nowcast: ncT.nowcast || null };""",
+   """            return { early, end, low: lo, high: rising ? hi : null, pp: Math.round(pp), rain: sn.rain, snow: sn.snow, wind, gust, cond, nowcast: ncT.nowcast || null, laterPP: laterChance(endIdx) };""")
+_r("""                const parts = [ni.nowcast && ni.nowcast.wet ? `${NOWCAST_WORD[ni.nowcast.kind]} falling now; low tonight near ${formatTemp(ni.low)}.` :""",
+   """                const parts = [ni.nowcast && ni.nowcast.wet ? `${NOWCAST_WORD[ni.nowcast.kind]} ${rainEndText() || 'falling now'}; low tonight near ${formatTemp(ni.low)}.` :""")
+_r("""                if (precipExpected(ni.pp, ni.rain + ni.snow)) parts.push(`${ni.pp}% chance of precipitation""",
+   """                if (ni.nowcast && ni.nowcast.wet) { const mt = moreText(ni.laterPP, 'tonight'); if (mt) parts.push(mt); }
+                else if (precipExpected(ni.pp, ni.rain + ni.snow)) parts.push(`${ni.pp}% chance of precipitation""")
+_r("""                bb.precipProb = Math.round(o.pp); bb.weatherCode = o.code; bb.nowcast = o.nowcast || null; bb.laterProb = modelProb;""",
+   """                bb.precipProb = Math.round(o.pp); bb.weatherCode = o.code; bb.nowcast = o.nowcast || null; bb.laterProb = laterChance(ids[ids.length - 1]);""")
+_r("""                parts.push(`${NOWCAST_WORD[nc.kind]} falling now, with a high near ${formatTemp(bb.bestMax)}.`);
+                if (bb.bestPrecip >= 0.25) parts.push(`About ${formatPrecip(bb.bestPrecip)} more today.`);
+                if (bb.laterProb != null) parts.push(`Once it ends, ${bb.laterProb}% chance of more later today.`);""",
+   """                parts.push(`${NOWCAST_WORD[nc.kind]} ${rainEndText() || 'falling now'}, with a high near ${formatTemp(bb.bestMax)}.`);
+                if (bb.bestPrecip >= 0.25 && bb.laterProb >= 40) parts.push(`About ${formatPrecip(bb.bestPrecip)} more today.`);
+                if (bb.laterProb != null) { const mt = moreText(bb.laterProb, 'later today'); if (mt) parts.push(mt); }""")
