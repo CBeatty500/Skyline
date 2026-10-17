@@ -2558,8 +2558,9 @@ body.no-data #sectionNav { display: none; }
                 RM.center = [+currentLoc.lat, +currentLoc.lon];
                 ['rmBase', 'rmRadar', 'rmLines', 'rmWarn', 'rmLabels'].forEach((p, i) => { RM.map.createPane(p).style.zIndex = 200 + i * 50; });
                 RM.map.getPane('rmLabels').style.pointerEvents = 'none'; RM.map.getPane('rmLines').style.pointerEvents = 'none';
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png', { pane: 'rmBase', maxZoom: 16, subdomains: 'abcd', attribution: '&copy; OpenStreetMap, &copy; CARTO, NOAA/NWS, US Census' }).addTo(RM.map);
-                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png', { pane: 'rmLabels', maxZoom: 16, subdomains: 'abcd' }).addTo(RM.map);
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}', { pane: 'rmBase', maxZoom: 16, attribution: 'Esri, NOAA/NWS, US Census' }).addTo(RM.map);
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}', { pane: 'rmLabels', maxZoom: 16 }).addTo(RM.map);
+                RM.map.getPane('rmBase').style.filter = 'brightness(0.42) contrast(1.15)';   // near-black background
                 RM.overlay = L.imageOverlay('data:image/gif;base64,R0lGODlhAQABAAAAACw=', RM.map.getBounds(), { pane: 'rmRadar', opacity: 0.88, interactive: false }).addTo(RM.map);
                 RM.map.on('moveend', () => { radarMapStop(); radarMapDraw(); });
                 rmCounties();
@@ -2586,7 +2587,7 @@ body.no-data #sectionNav { display: none; }
             } catch (e) { console.warn('County lines unavailable', e); }
         }
         // one radar frame for the current view, recoloured; returns a data URL
-        async function rmFrame(t, b, sz) {
+        async function rmFrame(t, b, sz, retry) {
             const sw = L.CRS.EPSG3857.project(b.getSouthWest()), ne = L.CRS.EPSG3857.project(b.getNorthEast());
             const w = Math.min(1400, sz.x), h = Math.round(sz.y * w / sz.x);
             const q = new URLSearchParams({ bbox: [sw.x, sw.y, ne.x, ne.y].join(','), bboxSR: '3857', imageSR: '3857', size: `${w},${h}`, format: 'png32', transparent: 'true',
@@ -2614,6 +2615,8 @@ body.no-data #sectionNav { display: none; }
                 const c = rmColor(z); d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = z < 20 ? 150 + Math.round((z - 15) * 21) : 255;   // light echoes recede
             }
             cx.putImageData(img, 0, 0);
+            let any = false; for (let i = 3; i < d.length; i += 4) if (d[i]) { any = true; break; }
+            if (!any && !retry && Z.some(z => z > 0) === false && t) return rmFrame(null, b, sz, true);   // empty image for that time: ask for the latest
             return cv.toDataURL('image/png');
         }
         function rmStamp(t) { return t ? new Date(t).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZoneName: 'short', timeZone: (ensembleData && ensembleData.timezone) || undefined }) : ''; }
