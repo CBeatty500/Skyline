@@ -5,7 +5,7 @@ import path from 'node:path';
 const [lat, lon, name] = [process.env.LAT || '39.0437', process.env.LON || '-77.4875', process.env.NAME || 'Ashburn, VA'];
 const browser = await chromium.launch();
 const page = await browser.newPage();
-const errors = []; page.on('pageerror', e => errors.push(String(e)));
+const errors = []; page.on('pageerror', e => errors.push(String(e))); page.on('console', m => { if (['warning', 'error'].includes(m.type())) errors.push(m.type() + ': ' + m.text().slice(0, 300)); });
 const t0 = Date.now();
 await page.goto(`file://${path.join(process.cwd(), 'index.html')}?city=${encodeURIComponent(name)}&lat=${lat}&lon=${lon}`, { timeout: 60000 });
 await page.waitForFunction(() => typeof bestBetResults !== 'undefined' && bestBetResults.length > 0 && !document.getElementById('dashboardContent').classList.contains('hidden'), null, { timeout: 90000 });
