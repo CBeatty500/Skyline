@@ -1,8 +1,8 @@
 [
  {
   "name": "Ashburn, VA",
-  "at": "2026-10-17T13:12:32.813Z",
-  "firstViewMs": 4291,
+  "at": "2026-10-17T13:14:25.537Z",
+  "firstViewMs": 4069,
   "errors": [],
   "snaps": [
    {
@@ -13,9 +13,10 @@
      "Breezy",
      "Breezy"
     ],
-    "hourWind": " 15 mph |  15 mph |  16 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  11 mph",
+    "hourWind": " 15 mph |  14 mph |  16 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  11 mph",
     "alerts": "\n                    \n                        Frost Advisory [NWS Official]\n                        Frost Advisory issued October 17 at 8:09AM EDT until October 18 at 9:00AM EDT by NWS Baltimore MD/Washington DC — Northwest Montgomery; Northwest Howard; Nelson; Albemarle; Greene; Madison; Rappahannock; Orange; Culpeper; Northern Fauquier; Southern Fauquier; Eastern Loudoun; Northwest Prince William\n                        Full alert text* WHAT...Temperatures as low as 33 will result in frost formation.\n\n* WHERE...Portions of central Maryland and central and northern\nVirginia.\n\n* WHEN...From 1 AM to 9 AM EDT Sunday.\n\n* IMPACTS...Frost could harm sensitive outdoor vegetation. Sensitive\noutdoor plants may be killed if left uncovered.\n\nTake steps now to protect tender plants from the cold.\n                        Area forecast discussion \n                    ",
     "tropical": null,
+    "radarOpen": false,
     "cond": "Cloudy",
     "radar": null,
     "radarInfo": null,
@@ -133,9 +134,9 @@
     "nowcast": {
      "wet": false,
      "kind": "rain",
-     "endedAgo": 2.25,
+     "endedAgo": 2.4166666666666665,
      "lastHourMm": 0,
-     "persist": 13
+     "persist": 12
     },
     "obs": {
      "id": "KIAD",
@@ -145,19 +146,20 @@
    },
    {
     "label": "+5s",
-    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. A 60% chance of drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. Patchy drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
     "outlook": "TONIGHT\n\nClear. Low near 37°F. North winds 5-15 mph.\n\nSUNDAY\n\nSunny. High near 59°F.\n\nSUNDAY NIGHT\n\nClear. Low near 38°F.",
     "windTags": [
      "Breezy",
      "Breezy"
     ],
-    "hourWind": " 15 mph |  15 mph |  16 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  11 mph",
+    "hourWind": " 15 mph |  14 mph |  16 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  11 mph",
     "alerts": "\n                    \n                        Frost Advisory [NWS Official]\n                        Frost Advisory issued October 17 at 8:09AM EDT until October 18 at 9:00AM EDT by NWS Baltimore MD/Washington DC — Northwest Montgomery; Northwest Howard; Nelson; Albemarle; Greene; Madison; Rappahannock; Orange; Culpeper; Northern Fauquier; Southern Fauquier; Eastern Loudoun; Northwest Prince William\n                        Full alert text* WHAT...Temperatures as low as 33 will result in frost formation.\n\n* WHERE...Portions of central Maryland and central and northern\nVirginia.\n\n* WHEN...From 1 AM to 9 AM EDT Sunday.\n\n* IMPACTS...Frost could harm sensitive outdoor vegetation. Sensitive\noutdoor plants may be killed if left uncovered.\n\nTake steps now to protect tender plants from the cold.\n                        Area forecast discussion \n                    ",
     "tropical": {
      "cones": [],
      "wsp": {},
      "area": null
     },
+    "radarOpen": true,
     "cond": "Light Drizzle",
     "radar": {
      "here": 14,
@@ -187,7 +189,7 @@
     "hours": [
      {
       "t": "09:00",
-      "pp": 55,
+      "pp": 50,
       "code": 51,
       "wet": 51,
       "thunder": 0,
@@ -196,7 +198,7 @@
      },
      {
       "t": "10:00",
-      "pp": 45,
+      "pp": 40,
       "code": 51,
       "wet": 51,
       "thunder": 0,
@@ -315,19 +317,20 @@
    },
    {
     "label": "+15s",
-    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. A 60% chance of drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. Patchy drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
     "outlook": "TONIGHT\n\nClear. Low near 37°F. North winds 5-15 mph.\n\nSUNDAY\n\nSunny. High near 59°F.\n\nSUNDAY NIGHT\n\nClear. Low near 38°F.",
     "windTags": [
      "Breezy",
      "Breezy"
     ],
-    "hourWind": " 15 mph |  15 mph |  16 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  11 mph",
+    "hourWind": " 15 mph |  14 mph |  16 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  11 mph",
     "alerts": "\n                    \n                        Frost Advisory [NWS Official]\n                        Frost Advisory issued October 17 at 8:09AM EDT until October 18 at 9:00AM EDT by NWS Baltimore MD/Washington DC — Northwest Montgomery; Northwest Howard; Nelson; Albemarle; Greene; Madison; Rappahannock; Orange; Culpeper; Northern Fauquier; Southern Fauquier; Eastern Loudoun; Northwest Prince William\n                        Full alert text* WHAT...Temperatures as low as 33 will result in frost formation.\n\n* WHERE...Portions of central Maryland and central and northern\nVirginia.\n\n* WHEN...From 1 AM to 9 AM EDT Sunday.\n\n* IMPACTS...Frost could harm sensitive outdoor vegetation. Sensitive\noutdoor plants may be killed if left uncovered.\n\nTake steps now to protect tender plants from the cold.\n                        Area forecast discussion \n                    ",
     "tropical": {
      "cones": [],
      "wsp": {},
      "area": null
     },
+    "radarOpen": true,
     "cond": "Light Drizzle",
     "radar": {
      "here": 14,
@@ -357,7 +360,7 @@
     "hours": [
      {
       "t": "09:00",
-      "pp": 55,
+      "pp": 50,
       "code": 51,
       "wet": 51,
       "thunder": 0,
@@ -366,7 +369,7 @@
      },
      {
       "t": "10:00",
-      "pp": 45,
+      "pp": 40,
       "code": 51,
       "wet": 51,
       "thunder": 0,
@@ -485,19 +488,20 @@
    },
    {
     "label": "+30s",
-    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. A 60% chance of drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. Patchy drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
     "outlook": "TONIGHT\n\nClear. Low near 37°F. North winds 5-15 mph.\n\nSUNDAY\n\nSunny. High near 59°F.\n\nSUNDAY NIGHT\n\nClear. Low near 38°F.",
     "windTags": [
      "Breezy",
      "Breezy"
     ],
-    "hourWind": " 15 mph |  15 mph |  16 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  11 mph",
+    "hourWind": " 15 mph |  14 mph |  16 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  11 mph",
     "alerts": "\n                    \n                        Frost Advisory [NWS Official]\n                        Frost Advisory issued October 17 at 8:09AM EDT until October 18 at 9:00AM EDT by NWS Baltimore MD/Washington DC — Northwest Montgomery; Northwest Howard; Nelson; Albemarle; Greene; Madison; Rappahannock; Orange; Culpeper; Northern Fauquier; Southern Fauquier; Eastern Loudoun; Northwest Prince William\n                        Full alert text* WHAT...Temperatures as low as 33 will result in frost formation.\n\n* WHERE...Portions of central Maryland and central and northern\nVirginia.\n\n* WHEN...From 1 AM to 9 AM EDT Sunday.\n\n* IMPACTS...Frost could harm sensitive outdoor vegetation. Sensitive\noutdoor plants may be killed if left uncovered.\n\nTake steps now to protect tender plants from the cold.\n                        Area forecast discussion \n                    ",
     "tropical": {
      "cones": [],
      "wsp": {},
      "area": null
     },
+    "radarOpen": true,
     "cond": "Light Drizzle",
     "radar": {
      "here": 14,
@@ -527,7 +531,7 @@
     "hours": [
      {
       "t": "09:00",
-      "pp": 55,
+      "pp": 50,
       "code": 51,
       "wet": 51,
       "thunder": 0,
@@ -536,7 +540,7 @@
      },
      {
       "t": "10:00",
-      "pp": 45,
+      "pp": 40,
       "code": 51,
       "wet": 51,
       "thunder": 0,
@@ -656,44 +660,758 @@
   ],
   "timings": [
    {
+    "url": "https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather/MapServer/identify",
+    "start": 2428,
+    "dur": 896
+   },
+   {
     "url": "https://api.weather.gov/stations/KIAD/observations",
-    "start": 554,
-    "dur": 1028
+    "start": 343,
+    "dur": 841
    },
    {
     "url": "https://data.rcc-acis.org/StnData",
-    "start": 5865,
-    "dur": 646
-   },
-   {
-    "url": "https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather/MapServer/identify",
-    "start": 2715,
-    "dur": 632
-   },
-   {
-    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
-    "start": 653,
-    "dur": 418
+    "start": 5547,
+    "dur": 497
    },
    {
     "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 256,
-    "dur": 413
+    "start": 203,
+    "dur": 414
    },
    {
     "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 256,
-    "dur": 396
+    "start": 202,
+    "dur": 407
    },
    {
     "url": "https://mesonet.agron.iastate.edu/json/cli.py",
-    "start": 5861,
-    "dur": 310
+    "start": 5531,
+    "dur": 384
    },
    {
-    "url": "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/8/97/74",
-    "start": 6904,
-    "dur": 224
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 612,
+    "dur": 382
+   },
+   {
+    "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
+    "start": 9497,
+    "dur": 364
+   }
+  ]
+ },
+ {
+  "name": "Cheyenne, WY",
+  "at": "2026-10-17T13:14:59.077Z",
+  "firstViewMs": 3219,
+  "errors": [],
+  "snaps": [
+   {
+    "label": "first view",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 72°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
+    "outlook": "TONIGHT\n\nClear. Low near 43°F. West winds 5-10 mph.\n\nSUNDAY\n\nSunny and breezy in the morning, less windy in the afternoon. High near 70°F. Northwest winds 5-15 mph, becoming north in the afternoon.\n\nSUNDAY NIGHT\n\nPartly cloudy. Low near 41°F.",
+    "windTags": [
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy"
+    ],
+    "hourWind": " 10 mph",
+    "alerts": " No active watches or warnings for this location.",
+    "tropical": null,
+    "radarOpen": false,
+    "cond": "Clear",
+    "radar": null,
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "17:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "18:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     }
+    ],
+    "spc": null,
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KCYS",
+     "ts": "2026-10-17T12:45:00+00:00",
+     "txt": "Clear"
+    }
+   },
+   {
+    "label": "+5s",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 72°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
+    "outlook": "TONIGHT\n\nClear. Low near 43°F. West winds 5-10 mph.\n\nSUNDAY\n\nSunny and breezy in the morning, less windy in the afternoon. High near 70°F. Northwest winds 5-15 mph, becoming north in the afternoon.\n\nSUNDAY NIGHT\n\nPartly cloudy. Low near 41°F.",
+    "windTags": [
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy"
+    ],
+    "hourWind": " 10 mph",
+    "alerts": " No active watches or warnings for this location.",
+    "tropical": {
+     "cones": [],
+     "wsp": {},
+     "area": null
+    },
+    "radarOpen": false,
+    "cond": "Clear",
+    "radar": {
+     "here": 0,
+     "here3": 0,
+     "passed": false,
+     "clearUpstream": true,
+     "endMin": null,
+     "motionSrc": "steering",
+     "moving": true,
+     "mph": 10,
+     "arrive": null,
+     "peak": 0,
+     "any": 0,
+     "ahead": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "drizzle": false,
+     "lightFrac": 0
+    },
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": true
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": true
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": true
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "17:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "18:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KCYS",
+     "ts": "2026-10-17T12:45:00+00:00",
+     "txt": "Clear"
+    }
+   },
+   {
+    "label": "+15s",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 72°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
+    "outlook": "TONIGHT\n\nClear. Low near 43°F. West winds 5-10 mph.\n\nSUNDAY\n\nSunny and breezy in the morning, less windy in the afternoon. High near 70°F. Northwest winds 5-15 mph, becoming north in the afternoon.\n\nSUNDAY NIGHT\n\nPartly cloudy. Low near 41°F.",
+    "windTags": [
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy"
+    ],
+    "hourWind": " 10 mph",
+    "alerts": " No active watches or warnings for this location.",
+    "tropical": {
+     "cones": [],
+     "wsp": {},
+     "area": null
+    },
+    "radarOpen": false,
+    "cond": "Clear",
+    "radar": {
+     "here": 0,
+     "here3": 0,
+     "passed": false,
+     "clearUpstream": true,
+     "endMin": null,
+     "motionSrc": "steering",
+     "moving": true,
+     "mph": 10,
+     "arrive": null,
+     "peak": 0,
+     "any": 0,
+     "ahead": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "drizzle": false,
+     "lightFrac": 0
+    },
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": true
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": true
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": true
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "17:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "18:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KCYS",
+     "ts": "2026-10-17T12:45:00+00:00",
+     "txt": "Clear"
+    }
+   },
+   {
+    "label": "+30s",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 72°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
+    "outlook": "TONIGHT\n\nClear. Low near 43°F. West winds 5-10 mph.\n\nSUNDAY\n\nSunny and breezy in the morning, less windy in the afternoon. High near 70°F. Northwest winds 5-15 mph, becoming north in the afternoon.\n\nSUNDAY NIGHT\n\nPartly cloudy. Low near 41°F.",
+    "windTags": [
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy",
+     "Breezy"
+    ],
+    "hourWind": " 10 mph",
+    "alerts": " No active watches or warnings for this location.",
+    "tropical": {
+     "cones": [],
+     "wsp": {},
+     "area": null
+    },
+    "radarOpen": false,
+    "cond": "Clear",
+    "radar": {
+     "here": 0,
+     "here3": 0,
+     "passed": false,
+     "clearUpstream": true,
+     "endMin": null,
+     "motionSrc": "steering",
+     "moving": true,
+     "mph": 10,
+     "arrive": null,
+     "peak": 0,
+     "any": 0,
+     "ahead": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "drizzle": false,
+     "lightFrac": 0
+    },
+    "radarInfo": null,
+    "hours": [
+     {
+      "t": "07:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": true
+     },
+     {
+      "t": "08:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": true
+     },
+     {
+      "t": "09:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": true
+     },
+     {
+      "t": "10:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "11:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "12:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "13:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "14:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     },
+     {
+      "t": "15:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "16:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "17:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 0,
+      "dry": false
+     },
+     {
+      "t": "18:00",
+      "pp": 0,
+      "code": 0,
+      "wet": 0,
+      "thunder": 0,
+      "cc": 1,
+      "dry": false
+     }
+    ],
+    "spc": [
+     {
+      "cat": null,
+      "valid": null
+     }
+    ],
+    "nowcast": {
+     "wet": false,
+     "kind": null,
+     "lastHourMm": 0
+    },
+    "obs": {
+     "id": "KCYS",
+     "ts": "2026-10-17T12:45:00+00:00",
+     "txt": "Clear"
+    }
+   }
+  ],
+  "timings": [
+   {
+    "url": "https://data.rcc-acis.org/StnData",
+    "start": 4758,
+    "dur": 2227
+   },
+   {
+    "url": "https://api.weather.gov/stations/KCYS/observations",
+    "start": 630,
+    "dur": 826
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 265,
+    "dur": 537
+   },
+   {
+    "url": "https://api.open-meteo.com/v1/forecast",
+    "start": 265,
+    "dur": 447
+   },
+   {
+    "url": "https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather/MapServer/identify",
+    "start": 2541,
+    "dur": 439
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 4784,
+    "dur": 392
+   },
+   {
+    "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
+    "start": 714,
+    "dur": 377
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
+    "start": 4782,
+    "dur": 205
    }
   ]
  }
