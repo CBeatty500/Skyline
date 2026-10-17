@@ -2329,10 +2329,13 @@ body.no-data #sectionNav { display: none; }
                 const score = mins >= 45 ? 100 + mins : mins;
                 if (!byHour[k] || score > byHour[k].score) byHour[k] = { o, score, t };
             });
-            const rows = Object.values(byHour).sort((a, b) => b.t - a.t).slice(0, 24);
+            // every report: the routine hourly one plus any specials between hours (duplicates from two feeds dropped)
+            const routine = new Set(Object.values(byHour).map(x => x.o));
+            const seen = new Set(), rows = obs.map(o => ({ o, t: Date.parse(o.timestamp), special: !routine.has(o) }))
+                .sort((a, b) => b.t - a.t).filter(r => { const k = Math.round(r.t / 120000); if (seen.has(k)) return false; seen.add(k); return true; });
             const td = (x, c = '') => `<td class="p-2 whitespace-nowrap ${c}">${x}</td>`;
             const th = x => `<th class="p-2 whitespace-nowrap">${x}</th>`;
-            const body = rows.map(({ o, t }) => {
+            const body = rows.map(({ o, t, special }) => {
                 const time = new Date(t).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
                 const T = val(o.temperature), D = val(o.dewpoint), RH = val(o.relativeHumidity);
                 const ws = kmh(o.windSpeed), wg = kmh(o.windGust), wd = val(o.windDirection);
@@ -2343,11 +2346,11 @@ body.no-data #sectionNav { display: none; }
                 const day = (() => { const d = ensembleData && ensembleData.daily; if (!d) return true; const ds = new Date(t).toLocaleDateString('en-CA', { timeZone: tz }), i = d.time.indexOf(ds); return i < 0 || !d.sunrise[i] ? true : (t >= Date.parse(d.sunrise[i] + ':00Z') - (ensembleData.utc_offset_seconds || 0) * 1000 && t < Date.parse(d.sunset[i] + ':00Z') - (ensembleData.utc_offset_seconds || 0) * 1000); })();
                 const sky = o.textDescription ? skyWording(o.textDescription, day) : '--';
                 const wet = /rain|drizzle|snow|thunder|shower|sleet|freezing|ice/i.test(sky);
-                return `<tr class="border-t border-white/5">${td(time, 'text-slate-200')}${td(n(T) ? formatTemp(T) : '--', 'text-amber-200')}${td(n(D) ? formatTemp(D) : '--', 'text-emerald-200')}${td(n(RH) ? Math.round(RH) + '%' : '--')}${td(wind)}${td(n(wg) ? formatSpeed(wg) : '')}${td(esc(sky), wet ? 'text-sky-300' : '')}${td(visTxt)}${td(pr !== null ? formatPressure(pr) : '--')}${td(n(p1) ? formatPrecip(p1) : '', p1 > 0 ? 'text-sky-300' : '')}</tr>`;
+                return `<tr class="border-t border-white/5${special ? ' bg-sky-950/30' : ''}">${td(time + (special ? ' <span class="text-[9px] text-sky-300 font-sans font-semibold ml-1">SPECIAL</span>' : ''), 'text-slate-200')}${td(n(T) ? formatTemp(T) : '--', 'text-amber-200')}${td(n(D) ? formatTemp(D) : '--', 'text-emerald-200')}${td(n(RH) ? Math.round(RH) + '%' : '--')}${td(wind)}${td(n(wg) ? formatSpeed(wg) : '')}${td(esc(sky), wet ? 'text-sky-300' : '')}${td(visTxt)}${td(pr !== null ? formatPressure(pr) : '--')}${td(n(p1) ? formatPrecip(p1) : '', p1 > 0 ? 'text-sky-300' : '')}</tr>`;
             }).join('');
             const sid = nwsObs && nwsObs.stationId ? nwsObs.stationId : '';
             w.innerHTML = `<table class="dclim w-full text-xs text-left text-slate-300 font-mono"><thead class="text-[11px] text-slate-400 uppercase bg-slate-800/80"><tr>${th('Time')}${th('Temp')}${th('Dewpt')}${th('RH')}${th('Wind')}${th('Gust')}${th('Sky / weather')}${th('Vis')}${th('Pressure')}${th('Precip')}</tr></thead><tbody>${body}</tbody></table>
-                <div class="text-[11px] text-slate-400 mt-2">${esc(sid)} reports, newest first; precipitation is for the hour ending at that time.</div>`;
+                <div class="text-[11px] text-slate-400 mt-2">${esc(sid)} reports, newest first. Specials are extra reports between the hourly ones when conditions change. Hourly precipitation is for the hour ending at that time; a special's is since the last hourly report.</div>`;
         }
         function restOfDayPhrase() {
             if (!ensembleData || !ensembleData.hourly || !ensembleData.daily) return null;
