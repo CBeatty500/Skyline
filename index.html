@@ -2799,6 +2799,7 @@ body.no-data #sectionNav { display: none; }
         // segs: [[label, startIdx, endIdx], ...]. One sentence: chance, amount (only when confident) and timing (a clock time
         // only when radar tracked the echoes well, otherwise the part of the day).
         // 'A 70% chance of a trace to 0.05" of rain around 7:30 AM, then a 40% chance this evening.'
+        const an = p => (p === 8 || p === 11 || p === 18 || (p >= 80 && p < 90)) ? 'an' : 'a';
         function periodPrecipSentence(segs, arrive) {
             const out = []; let said = false, lastWhat = null;
             const hIdx = ensembleData.hourly.time;
@@ -2821,8 +2822,8 @@ body.no-data #sectionNav { display: none; }
                 const pct = Math.round(g.pp / 10) * 10, ofWhat = lastWhat === what ? '' : ` of ${what}`;
                 let piece;
                 if (g.pp >= 90) piece = confident ? `${said ? 'an additional ' : ''}${r.text} of ${what} ${when}` : `${what} ${when}`;
-                else if (confident) piece = `a ${pct}% chance of ${said ? 'an additional ' : ''}${r.text} of ${what} ${when}`;
-                else piece = `a ${pct}% chance${ofWhat} ${when}`;
+                else if (confident) piece = `${an(pct)} ${pct}% chance of ${said ? 'an additional ' : ''}${r.text} of ${what} ${when}`;
+                else piece = `${an(pct)} ${pct}% chance${ofWhat} ${when}`;
                 out.push(piece); said = true; lastWhat = what;
             });
             if (!out.length) return '';
@@ -2870,7 +2871,7 @@ body.no-data #sectionNav { display: none; }
         // the rest of today (from now) and tonight, as labelled segments
         function todaySegs() {
             const h = ensembleData.hourly, d0 = ensembleData.daily.time[0], first = h.time.findIndex(t => t.startsWith(d0)), cur = hourlyStart();
-            return [['this morning', 6, 12], ['this afternoon', 12, 18], ['this evening', 18, 24]].map(([l, a, b]) => [l, Math.max(first + a, cur), first + b]).filter(([, s, e]) => e - s >= 1);
+            return [['this morning', 0, 12], ['this afternoon', 12, 18], ['this evening', 18, 24]].map(([l, a, b]) => [l, Math.max(first + a, cur), first + b]).filter(([, s, e]) => e - s >= 1);
         }
         function tonightSegs(ni) {
             const h = ensembleData.hourly, cur = hourlyStart();
