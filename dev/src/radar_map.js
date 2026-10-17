@@ -109,7 +109,8 @@
             const tok = ++RM.token, b = RM.map.getBounds(), sz = RM.map.getSize();
             try {
                 const info = await (await fetch(`${RADAR_IS}?f=json`)).json();
-                const tEnd = info && info.timeInfo && info.timeInfo.timeExtent ? info.timeInfo.timeExtent[1] : null;
+                let tEnd = info && info.timeInfo && info.timeInfo.timeExtent ? info.timeInfo.timeExtent[1] : null;
+                if (tEnd && tEnd > Date.now()) tEnd = Math.floor((Date.now() - 4 * 60e3) / 6e4) * 6e4;   // the service sometimes reports a time ahead of now
                 const fr = await rmFrame(tEnd, b, sz);
                 if (tok !== RM.token) return;
                 RM.overlay.setUrl(fr.url); RM.overlay.setBounds(fr.bounds);
