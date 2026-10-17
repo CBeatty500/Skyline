@@ -15,6 +15,9 @@ const firstView = Date.now() - t0;
 const snap = async label => page.evaluate(lbl => {
   const h = ensembleData.hourly, c = hourlyStart();
   return { label: lbl, narrative: document.getElementById('heroNarrative') && document.getElementById('heroNarrative').innerText,
+    outlook: (document.getElementById('heroOutlook') || {}).innerText, windTags: [...document.querySelectorAll('.wtag')].slice(0, 7).map(e => e.innerText),
+    hourWind: [...document.querySelectorAll('.hwind')].map(e => e.innerText).join(' | '), alerts: (document.getElementById('alertsList') || {}).innerText,
+    tropical: typeof tropicalInfo !== 'undefined' ? tropicalInfo : null,
     cond: (getCurrentConditions() || {}).text, radar: window._lastRadar || null, radarInfo: typeof radarInfo !== 'undefined' && radarInfo ? radarInfo.msg : null,
     hours: Array.from({ length: 12 }, (_, k) => ({ t: h.time[c + k].slice(11, 16), pp: h.precipitation_probability[c + k], code: h.weather_code[c + k], wet: hourWetCode(c + k), thunder: thunderAt(c + k), cc: Math.round(h.cloud_cover[c + k]), dry: !!(radarDry && radarDry[c + k]) })),
     spc: spcData && spcData.days ? spcData.days.slice(0, 1).map(d => ({ cat: d.cat, valid: d.valid })) : null,
