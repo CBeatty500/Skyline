@@ -2342,7 +2342,7 @@ body.no-data #sectionNav { display: none; }
             chron.forEach(r => {
                 let show = routine.has(r.o), special = false;
                 if (!show && isSpeci(r.o)) { show = true; special = true; }
-                else if (!show && !rawOf(r.o) && prev && r.t - lastExtra >= 15 * 60e3) {
+                else if (!show && !slpMode && !rawOf(r.o) && prev && r.t - lastExtra >= 15 * 60e3) {   // stations without proper reports only
                     // automated reading with no report: only a significant change (precipitation start/stop, thunder, gust 25 mph+, visibility drop)
                     const g = kmh(r.o.windGust);
                     const sig = wetOf(r.o) !== wetOf(prev) || (/thunder/i.test(r.o.textDescription || '') && !/thunder/i.test(prev.textDescription || ''))
