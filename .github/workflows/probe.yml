@@ -8,14 +8,42 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: |
-          IS=https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer
-          curl -s "$IS/legend?f=json" > /tmp/legend.json
-          curl -s "$IS?f=json" > /tmp/info.json
-          # samples along a line through northern Virginia right now
-          PTS='{"points":[[-77.49,39.04],[-77.75,38.7],[-77.9,38.45],[-78.1,38.3],[-77.5,38.3],[-77.0,38.6],[-76.7,39.3],[-76.6,39.4],[-77.4,38.0],[-77.45,37.55]],"spatialReference":{"wkid":4326}}'
-          curl -s -X POST "$IS/getSamples" --data-urlencode "geometry=$PTS" -d geometryType=esriGeometryMultipoint -d returnFirstValueOnly=true -d f=json > /tmp/samples.json
-          python3 -c "
-          import json
-          json.dump({'legend':json.load(open('/tmp/legend.json')),'info':{k:v for k,v in json.load(open('/tmp/info.json')).items() if k in ('pixelType','bandCount','minValues','maxValues','hasColormap','hasRasterAttributeTable','rasterFunctionInfos','timeInfo','serviceDataType')},'samples':json.load(open('/tmp/samples.json'))},open('data/radar_probe.json','w'),indent=0)"
+          for u in https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity/MapServer/legend?f=json https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/legend?f=json https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity/MapServer?f=json; do echo "== $u"; curl -s "$u" | head -c 300000; echo; done > /tmp/all.txt
+          python3 - <<'PY'
+          import json,re,base64,zlib,struct
+          txt=open('/tmp/all.txt').read()
+          out={'raw':txt[:2000]}
+          # decode legend swatches (PNG imageData) to their center colour
+          def png_rgb(b64):
+              b=base64.b64decode(b64); pos=8; idat=b''; w=h=0; ct=0
+              while pos<len(b):
+                  ln=struct.unpack('>I',b[pos:pos+4])[0]; typ=b[pos+4:pos+8]; data=b[pos+8:pos+8+ln]
+                  if typ==b'IHDR': w,h,bd,ct=struct.unpack('>IIBB',data[:10])
+                  if typ==b'IDAT': idat+=data
+                  pos+=12+ln
+              raw=zlib.decompress(idat); bpp={2:3,6:4}.get(ct,4); stride=w*bpp+1
+              rows=[]; prev=bytearray(w*bpp)
+              for y in range(h):
+                  f=raw[y*stride]; line=bytearray(raw[y*stride+1:(y+1)*stride])
+                  for i in range(len(line)):
+                      a=line[i-bpp] if i>=bpp else 0; up=prev[i]; c=prev[i-bpp] if i>=bpp else 0
+                      if f==1: line[i]=(line[i]+a)&255
+                      elif f==2: line[i]=(line[i]+up)&255
+                      elif f==3: line[i]=(line[i]+((a+up)>>1))&255
+                      elif f==4:
+                          p=a+up-c; pa,pb,pc=abs(p-a),abs(p-up),abs(p-c)
+                          line[i]=(line[i]+(a if pa<=pb and pa<=pc else up if pb<=pc else c))&255
+                  rows.append(line); prev=line
+              y=h//2; x=w//2; px=rows[y][x*bpp:x*bpp+bpp]; return list(px)
+          for blk in txt.split('== ')[1:]:
+              url,_,body=blk.partition('\n')
+              try: j=json.loads(body)
+              except Exception: continue
+              for L in j.get('layers',[]):
+                  for e in L.get('legend',[]):
+                      try: out.setdefault('swatches',[]).append({'layer':L.get('layerName'),'label':e.get('label'),'rgb':png_rgb(e['imageData'])})
+                      except Exception as ex: out.setdefault('err',[]).append(str(ex))
+          json.dump(out,open('data/radar_probe.json','w'),indent=0)
+          PY
           git config user.name skyline-bot; git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add data/radar_probe.json; git commit -m probe; git pull --rebase -q origin main; git push -q
