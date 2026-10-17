@@ -2321,25 +2321,29 @@ body.no-data #sectionNav { display: none; }
             const tz = ensembleData && ensembleData.timezone, now = Date.now();
             const obs = (nwsObsToday || []).filter(o => o && o.timestamp && o.temperature && n(o.temperature.value) && now - Date.parse(o.timestamp) <= 24.5 * 36e5);
             if (!obs.length) { w.innerHTML = '<div class="text-xs text-slate-400 p-2">No station reports in the last 24 hours.</div>'; return; }
-            // one per clock hour: the routine report (minutes 45-59) if there is one, else the latest that hour
+            // US airport reports: the routine hourly METAR carries the sea-level pressure remark (SLPnnn), a special (SPECI)
+            // does not, and the automated 5-minute readings have no report text. (Raw text from the NWS has no METAR/SPECI word.)
+            const rawOf = o => String(o.rawMessage || '').trim();
+            const hasSLP = r => /\bSLP(\d{3}|NO)\b/.test(r);
+            const slpMode = obs.some(o => hasSLP(rawOf(o)));
             const byHour = {};
             obs.forEach(o => {
-                const t = Date.parse(o.timestamp), mins = new Date(t).getUTCMinutes(), k = Math.floor(t / 36e5);
-                const score = /^METAR\b/.test(String(o.rawMessage || '').trim()) ? 1000 : mins >= 45 ? 100 + mins : mins;   // the routine METAR first
+                const t = Date.parse(o.timestamp), mins = new Date(t).getUTCMinutes(), k = Math.floor(t / 36e5), r = rawOf(o);
+                const score = /^METAR\b/.test(r) || (slpMode && hasSLP(r)) ? 1000 + mins : slpMode ? -1 : mins >= 45 ? 100 + mins : mins;
+                if (score < 0) return;
                 if (!byHour[k] || score > byHour[k].score) byHour[k] = { o, score, t };
             });
-            // the routine hourly report plus true specials (SPECI) only; the 5-minute automated readings are left out unless
-            // they carry a significant change (precipitation starting or stopping, thunder, gusts 25 mph+, visibility under 3 or 1 mi)
             const routine = new Set(Object.values(byHour).map(x => x.o));
+            const isSpeci = o => { const r = rawOf(o); return /^SPECI\b/.test(r) || (slpMode && r && !hasSLP(r) && !/^METAR\b/.test(r)); };
             const wetOf = o => /rain|drizzle|snow|thunder|shower|sleet|freezing|ice|hail/i.test(o.textDescription || '') || (Array.isArray(o.presentWeather) && o.presentWeather.some(w => /(RA|DZ|SN|TS|PL|GR|GS|SG|UP)/.test(w.rawString || '')));
             const visBand = o => { const v = o.visibility && n(o.visibility.value) ? o.visibility.value : null; return v === null ? null : v < 1609 ? 0 : v < 4828 ? 1 : 2; };
             const chron = obs.map(o => ({ o, t: Date.parse(o.timestamp) })).sort((a, b) => a.t - b.t);
             const keep = []; let prev = null, lastExtra = 0;
             chron.forEach(r => {
-                const raw = String(r.o.rawMessage || '').trim();
                 let show = routine.has(r.o), special = false;
-                if (!show && /^SPECI\b/.test(raw)) { show = true; special = true; }
-                else if (!show && !raw && prev && r.t - lastExtra >= 15 * 60e3) {
+                if (!show && isSpeci(r.o)) { show = true; special = true; }
+                else if (!show && !rawOf(r.o) && prev && r.t - lastExtra >= 15 * 60e3) {
+                    // automated reading with no report: only a significant change (precipitation start/stop, thunder, gust 25 mph+, visibility drop)
                     const g = kmh(r.o.windGust);
                     const sig = wetOf(r.o) !== wetOf(prev) || (/thunder/i.test(r.o.textDescription || '') && !/thunder/i.test(prev.textDescription || ''))
                         || (g !== null && g >= 40) || (visBand(r.o) !== null && visBand(prev) !== null && visBand(r.o) < visBand(prev));
