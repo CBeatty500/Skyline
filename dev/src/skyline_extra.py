@@ -1468,9 +1468,8 @@ _r("""            return r;
 _r("""        function modelWindAt(field, j) {
             const h = ensembleData.hourly, mh""", """        function _modelWindAtRaw(field, j) {
             const h = ensembleData.hourly, mh""")
-_r("""                radarInfo = null; radarNow = null; learnState = null;""", """                radarInfo = null; radarNow = null; learnState = null;
-                try { snapHourlyRaw(); applyHourlyLearning(await sharedEntryFor(lat, lon)); } catch (e) { hourlyLearn = null; }
-                if (token !== fetchToken) return;""")
+_r("""                radarInfo = null; radarNow = null; learnState = null;""", """                radarInfo = null; radarNow = null; learnState = null; hourlyLearn = null;
+                try { snapHourlyRaw(); } catch (e) {}""")
 
 # ---- today's curve is stretched to the forecast high only while the afternoon peak is still ahead ----
 _r("""                if (di === 0 && todayCurveTarget == null) return;   // today: mapped only to the final blended high (raiseTodayHigh)""", """                if (di === 0 && todayCurveTarget == null) return;   // today: mapped only to the final blended high (raiseTodayHigh)
@@ -1492,7 +1491,8 @@ _r("""const sl = await (await fetch(props.observationStations)).json();""", """c
 _r("""                nwsThunder = nws.thunder || null;""", """                nwsThunder = nws.thunder || null;
                 nwsStationList = nws.stationList || null; regionalAdj = null; regionalInfo = null;""")
 _r("""                if (nwsOffice) loadRadar(token, lat, lon);""", """                if (nwsOffice) loadRadar(token, lat, lon);
-                if (nwsOffice) loadRegional(token, lat, lon);""")
+                if (nwsOffice) loadRegional(token, lat, lon);
+                loadHourlyLearning(token, lat, lon);""")
 _r("""            const v = { T, D, bT, bD, cur, trend };""", """            for (let j = cur + 1; j <= cur + 9 && j < T.length; j++) {
                 if (T[j] !== null) T[j] += regionalDelta('t', j);
                 if (D[j] !== null) D[j] = Math.min(D[j] + regionalDelta('td', j), T[j] ?? Infinity);

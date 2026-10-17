@@ -6,7 +6,7 @@
         const HL_LEADS = ['0-6', '6-24', '24-48', '48+'];
         const hlLead = hrs => hrs < 6 ? '0-6' : hrs < 24 ? '6-24' : hrs < 48 ? '24-48' : '48+';
         async function sharedEntryFor(lat, lon) {
-            const sh = await Promise.race([sharedLearning(), new Promise(r => setTimeout(() => r(null), 2500))]);
+            const sh = await Promise.race([sharedLearning(), new Promise(r => setTimeout(() => r(null), 8000))]);
             if (!sh || !sh.locations) return null;
             let best = null;
             Object.values(sh.locations).forEach(e => { if (e && e.lat != null) { const km = distKm(+lat, +lon, e.lat, e.lon); if (km <= 12 && (!best || km < best.km)) best = { ...e, km }; } });
@@ -68,3 +68,12 @@
                 <div class="text-[11px] text-slate-400 mt-2">Every forecast hour checked against ${esc(hourlyLearn.station || 'the station')} (${hourlyLearn.n} hours, updated ${new Date(hourlyLearn.updated).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}). Bias = forecast minus observed. Corrections grow with the number of cases: temperature and dewpoint up to ±3°C (±5.4°F), cloud ±20%, wind and gusts ×0.75 to ×1.25, rain chance ×0.75 to ×1.25 (not in the first 3 hours, where radar leads). Station cloud reports stop at 12,000 ft, so a clear report only counts against forecasts of mostly cloudy skies.</div>`;
         }
         try { sharedLearning(); } catch (e) {}   // start fetching the shared corrections as the page loads
+        // applied after the page is shown (never delays the first view), then the forecast is rebuilt
+        async function loadHourlyLearning(token, lat, lon) {
+            try {
+                const e = await sharedEntryFor(lat, lon);
+                if (token !== fetchToken) return;
+                applyHourlyLearning(e);
+                if (hourlyLearn && !NOLEARN) recomputeForecast();
+            } catch (e) { hourlyLearn = null; }
+        }
