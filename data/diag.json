@@ -1,8 +1,8 @@
 [
  {
   "name": "Ashburn, VA",
-  "at": "2026-10-17T13:14:25.537Z",
-  "firstViewMs": 4069,
+  "at": "2026-10-17T13:29:05.586Z",
+  "firstViewMs": 4978,
   "errors": [],
   "snaps": [
    {
@@ -16,14 +16,37 @@
     "hourWind": " 15 mph |  14 mph |  16 mph |  15 mph |  15 mph |  15 mph |  15 mph |  14 mph |  11 mph",
     "alerts": "\n                    \n                        Frost Advisory [NWS Official]\n                        Frost Advisory issued October 17 at 8:09AM EDT until October 18 at 9:00AM EDT by NWS Baltimore MD/Washington DC — Northwest Montgomery; Northwest Howard; Nelson; Albemarle; Greene; Madison; Rappahannock; Orange; Culpeper; Northern Fauquier; Southern Fauquier; Eastern Loudoun; Northwest Prince William\n                        Full alert text* WHAT...Temperatures as low as 33 will result in frost formation.\n\n* WHERE...Portions of central Maryland and central and northern\nVirginia.\n\n* WHEN...From 1 AM to 9 AM EDT Sunday.\n\n* IMPACTS...Frost could harm sensitive outdoor vegetation. Sensitive\noutdoor plants may be killed if left uncovered.\n\nTake steps now to protect tender plants from the cold.\n                        Area forecast discussion \n                    ",
     "tropical": null,
-    "radarOpen": false,
+    "radarOpen": true,
     "cond": "Cloudy",
-    "radar": null,
+    "radar": {
+     "here": 14,
+     "here3": 16,
+     "passed": false,
+     "clearUpstream": true,
+     "endMin": null,
+     "motionSrc": "radar",
+     "moving": true,
+     "mph": 6,
+     "arrive": null,
+     "peak": 0,
+     "any": 37,
+     "ahead": [
+      14,
+      16,
+      18,
+      18,
+      14,
+      14,
+      14
+     ],
+     "drizzle": false,
+     "lightFrac": 0.86
+    },
     "radarInfo": null,
     "hours": [
      {
       "t": "09:00",
-      "pp": 13,
+      "pp": 15,
       "code": 3,
       "wet": 0,
       "thunder": 0,
@@ -32,25 +55,25 @@
      },
      {
       "t": "10:00",
-      "pp": 11,
+      "pp": 12,
       "code": 3,
       "wet": 0,
       "thunder": 0,
       "cc": 97,
-      "dry": false
+      "dry": true
      },
      {
       "t": "11:00",
-      "pp": 9,
+      "pp": 10,
       "code": 3,
       "wet": 0,
       "thunder": 0,
       "cc": 95,
-      "dry": false
+      "dry": true
      },
      {
       "t": "12:00",
-      "pp": 6,
+      "pp": 7,
       "code": 3,
       "wet": 0,
       "thunder": 0,
@@ -68,7 +91,7 @@
      },
      {
       "t": "14:00",
-      "pp": 1,
+      "pp": 2,
       "code": 0,
       "wet": 0,
       "thunder": 0,
@@ -134,19 +157,19 @@
     "nowcast": {
      "wet": false,
      "kind": "rain",
-     "endedAgo": 2.4166666666666665,
+     "endedAgo": 0.08333333333333333,
      "lastHourMm": 0,
-     "persist": 12
+     "persist": 0
     },
     "obs": {
      "id": "KIAD",
-     "ts": "2026-10-17T12:50:00+00:00",
+     "ts": "2026-10-17T13:00:00+00:00",
      "txt": "Cloudy"
     }
    },
    {
     "label": "+5s",
-    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. Patchy drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. North winds 10-20 mph. Overnight low near 37°F.",
     "outlook": "TONIGHT\n\nClear. Low near 37°F. North winds 5-15 mph.\n\nSUNDAY\n\nSunny. High near 59°F.\n\nSUNDAY NIGHT\n\nClear. Low near 38°F.",
     "windTags": [
      "Breezy",
@@ -160,7 +183,7 @@
      "area": null
     },
     "radarOpen": true,
-    "cond": "Light Drizzle",
+    "cond": "Cloudy",
     "radar": {
      "here": 14,
      "here3": 16,
@@ -169,54 +192,54 @@
      "endMin": null,
      "motionSrc": "radar",
      "moving": true,
-     "mph": 7,
+     "mph": 6,
      "arrive": null,
      "peak": 0,
      "any": 37,
      "ahead": [
       14,
       16,
+      18,
+      18,
       14,
       14,
-      14,
-      14,
-      13
+      14
      ],
-     "drizzle": true,
+     "drizzle": false,
      "lightFrac": 0.86
     },
     "radarInfo": null,
     "hours": [
      {
       "t": "09:00",
-      "pp": 50,
-      "code": 51,
-      "wet": 51,
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
       "thunder": 0,
       "cc": 97,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 40,
-      "code": 51,
-      "wet": 51,
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
       "thunder": 0,
       "cc": 97,
-      "dry": false
+      "dry": true
      },
      {
       "t": "11:00",
-      "pp": 40,
-      "code": 51,
-      "wet": 51,
+      "pp": 10,
+      "code": 3,
+      "wet": 0,
       "thunder": 0,
       "cc": 95,
-      "dry": false
+      "dry": true
      },
      {
       "t": "12:00",
-      "pp": 6,
+      "pp": 7,
       "code": 3,
       "wet": 0,
       "thunder": 0,
@@ -234,7 +257,7 @@
      },
      {
       "t": "14:00",
-      "pp": 1,
+      "pp": 2,
       "code": 0,
       "wet": 0,
       "thunder": 0,
@@ -304,20 +327,20 @@
     ],
     "nowcast": {
      "wet": false,
-     "kind": "drizzle",
-     "endedAgo": 0,
+     "kind": "rain",
+     "endedAgo": 0.08333333333333333,
      "lastHourMm": 0,
-     "persist": 20
+     "persist": 0
     },
     "obs": {
      "id": "KIAD",
-     "ts": "2026-10-17T12:50:00+00:00",
+     "ts": "2026-10-17T13:00:00+00:00",
      "txt": "Cloudy"
     }
    },
    {
     "label": "+15s",
-    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. Patchy drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. North winds 10-20 mph. Overnight low near 37°F.",
     "outlook": "TONIGHT\n\nClear. Low near 37°F. North winds 5-15 mph.\n\nSUNDAY\n\nSunny. High near 59°F.\n\nSUNDAY NIGHT\n\nClear. Low near 38°F.",
     "windTags": [
      "Breezy",
@@ -331,7 +354,7 @@
      "area": null
     },
     "radarOpen": true,
-    "cond": "Light Drizzle",
+    "cond": "Cloudy",
     "radar": {
      "here": 14,
      "here3": 16,
@@ -340,54 +363,54 @@
      "endMin": null,
      "motionSrc": "radar",
      "moving": true,
-     "mph": 7,
+     "mph": 6,
      "arrive": null,
      "peak": 0,
      "any": 37,
      "ahead": [
       14,
       16,
+      18,
+      18,
       14,
       14,
-      14,
-      14,
-      13
+      14
      ],
-     "drizzle": true,
+     "drizzle": false,
      "lightFrac": 0.86
     },
     "radarInfo": null,
     "hours": [
      {
       "t": "09:00",
-      "pp": 50,
-      "code": 51,
-      "wet": 51,
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
       "thunder": 0,
       "cc": 97,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 40,
-      "code": 51,
-      "wet": 51,
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
       "thunder": 0,
       "cc": 97,
-      "dry": false
+      "dry": true
      },
      {
       "t": "11:00",
-      "pp": 40,
-      "code": 51,
-      "wet": 51,
+      "pp": 10,
+      "code": 3,
+      "wet": 0,
       "thunder": 0,
       "cc": 95,
-      "dry": false
+      "dry": true
      },
      {
       "t": "12:00",
-      "pp": 6,
+      "pp": 7,
       "code": 3,
       "wet": 0,
       "thunder": 0,
@@ -405,7 +428,7 @@
      },
      {
       "t": "14:00",
-      "pp": 1,
+      "pp": 2,
       "code": 0,
       "wet": 0,
       "thunder": 0,
@@ -475,20 +498,20 @@
     ],
     "nowcast": {
      "wet": false,
-     "kind": "drizzle",
-     "endedAgo": 0,
+     "kind": "rain",
+     "endedAgo": 0.08333333333333333,
      "lastHourMm": 0,
-     "persist": 20
+     "persist": 0
     },
     "obs": {
      "id": "KIAD",
-     "ts": "2026-10-17T12:50:00+00:00",
+     "ts": "2026-10-17T13:00:00+00:00",
      "txt": "Cloudy"
     }
    },
    {
     "label": "+30s",
-    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. Patchy drizzle this morning. North winds 10-20 mph. Overnight low near 37°F.",
+    "narrative": "Overcast this morning, partly cloudy this afternoon, then clear this evening. Breezy through this afternoon. High near 55°F. North winds 10-20 mph. Overnight low near 37°F.",
     "outlook": "TONIGHT\n\nClear. Low near 37°F. North winds 5-15 mph.\n\nSUNDAY\n\nSunny. High near 59°F.\n\nSUNDAY NIGHT\n\nClear. Low near 38°F.",
     "windTags": [
      "Breezy",
@@ -502,7 +525,7 @@
      "area": null
     },
     "radarOpen": true,
-    "cond": "Light Drizzle",
+    "cond": "Cloudy",
     "radar": {
      "here": 14,
      "here3": 16,
@@ -511,54 +534,54 @@
      "endMin": null,
      "motionSrc": "radar",
      "moving": true,
-     "mph": 7,
+     "mph": 6,
      "arrive": null,
      "peak": 0,
      "any": 37,
      "ahead": [
       14,
       16,
+      18,
+      18,
       14,
       14,
-      14,
-      14,
-      13
+      14
      ],
-     "drizzle": true,
+     "drizzle": false,
      "lightFrac": 0.86
     },
     "radarInfo": null,
     "hours": [
      {
       "t": "09:00",
-      "pp": 50,
-      "code": 51,
-      "wet": 51,
+      "pp": 15,
+      "code": 3,
+      "wet": 0,
       "thunder": 0,
       "cc": 97,
       "dry": false
      },
      {
       "t": "10:00",
-      "pp": 40,
-      "code": 51,
-      "wet": 51,
+      "pp": 12,
+      "code": 3,
+      "wet": 0,
       "thunder": 0,
       "cc": 97,
-      "dry": false
+      "dry": true
      },
      {
       "t": "11:00",
-      "pp": 40,
-      "code": 51,
-      "wet": 51,
+      "pp": 10,
+      "code": 3,
+      "wet": 0,
       "thunder": 0,
       "cc": 95,
-      "dry": false
+      "dry": true
      },
      {
       "t": "12:00",
-      "pp": 6,
+      "pp": 7,
       "code": 3,
       "wet": 0,
       "thunder": 0,
@@ -576,7 +599,7 @@
      },
      {
       "t": "14:00",
-      "pp": 1,
+      "pp": 2,
       "code": 0,
       "wet": 0,
       "thunder": 0,
@@ -646,70 +669,70 @@
     ],
     "nowcast": {
      "wet": false,
-     "kind": "drizzle",
-     "endedAgo": 0,
+     "kind": "rain",
+     "endedAgo": 0.08333333333333333,
      "lastHourMm": 0,
-     "persist": 20
+     "persist": 0
     },
     "obs": {
      "id": "KIAD",
-     "ts": "2026-10-17T12:50:00+00:00",
+     "ts": "2026-10-17T13:00:00+00:00",
      "txt": "Cloudy"
     }
    }
   ],
   "timings": [
    {
-    "url": "https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather/MapServer/identify",
-    "start": 2428,
-    "dur": 896
-   },
-   {
     "url": "https://api.weather.gov/stations/KIAD/observations",
-    "start": 343,
-    "dur": 841
+    "start": 409,
+    "dur": 1088
    },
    {
     "url": "https://data.rcc-acis.org/StnData",
-    "start": 5547,
-    "dur": 497
+    "start": 6804,
+    "dur": 693
    },
    {
     "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 203,
-    "dur": 414
+    "start": 198,
+    "dur": 666
    },
    {
     "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 202,
-    "dur": 407
+    "start": 198,
+    "dur": 644
    },
    {
     "url": "https://mesonet.agron.iastate.edu/json/cli.py",
-    "start": 5531,
-    "dur": 384
+    "start": 6667,
+    "dur": 638
    },
    {
     "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
-    "start": 612,
-    "dur": 382
+    "start": 844,
+    "dur": 596
    },
    {
     "url": "https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer/",
-    "start": 9497,
-    "dur": 364
+    "start": 6554,
+    "dur": 406
+   },
+   {
+    "url": "https://mesonet.agron.iastate.edu/cgi-bin/afos/retrieve.py",
+    "start": 2522,
+    "dur": 366
    }
   ]
  },
  {
   "name": "Cheyenne, WY",
-  "at": "2026-10-17T13:14:59.077Z",
-  "firstViewMs": 3219,
+  "at": "2026-10-17T13:29:39.226Z",
+  "firstViewMs": 3068,
   "errors": [],
   "snaps": [
    {
     "label": "first view",
-    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 72°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 73°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
     "outlook": "TONIGHT\n\nClear. Low near 43°F. West winds 5-10 mph.\n\nSUNDAY\n\nSunny and breezy in the morning, less windy in the afternoon. High near 70°F. Northwest winds 5-15 mph, becoming north in the afternoon.\n\nSUNDAY NIGHT\n\nPartly cloudy. Low near 41°F.",
     "windTags": [
      "Breezy",
@@ -724,8 +747,31 @@
     "alerts": " No active watches or warnings for this location.",
     "tropical": null,
     "radarOpen": false,
-    "cond": "Clear",
-    "radar": null,
+    "cond": "Sunny",
+    "radar": {
+     "here": 0,
+     "here3": 0,
+     "passed": false,
+     "clearUpstream": true,
+     "endMin": null,
+     "motionSrc": "steering",
+     "moving": true,
+     "mph": 10,
+     "arrive": null,
+     "peak": 0,
+     "any": 0,
+     "ahead": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+     ],
+     "drizzle": false,
+     "lightFrac": 0
+    },
     "radarInfo": null,
     "hours": [
      {
@@ -735,7 +781,7 @@
       "wet": 0,
       "thunder": 0,
       "cc": 1,
-      "dry": false
+      "dry": true
      },
      {
       "t": "08:00",
@@ -744,7 +790,7 @@
       "wet": 0,
       "thunder": 0,
       "cc": 1,
-      "dry": false
+      "dry": true
      },
      {
       "t": "09:00",
@@ -753,7 +799,7 @@
       "wet": 0,
       "thunder": 0,
       "cc": 1,
-      "dry": false
+      "dry": true
      },
      {
       "t": "10:00",
@@ -845,13 +891,13 @@
     },
     "obs": {
      "id": "KCYS",
-     "ts": "2026-10-17T12:45:00+00:00",
+     "ts": "2026-10-17T13:05:00+00:00",
      "txt": "Clear"
     }
    },
    {
     "label": "+5s",
-    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 72°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 73°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
     "outlook": "TONIGHT\n\nClear. Low near 43°F. West winds 5-10 mph.\n\nSUNDAY\n\nSunny and breezy in the morning, less windy in the afternoon. High near 70°F. Northwest winds 5-15 mph, becoming north in the afternoon.\n\nSUNDAY NIGHT\n\nPartly cloudy. Low near 41°F.",
     "windTags": [
      "Breezy",
@@ -870,7 +916,7 @@
      "area": null
     },
     "radarOpen": false,
-    "cond": "Clear",
+    "cond": "Sunny",
     "radar": {
      "here": 0,
      "here3": 0,
@@ -1019,13 +1065,13 @@
     },
     "obs": {
      "id": "KCYS",
-     "ts": "2026-10-17T12:45:00+00:00",
+     "ts": "2026-10-17T13:05:00+00:00",
      "txt": "Clear"
     }
    },
    {
     "label": "+15s",
-    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 72°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 73°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
     "outlook": "TONIGHT\n\nClear. Low near 43°F. West winds 5-10 mph.\n\nSUNDAY\n\nSunny and breezy in the morning, less windy in the afternoon. High near 70°F. Northwest winds 5-15 mph, becoming north in the afternoon.\n\nSUNDAY NIGHT\n\nPartly cloudy. Low near 41°F.",
     "windTags": [
      "Breezy",
@@ -1044,7 +1090,7 @@
      "area": null
     },
     "radarOpen": false,
-    "cond": "Clear",
+    "cond": "Sunny",
     "radar": {
      "here": 0,
      "here3": 0,
@@ -1193,13 +1239,13 @@
     },
     "obs": {
      "id": "KCYS",
-     "ts": "2026-10-17T12:45:00+00:00",
+     "ts": "2026-10-17T13:05:00+00:00",
      "txt": "Clear"
     }
    },
    {
     "label": "+30s",
-    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 72°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
+    "narrative": "Sunny this morning and afternoon, then clear this evening. High near 73°F. Southwest winds 5-10 mph. Overnight low near 43°F.",
     "outlook": "TONIGHT\n\nClear. Low near 43°F. West winds 5-10 mph.\n\nSUNDAY\n\nSunny and breezy in the morning, less windy in the afternoon. High near 70°F. Northwest winds 5-15 mph, becoming north in the afternoon.\n\nSUNDAY NIGHT\n\nPartly cloudy. Low near 41°F.",
     "windTags": [
      "Breezy",
@@ -1218,7 +1264,7 @@
      "area": null
     },
     "radarOpen": false,
-    "cond": "Clear",
+    "cond": "Sunny",
     "radar": {
      "here": 0,
      "here3": 0,
@@ -1367,7 +1413,7 @@
     },
     "obs": {
      "id": "KCYS",
-     "ts": "2026-10-17T12:45:00+00:00",
+     "ts": "2026-10-17T13:05:00+00:00",
      "txt": "Clear"
     }
    }
@@ -1375,43 +1421,43 @@
   "timings": [
    {
     "url": "https://data.rcc-acis.org/StnData",
-    "start": 4758,
-    "dur": 2227
+    "start": 5261,
+    "dur": 1832
    },
    {
     "url": "https://api.weather.gov/stations/KCYS/observations",
-    "start": 630,
-    "dur": 826
+    "start": 299,
+    "dur": 868
    },
    {
     "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 265,
-    "dur": 537
+    "start": 175,
+    "dur": 669
    },
    {
     "url": "https://api.open-meteo.com/v1/forecast",
-    "start": 265,
-    "dur": 447
-   },
-   {
-    "url": "https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather/MapServer/identify",
-    "start": 2541,
-    "dur": 439
+    "start": 175,
+    "dur": 642
    },
    {
     "url": "https://mesonet.agron.iastate.edu/json/cli.py",
-    "start": 4784,
-    "dur": 392
+    "start": 5231,
+    "dur": 616
    },
    {
     "url": "https://air-quality-api.open-meteo.com/v1/air-quality",
-    "start": 714,
-    "dur": 377
+    "start": 818,
+    "dur": 597
    },
    {
-    "url": "https://mesonet.agron.iastate.edu/json/cli.py",
-    "start": 4782,
-    "dur": 205
+    "url": "https://mesonet.agron.iastate.edu/cgi-bin/afos/retrieve.py",
+    "start": 2236,
+    "dur": 332
+   },
+   {
+    "url": "https://mapservices.weather.noaa.gov/tropical/rest/services/tropical/NHC_tropical_weather/MapServer/identify",
+    "start": 2241,
+    "dur": 321
    }
   ]
  }
