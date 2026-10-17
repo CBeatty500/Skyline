@@ -31,9 +31,10 @@ header = '''<div id="skyBg"></div>
             <div class="relative flex-1 min-w-0">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
                 <input type="text" id="cityInput" class="search-input" placeholder="Search any city in the world" autocomplete="off">
+                <button type="button" onclick="useMyLocation()" id="myLocBtn" class="loc-in" title="Use my location" aria-label="Use my location"><i class="fa-solid fa-location-crosshairs"></i></button>
                 <div id="autocompleteResults" class="absolute w-full mt-2 bg-slate-800/95 border border-slate-700 rounded-2xl shadow-2xl max-h-60 overflow-y-auto hidden z-50 divide-y divide-slate-700/60"></div>
             </div>
-            <button onclick="searchAndFetch()" class="go-btn shrink-0"><span id="generateBtnText">Fetch</span><div id="generateLoader" class="loader hidden"></div></button>
+            <button onclick="searchAndFetch()" class="go-btn shrink-0" aria-label="Get the forecast"><i class="fa-solid fa-arrow-right go-ic"></i><span id="generateBtnText">Fetch</span><div id="generateLoader" class="loader hidden"></div></button>
             <button onclick="refreshData()" id="refreshTop" class="unit-btn shrink-0" title="Refresh data" aria-label="Refresh data"><i class="fa-solid fa-rotate-right"></i><span>Refresh</span></button>
             <button onclick="toggleUnits()" id="unitToggleBtn" class="unit-btn shrink-0" title="Switch units"><i class="fa-solid fa-temperature-half"></i><span id="unitToggleLabel">°F · in · mph</span></button>
         </div>
@@ -42,7 +43,6 @@ header = '''<div id="skyBg"></div>
                 <a href="#sec-now" class="navpill">Now</a><a href="#sec-details" class="navpill">Details</a><a href="#sec-radar" class="navpill">Radar</a><a href="#sec-hourly" class="navpill">Hourly</a><a href="#sec-forecast" class="navpill">Forecast</a><a href="#sec-climate" class="navpill">Climate</a>
             </span>
             <span class="rail-sep" aria-hidden="true"></span>
-            <button onclick="useMyLocation()" id="myLocBtn" class="chip" title="Use my location"><i class="fa-solid fa-location-crosshairs mr-1.5 text-sky-300"></i>My location</button>
             <button type="button" id="placesToggle" class="chip" onclick="togglePlaces()" aria-expanded="false" aria-controls="placeChips"><i class="fa-solid fa-city mr-1.5 text-slate-400"></i>Places<i class="fa-solid fa-chevron-right ml-1.5 text-[9px] text-slate-400 pl-chev"></i></button>
             <span id="placeChips" class="place-chips">''' + chips + '''</span>
         </div>
@@ -238,9 +238,13 @@ body[data-sky="clear-night"] #skyBg::before { background: radial-gradient(1px 1p
 .brand { display: flex; align-items: center; gap: .6rem; color: #fff; text-decoration: none; }
 .brand-mark { width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; background: linear-gradient(135deg, #ffb84d, #ff7a59); color: #1a1205; font-size: 18px; }
 .brand-name { font-family: 'Fraunces', serif; font-size: 1.5rem; letter-spacing: -.02em; }
-.search-input { width: 100%; height: 44px; border-radius: 999px; background: rgba(255,255,255,.09); border: 1px solid var(--line); color: #fff; padding: 0 16px 0 42px; font-size: 14px; outline: none; }
+.search-input { width: 100%; height: 44px; border-radius: 999px; background: rgba(255,255,255,.09); border: 1px solid var(--line); color: #fff; padding: 0 44px 0 42px; font-size: 14px; outline: none; }
+.loc-in { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center; color: #7dd3fc; background: rgba(125,211,252,.10); border: 1px solid rgba(125,211,252,.30); }
+.loc-in:hover { background: rgba(125,211,252,.20); color: #fff; }
 .search-input::placeholder { color: var(--mute); }
 .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(124,200,255,.2); }
+.go-ic { display: none; }
+@media (max-width: 639px) { .go-btn { width: 44px; padding: 0; justify-content: center; } .go-btn #generateBtnText { display: none; } .go-btn .go-ic { display: inline; } .go-btn:has(.loader:not(.hidden)) .go-ic { display: none; } }
 .go-btn { height: 44px; padding: 0 20px; border-radius: 999px; background: linear-gradient(135deg, #ffb84d, #ff8a4c); color: #1a1205; font-weight: 700; font-size: 14px; display: flex; align-items: center; gap: 8px; }
 .unit-btn { height: 44px; padding: 0 14px; border-radius: 999px; background: rgba(255,255,255,.09); border: 1px solid var(--line); color: var(--ink); font-size: 12px; display: flex; align-items: center; gap: 8px; white-space: nowrap; }
 #myLocBtn.busy i { animation: spin 1s linear infinite; } @keyframes spin { to { transform: rotate(360deg); } }
