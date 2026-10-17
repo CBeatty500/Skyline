@@ -1689,3 +1689,22 @@ _r("""                try { snapHourlyRaw(); } catch (e) {}""", """             
                 radarDry = {};
                 try { hourlyContinuity(); } catch (e) {}
                 try { restoreRadarState(); } catch (e) {}""")
+# ---- Radar map section, below Detailed Current Observations (starts closed) ----
+_r("""            </div>
+            <div id="sec-hourly">""", """            </div>
+""" + open('/home/claude/radar_map.html').read() + """            <div id="sec-hourly">""")
+_a = out.index('        function restOfDayPhrase() {')
+out = out[:_a] + open('/home/claude/radar_map.js').read() + out[_a:]
+_r(""".rec-btn { background: none;""", """#radarMap { height: 440px; background: #0b0f17; }
+@media (max-width: 767px) { #radarMap { height: 360px; } }
+.rm-ctl { position: absolute; top: 10px; right: 10px; z-index: 600; display: flex; gap: 6px; align-items: center; }
+.rm-chk, .rm-btn { background: rgba(8,16,34,.85); border: 1px solid rgba(255,255,255,.15); color: #e2e8f0; font-size: 12px; border-radius: 8px; padding: 5px 9px; display: flex; gap: 6px; align-items: center; cursor: pointer; }
+.rm-time { position: absolute; left: 10px; bottom: 10px; z-index: 600; background: rgba(8,16,34,.85); color: #e2e8f0; font: 12px ui-monospace, monospace; border-radius: 6px; padding: 3px 8px; }
+.rm-legend { position: absolute; right: 10px; bottom: 22px; z-index: 600; display: flex; align-items: center; gap: 5px; color: #cbd5e1; font: 10px ui-monospace, monospace; background: rgba(8,16,34,.85); border-radius: 6px; padding: 3px 7px; }
+.rm-bar { width: 120px; height: 7px; border-radius: 3px; background: linear-gradient(90deg, rgb(24,128,120), rgb(2,200,30) 18%, rgb(0,140,0) 27%, rgb(235,225,0) 36%, rgb(250,110,0) 55%, rgb(225,0,0) 64%, rgb(165,0,0) 73%, rgb(240,0,240) 82%, rgb(150,60,220) 91%, #fff); }
+#radarMap .leaflet-popup-content-wrapper, #radarMap .leaflet-popup-tip { background: #0f172a; color: #e2e8f0; }
+.rec-btn { background: none;""")
+_r("""                if (nwsOffice) loadRadar(token, lat, lon);
+""", """                if (nwsOffice) loadRadar(token, lat, lon);
+                if (typeof RM !== 'undefined' && RM.map) { radarMapStop(); radarMapCenter(true); if (document.getElementById('rmWarn').checked) radarMapWarnings(true); }
+""")

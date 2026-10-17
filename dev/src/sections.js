@@ -1,6 +1,8 @@
         // ---------- Collapsible sections: one look, one behavior; open/closed is remembered per section ----------
         const SECTIONS = [
             { key: 'details', panel: () => document.querySelector('#sec-details > .glass-panel'), title: p => p.querySelector('h3') },
+            { key: 'radar', panel: () => document.querySelector('#sec-radar > .glass-panel'), title: p => p.querySelector('h3'), closed: true,
+              onOpen: () => { try { openRadarMap(); } catch (e) {} }, onClose: () => { try { radarMapStop(); } catch (e) {} } },
             { key: 'hourly', panel: () => document.querySelector('#sec-hourly > .glass-panel'), title: p => p.querySelector('h3 > span') },
             { key: 'graphs', panel: () => document.getElementById('sec-graphs'), title: p => p.querySelector('.graphs-head h3'), onOpen: () => { try { renderCharts(); } catch (e) {} } },
             { key: 'forecast', panel: () => document.querySelector('#sec-forecast > div'), title: p => p.querySelector('h3 > span') },
