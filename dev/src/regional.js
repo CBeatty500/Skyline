@@ -83,7 +83,7 @@
             const ue = regionalAdj.up.t[k];
             if (ue == null || Math.sign(ue) !== Math.sign(m) || Math.abs(ue) < 1.6) { regionalInfo.msg = null; return; }
             const deg = Math.round(Math.abs(ue) * (isImperial ? 1.8 : 1));
-            regionalInfo.msg = `Stations ${mi} miles ${from} are running ${deg}° ${m < 0 ? 'colder' : 'warmer'} than forecast; that air arrives by about ${when}.`;
+            regionalInfo.msg = `${m < 0 ? 'Colder' : 'Warmer'} air arrives from the ${from} by about ${when}.`;   // the forecast itself, not the analysis
         }
         // added to the hourly temperature / dewpoint after the observation correction (hours after the analysis)
         function regionalDelta(f, j) {

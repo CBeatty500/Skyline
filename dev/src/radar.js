@@ -11,7 +11,7 @@
         // ---------- Radar nowcast (0-3 h): NOAA/NWS national base reflectivity mosaic, sampled on a grid around the location.
         // Echo motion from the last 30 minutes (pattern matching), extrapolated to the location. Raises the hourly chance and
         // wet/thunder codes when echoes are on the way; trims the next hour when there are no echoes anywhere nearby. ----------
-        let radarInfo = null, radarNow = null;   // radarNow: reflectivity right over the location { z (dBZ), z3 (max within ~15 km), t }
+        let radarInfo = null, radarNow = null, radarDry = {};   // radarDry: hour indices radar shows clear of precipitation   // radarNow: reflectivity right over the location { z (dBZ), z3 (max within ~15 km), t }
         const RADAR_IS = 'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer';
         const DBZ_COLORS = [[5, [4, 233, 231]], [10, [1, 159, 244]], [15, [3, 0, 244]], [20, [2, 253, 2]], [25, [1, 197, 1]], [30, [0, 142, 0]], [35, [253, 248, 2]], [40, [229, 188, 0]], [45, [253, 149, 0]], [50, [253, 0, 0]], [55, [212, 0, 0]], [60, [188, 0, 0]], [65, [248, 0, 253]], [70, [152, 84, 198]], [75, [253, 253, 253]]];
         function rgbToDbz(v) {
@@ -65,14 +65,22 @@
             if (Math.hypot(vx * kmX, vy * kmY) * 60 > 100) { vx = 0; vy = 0; moving = false; }   // over ~60 mph: not believable for a precipitation area
             const near = (z, r) => { let m = 0; for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) m = Math.max(m, g(B, Math.round(C + z.x) + x, Math.round(C + z.y) + y)); return m; };
             // echo at the location after t minutes = echo now at (location - v*t)
-            const ahead = t => near({ x: -vx * t, y: -vy * t }, 1);
+            const ahead = t => {
+                if (!moving && t > 20) return 0;          // motion unknown: radar speaks only for the next 20 minutes
+                return near({ x: -vx * t, y: -vy * t }, t <= 15 ? 0 : 1);
+            };
+            // rain that has already passed: echoes just downstream of the location and none on the way
+            let behind = 0; if (moving) for (let t = 10; t <= 90; t += 10) behind = Math.max(behind, near({ x: vx * t, y: vy * t }, 1));
+            let upstream = 0; for (let t = 0; t <= 120; t += 10) upstream = Math.max(upstream, ahead(t));
+            const passed = moving && behind >= 30 && upstream < 20;
             let any = 0; for (let i = 0; i < N * N; i++) if (B[i] >= 20) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 100) any++; }
             let arrive = null; for (let t = 0; t <= 180; t += 10) if (ahead(t) >= 20) { arrive = t; break; }
             const speedKmh = Math.hypot(vx * kmX, vy * kmY) * 60;
-            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
+            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), passed, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
         }
         function applyRadarNowcast(rn) {
             const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
+            radarDry = {};
             const cur = hourlyStart(), ct = ensembleData.current && ensembleData.current.time;
             const mm = ct ? (parseInt(ct.slice(14, 16)) || 0) : 0;
             const P = [90, 80, 65, 50];
@@ -86,22 +94,22 @@
                     const wc = h.weather_code[j] || 0;
                     if (z >= 45) h.weather_code[j] = Math.max(wc, 95);
                     else if (!(wc >= 51 && wc <= 99)) h.weather_code[j] = 80;
+                } else if (rn.passed && k <= 2) {
+                    h.precipitation_probability[j] = Math.min(pp, 20);
+                    radarDry[j] = true;
                 } else if (rn.any === 0 && k <= 1) {
                     h.precipitation_probability[j] = Math.min(pp, 15);
+                    radarDry[j] = true;
                 }
             }
-            // one line for the forecast text
+            // one line for the forecast text, only for precipitation on the way (rain overhead is handled by current conditions)
             radarInfo = null;
-            if (rn.arrive !== null) {
-                const dirs = ['north', 'northeast', 'east', 'southeast', 'south', 'southwest', 'west', 'northwest'];
-                const from = rn.moving ? dirs[Math.round(((Math.atan2(-rn.vx * rn.kmX, rn.vy * rn.kmY) * 180 / Math.PI) + 360) % 360 / 45) % 8] : null;
+            if (rn.moving && rn.arrive !== null && rn.arrive >= 15 && rn.arrive <= 150) {
                 const tz = ensembleData.timezone;
-                const when = new Date(Date.now() + rn.arrive * 60e3).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
-                const what = rn.peak >= 45 ? 'Heavy rain and possible thunderstorms' : rn.peak >= 30 ? 'Rain' : 'Light rain';
-                const mph = Math.round(rn.speedKmh * 0.621 / 5) * 5;   // the motion is good to about 5 mph
-                const to = from ? dirs[(dirs.indexOf(from) + 4) % 8] : null;
-                radarInfo = { msg: rn.arrive <= 5 ? `Radar: ${what.toLowerCase()} over the area now${to && mph >= 5 ? `, moving ${to} near ${mph} mph` : ''}.`
-                    : `Radar: ${what.toLowerCase()} approaching${from && mph >= 5 ? ` from the ${from} near ${mph} mph` : ''}, arriving around ${when}.` };
+                const when = new Date(Math.round((Date.now() + rn.arrive * 60e3) / 9e5) * 9e5).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
+                const snowy = (() => { const c = getCurrentConditions(); return c && c.temp != null && c.temp <= 0.5; })();
+                const what = snowy ? (rn.peak >= 30 ? 'Snow' : 'Light snow') : rn.peak >= 45 ? 'Heavy rain and thunderstorms' : rn.peak >= 30 ? 'Rain' : 'Light rain';
+                radarInfo = { msg: `${what} arriving around ${when}.` };
             }
         }
         async function loadRadar(token, lat, lon) {
@@ -109,7 +117,7 @@
             try {
                 const rn = await radarNowcast(+lat, +lon);
                 if (token !== fetchToken) return;
-                radarNow = { z: rn.here, z3: rn.here3, t: rn.t };
+                radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null };
                 applyRadarNowcast(rn);
                 recomputeForecast();
             } catch (e) { console.warn('Radar nowcast unavailable:', e); }

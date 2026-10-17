@@ -1445,7 +1445,15 @@ _r("""            return r;
         function radarWeather(r) {
             if (!radarNow || Date.now() - radarNow.t > 20 * 60e3) return;
             const wetTxt = /rain|shower|drizzle|snow|sleet|thunder|storm|freezing|ice pellets|flurr/i;
-            const z = Math.max(radarNow.z || 0, (radarNow.z3 || 0) >= 30 ? radarNow.z3 - 10 : 0);
+            const z = radarNow.z || 0;   // the location's own sample, not neighbouring cells
+            // the station still reports precipitation, but newer radar shows the location clear with nothing on the way
+            if (z < 15 && r.text && wetTxt.test(r.text) && radarNow.clearAhead && nwsObs && nwsObs.timestamp && radarNow.t - Date.parse(nwsObs.timestamp) > 10 * 60e3) {
+                const amt = (r.layers || []).reduce((m, l) => Math.max(m, { FEW: 1, SCT: 2, BKN: 3, OVC: 4, VV: 4 }[l.amount] || 0), 0);
+                const day = r.isDay === 1 || r.isDay === true;
+                r.text = amt >= 4 || !amt ? 'Cloudy' : amt === 3 ? 'Mostly Cloudy' : amt === 2 ? 'Partly Cloudy' : (day ? 'Mostly Sunny' : 'Mostly Clear');
+                r.code = amt >= 4 || !amt ? 3 : amt === 3 ? 3 : 2; r.wx = []; r.radarWx = true;
+                return;
+            }
             if (z < 20 || (r.text && wetTxt.test(r.text))) return;
             const snow = r.temp !== null && r.temp !== undefined && r.temp <= 0.5;
             const kind = snow ? 'Snow' : 'Rain';
@@ -1563,3 +1571,17 @@ _r("""        function preferredStation(lat, lon) {
             VERIFY_STATIONS.forEach(([la, lo, id, name, sla, slo]) => { const km = distKm(+lat, +lon, la, lo); if (km <= 12 && (!best || km < best.km)) best = { km, id, name, lat: sla, lon: slo, elev: null }; });
             return best;
         }""")
+
+# radar shows the hour clear (rain passed, nothing on the way): no wet or thunder code from older guidance
+_r("""            const th = thunderAt(j);
+            if (th != null && th >= 40) return 95;""", """            if (typeof radarDry !== 'undefined' && radarDry[j]) return 0;
+            const th = thunderAt(j);
+            if (th != null && th >= 40) return 95;""")
+
+# the last station report says rain, but newer radar shows the location clear with nothing on the way: the rain has ended
+_r("""            if (nowKind) return { wet: true, kind: nowKind, lastHourMm };""", """            const obsMs = nwsObs.timestamp ? Date.parse(nwsObs.timestamp) : 0;
+            if (nowKind && radarNow && radarNow.clearAhead && (radarNow.z || 0) < 15 && radarNow.t - obsMs > 10 * 60e3 && Date.now() - radarNow.t < 20 * 60e3)
+                return { wet: false, kind: nowKind, endedAgo: 0, lastHourMm, persist: 20 };
+            if (nowKind) return { wet: true, kind: nowKind, lastHourMm };""")
+_r("""                                  persist: Math.round(60 * Math.exp(-Math.max(0, lastWet.ago) / 1.5)) };   // showers often redevelop soon after they end""", """                                  persist: radarNow && radarNow.clearAhead && Date.now() - radarNow.t < 20 * 60e3 ? 20   // radar: nothing on the way
+                                         : Math.round(60 * Math.exp(-Math.max(0, lastWet.ago) / 1.5)) };   // showers often redevelop soon after they end""")

@@ -23,7 +23,8 @@ Open-Meteo (forecast, individual models, elevation; multi-point for regional ana
 - Multi-model blend weighted by region and by today's skill against the station; NWS point forecast blended 40% for highs / lows; NWS grid PoP and sky cover blended 50/50.
 - Observation correction: the hourly curve starts from the latest report and the bias fades; measured warming trend extrapolated to the afternoon peak; today's high raised to the curve peak and measured value (raiseTodayHigh), curve mapped to the high only while the peak is still ahead.
 - Regional observations (regional.js): nearby station errors versus the model, carried along the low-level flow, 0-9 h.
-- Radar (radar.js): 33x33 samples, three frames 15 min apart, consistent motion only, under 60 mph; nowcast PoP / thunder for 0-3 h; radar over the location sets current precipitation when the station reports none.
+- Radar (radar.js): 33x33 samples, three frames 15 min apart, consistent motion only, under 60 mph; echo along the trajectory (the location's own cell first, widening later); no extrapolation beyond 20 min without reliable motion. Rain that has passed (echoes just downstream, none upstream) caps the next 3 hours at 20% with no thunder from older guidance, and ends a stale station 'rain' report. Radar over the location (own sample) sets current precipitation when the station reports none.
+- Forecast text states the forecast, not the analysis: no 'Radar:' or station commentary (e.g. 'Rain arriving around 9:00 PM.', 'Colder air arrives from the northwest by about 10 PM.').
 - SPC: Day 1-3 risks, mesoscale discussions, thunder chances (thunder.js, spc.js).
 - Learning: daily (highs, lows, rain chance, rain amount by lead) and hourly (temperature, dewpoint, wind, gust, cloud, rain chance by lead and day / night), shrunk and capped corrections from the shared verification (and on-device daily learning).
 - Day / night per hour from actual sunrise / sunset (sun shown if up at that hour).
