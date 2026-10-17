@@ -9,7 +9,7 @@
   {"name": "Brambleton, VA", "lat": 38.9846, "lon": -77.5397, "obs": "KIAD", "daily": "KIAD"},
   {"name": "Anchorage, AK", "lat": 61.2181, "lon": -149.9003, "obs": "PANC", "daily": "PANC"},
   {"name": "Miami, FL", "lat": 25.7617, "lon": -80.1918, "obs": "KMIA", "daily": "KMIA"},
-  {"name": "Los Angeles, CA", "lat": 34.0522, "lon": -118.2437, "obs": "KCQT", "daily": "KCQT"},
+  {"name": "Los Angeles, CA", "lat": 34.0522, "lon": -118.2437, "obs": "KBUR", "daily": "KCQT"},
   {"name": "Phoenix, AZ", "lat": 33.4484, "lon": -112.074, "obs": "KPHX", "daily": "KPHX"},
   {"name": "St. Louis, MO", "lat": 38.627, "lon": -90.1994, "obs": "KSTL", "daily": "KSTL"},
   {"name": "Honolulu, HI", "lat": 21.3069, "lon": -157.8583, "obs": "PHNL", "daily": "PHNL"},

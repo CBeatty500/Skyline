@@ -36,6 +36,8 @@ Order: location, alerts (chips; under the city on phones), hero (Current Conditi
 
 Mammoth Lakes was removed from verification (Oct 16) at the owner's request: unreliable station data.
 
+Los Angeles hourly checks and current conditions use Burbank (KBUR) since Oct 17: the Downtown/USC station (KCQT) stopped reporting through the NWS; daily checks stay on the official downtown record (KCQT).
+
 ## Current-conditions stations
 Tracked cities show current conditions from the same station their forecasts are verified against (VERIFY_STATIONS in the app, matching `obs` in data/locations.json; within 12 km of the city). Order: that station from the NWS API, then the same station from IEM, then the next nearest station. Keep the two lists in sync when cities or stations change.
 
