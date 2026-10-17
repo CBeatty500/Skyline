@@ -1657,3 +1657,7 @@ _r("""            renderClimateAnalytics();
             try { renderObs24(); } catch (e) {}
 
             // Render Hourly & Precip Charts""")
+# ---- an hour shows precipitation only when its chance is 40%+ (the icon follows the number shown under it) ----
+_r("""            if (!((wetCode && (hp >= 30 || (ha >= 0.1 && hp >= 20))) || hp >= 40)) return 0;""", """            if (hp < 40) return 0;""")
+_r("""            if (th != null && th >= 40) return 95;""", """            if (th != null && th >= 40 && hp >= 40) return 95;""")
+out = out.replace("// A forecast hour is wet when the chance is 40%+ (whatever the deterministic code says), or the code is wet with 30%+\n        // (20%+ with a measurable amount).", "// A forecast hour is wet when its chance is 40%+ (the icon follows the number shown with it).", 1)

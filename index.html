@@ -1381,8 +1381,7 @@ body.no-data #sectionNav { display: none; }
 
         // Rest-of-today wording, period by period, using the same hourly rule as the hourly forecast's rain icons
         // (a wet weather code with at least a 30% chance or measurable rain), so the two always agree.
-        // A forecast hour is wet when the chance is 40%+ (whatever the deterministic code says), or the code is wet with 30%+
-        // (20%+ with a measurable amount). Returns the weather code to show, or 0 when dry.
+        // A forecast hour is wet when its chance is 40%+ (the icon follows the number shown with it). Returns the weather code to show, or 0 when dry.
         function spcThunderAt(t) {
             if (!spcData || !spcData.days) return false;
             return spcData.days.some(d => {
@@ -1400,8 +1399,8 @@ body.no-data #sectionNav { display: none; }
             const wetCode = hc >= 51 && hc <= 99;
             if (typeof radarDry !== 'undefined' && radarDry[j]) return 0;
             const th = thunderAt(j);
-            if (th != null && th >= 40) return 95;
-            if (!((wetCode && (hp >= 30 || (ha >= 0.1 && hp >= 20))) || hp >= 40)) return 0;
+            if (th != null && th >= 40 && hp >= 40) return 95;
+            if (hp < 40) return 0;
             const tC = h.temperature_2m ? h.temperature_2m[j] : null, snowy = (h.snowfall && h.snowfall[j] > 0) || (tC != null && tC <= 0.5);
             let code = wetCode ? hc : snowy ? 85 : 80;
             if (code < 95 && !snowy && (code >= 80 || !wetCode) && (th != null ? th >= 20 : spcThunderAt(new Date(h.time[j]).getTime()))) code = 95;
