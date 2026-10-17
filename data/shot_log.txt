@@ -1,6 +1,6 @@
-desk warning: Radar nowcast unavailable: Error: radar not current
-    at radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1910:63)
-    at async loadRad
-phone warning: Radar nowcast unavailable: Error: radar samples
+desk warning: Radar nowcast unavailable: Error: radar samples
     at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1897:60)
     at async Promise.all (
+phone warning: Radar nowcast unavailable: Error: radar not current
+    at radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1910:63)
+    at async loadRad
