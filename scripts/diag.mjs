@@ -5,7 +5,7 @@ import path from 'node:path';
 const places = (process.env.PLACES || '39.0437,-77.4875,Ashburn, VA').split(';').map(p => { const [a, b, ...n] = p.split(','); return [a.trim(), b.trim(), n.join(',').trim()]; });
 const browser = await chromium.launch();
 const results = [];
-for (const [lat, lon, name] of places) {
+for (const [lat, lon, name] of places) { try {
 const page = await browser.newPage();
 const errors = []; page.on('pageerror', e => errors.push(String(e))); page.on('console', m => { if (['warning', 'error'].includes(m.type())) errors.push(m.type() + ': ' + m.text().slice(0, 300)); });
 const t0 = Date.now();
@@ -25,6 +25,6 @@ for (const s of [5, 15, 30]) { await page.waitForTimeout(s * 1000 - (s === 5 ? 0
 const timings = await page.evaluate(() => performance.getEntriesByType('resource').map(r => ({ url: r.name.replace(/\?.*/, '').slice(0, 110), start: Math.round(r.startTime), dur: Math.round(r.duration) })).sort((a, b) => b.dur - a.dur).slice(0, 30));
 results.push({ name, at: new Date().toISOString(), firstViewMs: firstView, errors, snaps, timings: timings.slice(0, 8) });
 await page.close();
-}
+} catch (e) { results.push({ name, error: String(e).slice(0, 300) }); } }
 fs.writeFileSync('data/diag.json', JSON.stringify(results, null, 1));
 await browser.close();
