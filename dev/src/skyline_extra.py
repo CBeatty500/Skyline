@@ -1867,3 +1867,11 @@ _r("""            document.getElementById('toastMessage').innerText = msg;
             container.classList.remove('hidden');""", """            document.getElementById('toastMessage').innerText = msg;
             container.classList.remove('hidden');
             clearTimeout(window._toastT); window._toastT = setTimeout(closeToast, Math.min(12000, 4000 + String(msg).length * 45));""")
+
+# one wind word when the same level spans several sky changes
+assert out.count("            if (!parts.length) return null;") == 2
+out = out.replace("            if (!parts.length) return null;", "            if (!parts.length) return null;\n            const wSum = windSummary(parts);")
+_r("""            if (parts.length === 1) return `${cap(parts[0].state)} for the rest of today`;""", """            if (parts.length === 1) return `${cap(parts[0].state)} for the rest of today`;
+            if (wSum) { const b2 = parts.map(p => `${p.state} ${p.labels.length > 1 ? p.labels.slice(0, -1).join(', ') + ' and ' + p.labels.slice(-1) : p.labels[0]}`);
+                return cap(b2.length > 2 ? b2.slice(0, -1).join(', ') + ', then ' + b2.slice(-1) : b2.join(', then ')).replace(/, then (becoming|less windy)/g, ', $1') + '. ' + wSum.replace(/\.$/, ''); }""")
+_r("""            return { text, wet: wetAll };""", """            return { text: wSum ? text + '. ' + wSum.replace(/\.$/, '') : text, wet: wetAll };""")

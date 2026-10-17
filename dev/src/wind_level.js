@@ -38,6 +38,28 @@
             if (prev && prev.sky === sky) return lv ? `becoming ${WIND_WORD[lv]}` : 'less windy';
             return lv ? `${sky} and ${WIND_WORD[lv]}` : sky;
         }
+        // the same wind level across several sky changes is said once: 'Overcast this morning, partly cloudy this afternoon,
+        // then clear this evening. Breezy through this afternoon.' Returns the extra sentence ('' when nothing changes).
+        function windSummary(parts) {
+            if (!parts || parts.length < 2) return '';
+            // first stretch of 2+ parts with the same wind level whose skies differ
+            let i = 0, k = -1;
+            for (; i < parts.length - 1; i++) {
+                if (!parts[i].lv) continue;
+                k = i; while (k + 1 < parts.length && parts[k + 1].lv === parts[i].lv && parts[k + 1].sky !== parts[k].sky) k++;
+                if (k > i) break; k = -1;
+            }
+            if (k < 0) return '';
+            const L = parts[i].lv;
+            for (let m = i; m <= k; m++) parts[m].state = parts[m].sky;
+            const W = WIND_WORD[L], Wc = W[0].toUpperCase() + W.slice(1);
+            const lab = (p, last) => { let l = last ? p.labels[p.labels.length - 1] : p.labels[0]; return /^(this|in the|after)\b/.test(l) ? l.replace(/^in the /, 'the ') : 'this ' + l; };
+            const end = k === parts.length - 1;
+            if (i === 0 && end) return `${Wc}.`;
+            if (i === 0) return `${Wc} through ${lab(parts[k], true)}.`;
+            if (end) return `Becoming ${W} ${lab(parts[i], false).replace(/^the /, 'in the ')}.`;
+            return `${Wc} ${lab(parts[i], false).replace(/^the /, 'in the ')} through ${lab(parts[k], true)}.`;
+        }
         function windPhrase(sky, s, e) { const lv = windLevel(s, e); return lv ? `${sky} and ${WIND_WORD[lv]}` : sky; }
         const WIND_TAG_CLS = ['', 'wl1', 'wl2', 'wl3'];
         // day card: daytime (6 AM to 6 PM, from now for today) or tonight
