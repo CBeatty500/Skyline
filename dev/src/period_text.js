@@ -48,7 +48,7 @@
             segs.forEach(([label, s, e]) => {
                 if (e - s < 1) return;
                 const g = ptSeg(s, e);
-                if (g.pp < 20 || (g.amt < 0.1 && !g.wet)) return;
+                if (g.pp < 40 || (g.amt < 0.1 && !g.wet)) return;   // below 40% the text says nothing about precipitation (matches the icons)
                 if (g.wet && g.amt < 0.3) g.amt = 0.3;   // the text calls this part wet, so it always gets an amount
                 const sp = ptSpread(g.date) || { lo: 0.5, hi: 1.8 };
                 const isSnow = g.snow >= 0.5 && g.snow >= g.rain / 10;
