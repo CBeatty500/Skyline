@@ -14,6 +14,7 @@ Everything a new session needs to continue the work. The owner is a meteorologis
 - Measured / official data only, no API keys.
 - Minimal text. No middle dots except in the "Lat · Lon · Elev" line. No subjective dewpoint descriptors.
 - Forecast continuity between loads. Summary text must match the hourly icons. Never mention rain that already ended.
+- Thoroughness over speed: check changes on live data (Diagnose / Screenshot workflows) whenever it makes the page better, unless the owner asks for something quick.
 - Think before posting: nothing physically implausible (e.g. warming to the day's high after sunset, 77 mph radar motion).
 
 ## Forecast wording (all periods)
