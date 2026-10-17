@@ -75,6 +75,7 @@ function addCase(cell, v, x) {
   if ('pp' in x) { s.p += x.pp; s.o += x.wet; }
 }
 function hourlyCorr(cell) {
+  if (!cell.days || cell.days.length < 3) return { t: 0, td: 0, cc: 0, ws: 1, wg: 1, pp: 1 };   // one or two days are one weather pattern, not a bias
   const cap = (x, m) => Math.max(-m, Math.min(m, x));
   const add = (a, m) => a && a.w >= 6 ? +cap(-(a.s / a.w) * a.w / (a.w + 24), m).toFixed(2) : 0;
   const ratio = (a, lo, hi) => { if (!a || a.w < 6 || a.f <= 0) return 1; const r = Math.max(lo, Math.min(hi, a.o / a.f)); return +(1 + (r - 1) * a.w / (a.w + 24)).toFixed(3); };
@@ -99,10 +100,10 @@ async function loadPage(browser, loc) {
         for (let j = cur; j < Math.min(h.time.length, cur + 73); j++) {
           const g = (f) => raw[f] && raw[f][j] != null ? +(+raw[f][j]).toFixed(2) : null;
           const w = f => { const v = _modelWindAtRaw(f, j); return v == null || isNaN(v) ? null : +v.toFixed(1); };
-          hrs.push({ ms: Date.parse(h.time[j] + ':00Z') - off, d: h.is_day && h.is_day[j] ? 1 : 0, t: g('temperature_2m'), td: g('dew_point_2m'), cc: g('cloud_cover'), pp: g('precipitation_probability'), ws: w('wind_speed_10m'), wg: w('wind_gusts_10m'), ts: shown && shown.T[j] != null ? +shown.T[j].toFixed(2) : null });
+          hrs.push({ ms: Date.parse(h.time[j] + ':00Z') - off, d: h.is_day && h.is_day[j] ? 1 : 0, ph: h.is_day && h.is_day[j] ? 'd' : (+h.time[j].slice(11, 13) >= 12 ? 'e' : 'n'), day: h.time[j].slice(0, 10), t: g('temperature_2m'), td: g('dew_point_2m'), cc: g('cloud_cover'), pp: g('precipitation_probability'), ws: w('wind_speed_10m'), wg: w('wind_gusts_10m'), ts: shown && shown.T[j] != null ? +shown.T[j].toFixed(2) : null });
         }
         return {
-          today: ensembleData.daily.time[0],
+          today: ensembleData.daily.time[0], utcOff: ensembleData.utc_offset_seconds || 0,
           fc: bestBetResults.slice(0, 7).map(b => ({ date: b.date, max: b.learnRawMax ?? b.bestMax, min: b.learnRawMin ?? b.bestMin, pp: b.learnRawPP ?? b.precipProb, pr: b.learnRawPR ?? b.bestPrecip ?? null })),
           meas: await measuredDays(),
           obsStation: nwsObs && nwsObs.stationId || null,
@@ -191,12 +192,13 @@ async function doLocation(loc) {
     r.hrs.forEach(x => {
       const lead = hlLead(Math.max(0, (x.ms - now) / 36e5));
       const slot = hs.hrs[x.ms] || (hs.hrs[x.ms] = {});
-      if (!slot[lead]) slot[lead] = { d: x.d, t: x.t, td: x.td, cc: x.cc, pp: x.pp, ws: x.ws, wg: x.wg, ts: x.ts };   // first forecast per hour and lead
+      if (!slot[lead]) slot[lead] = { d: x.d, ph: x.ph, day: x.day, t: x.t, td: x.td, cc: x.cc, pp: x.pp, ws: x.ws, wg: x.wg, ts: x.ts };   // first forecast per hour and lead
     });
     // hourly checks use the location's main airport when one is listed, else the app's observing station
     const obsId = loc.obs || loc.station || r.obsStation;
     if (L.hourly && L.hourly.station && L.hourly.station !== obsId) delete L.hourly;   // a different station starts fresh
-    const H = L.hourly || (L.hourly = { cells: {}, corr: {}, n: 0 });
+    if (L.hourly && L.hourly.v !== 2) delete L.hourly;   // v2: day / evening / late night, corrections need 3+ days
+    const H = L.hourly || (L.hourly = { cells: {}, corr: {}, n: 0, v: 2 });
     let scored = 0;
     if (obsId) {
       const obs = (await stationObs(obsId)).filter(o => ok(o.ms)).sort((a, b) => a.ms - b.ms);
@@ -206,8 +208,11 @@ async function doLocation(loc) {
         if (ms > now - 45 * 60e3) return;                       // not observed yet
         const o = ms >= oldest ? near(ms) : null;
         if (o) Object.entries(hs.hrs[ms]).forEach(([lead, f]) => {
-          const cell = H.cells[lead + '|' + (f.d ? 'd' : 'n')] || (H.cells[lead + '|' + (f.d ? 'd' : 'n')] = { n: 0 });
+          const ph = f.ph || (f.d ? 'd' : (new Date(ms).getUTCHours() + 24 + Math.round((r.utcOff || 0) / 3600)) % 24 >= 12 ? 'e' : 'n');
+          const ck = lead + '|' + ph, cell = H.cells[ck] || (H.cells[ck] = { n: 0, days: [] });
           cell.n++; scored++;
+          const dk = f.day || new Date(ms).toISOString().slice(0, 10);   // which days the cases come from
+          cell.days = cell.days || []; if (!cell.days.includes(dk)) { cell.days.push(dk); cell.days = cell.days.slice(-12); }
           if (ok(f.t) && ok(o.t)) addCase(cell, 't', { e: f.t - o.t });
           if (ok(f.td) && ok(o.td)) addCase(cell, 'td', { e: f.td - o.td });
           if (ok(f.ts) && ok(o.t)) addCase(cell, 'ts', { e: f.ts - o.t });   // displayed temperature: measures the observation / regional adjustments (not corrected)
@@ -241,11 +246,11 @@ await browser.close();
   const hc = {}, hcells = new Set();
   cities.forEach(L => Object.keys((L.hourly && L.hourly.cells) || {}).forEach(k => hcells.add(k)));
   hcells.forEach(k => {
-    const add = (v, cap) => { const vals = cities.map(L => L.hourly && L.hourly.cells[k] && L.hourly.cells[k][v]).filter(x => x && x.w >= 12).map(x => x.s / x.w);
+    const add = (v, cap) => { const vals = cities.map(L => L.hourly && L.hourly.cells[k] && L.hourly.cells[k][v] && L.hourly.cells[k].days && L.hourly.cells[k].days.length >= 3 ? L.hourly.cells[k][v] : null).filter(x => x && x.w >= 12).map(x => x.s / x.w);
       return agree(vals, 0) ? +Math.max(-cap, Math.min(cap, -0.7 * med(vals))).toFixed(2) : 0; };
-    const ratio = v => { const vals = cities.map(L => L.hourly && L.hourly.cells[k] && L.hourly.cells[k][v]).filter(x => x && x.w >= 12 && x.f > 0).map(x => x.o / x.f);
+    const ratio = v => { const vals = cities.map(L => L.hourly && L.hourly.cells[k] && L.hourly.cells[k][v] && L.hourly.cells[k].days && L.hourly.cells[k].days.length >= 3 ? L.hourly.cells[k][v] : null).filter(x => x && x.w >= 12 && x.f > 0).map(x => x.o / x.f);
       return agree(vals, 1) ? +Math.max(0.88, Math.min(1.12, 1 + 0.7 * (med(vals) - 1))).toFixed(3) : 1; };
-    const ppv = cities.map(L => L.hourly && L.hourly.cells[k] && L.hourly.cells[k].pp).filter(x => x && x.w >= 24).map(x => (x.o / x.w + 0.05) / (x.p / x.w + 0.05));
+    const ppv = cities.map(L => L.hourly && L.hourly.cells[k] && L.hourly.cells[k].days && L.hourly.cells[k].days.length >= 3 && L.hourly.cells[k].pp).filter(x => x && x.w >= 24).map(x => (x.o / x.w + 0.05) / (x.p / x.w + 0.05));
     hc[k] = { t: add('t', 1.5), td: add('td', 1.5), cc: add('cc', 10), ws: ratio('ws'), wg: ratio('wg'), pp: agree(ppv, 1) ? +Math.max(0.88, Math.min(1.12, 1 + 0.7 * (med(ppv) - 1))).toFixed(3) : 1 };
   });
   const dc = {};

@@ -28,6 +28,7 @@ Open-Meteo (forecast, individual models, elevation; multi-point for regional ana
 - Forecast text states the forecast, not the analysis: no 'Radar:' or station commentary (e.g. 'Rain arriving around 9:00 PM.', 'Colder air arrives from the northwest by about 10 PM.').
 - SPC: Day 1-3 risks, mesoscale discussions, thunder chances (thunder.js, spc.js).
 - Nationwide corrections (learning.national): errors shared by 75%+ of at least 8 tracked cities (median, 70%, capped at half the city limits). Untracked US places get them in full; tracked cities blend from nationwide toward their own as their cases grow.
+- Hourly learning cells: lead (0-6, 6-24, 24-48, 48+ h) x phase (day, evening = sunset to midnight, late night = midnight to sunrise, so pre-dawn lows are learned separately). No correction (city or nationwide) until a cell's cases span 3+ different days.
 - Learning: daily (highs, lows, rain chance, rain amount by lead) and hourly (temperature, dewpoint, wind, gust, cloud, rain chance by lead and day / night), shrunk and capped corrections from the shared verification (and on-device daily learning).
 - Day / night per hour from actual sunrise / sunset (sun shown if up at that hour).
 - Hourly precipitation icon only at 40%+ chance (the icon follows the number shown); below that the sky icon.
