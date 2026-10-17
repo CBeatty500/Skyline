@@ -19,13 +19,30 @@
             const byHour = {};
             obs.forEach(o => {
                 const t = Date.parse(o.timestamp), mins = new Date(t).getUTCMinutes(), k = Math.floor(t / 36e5);
-                const score = mins >= 45 ? 100 + mins : mins;
+                const score = /^METAR\b/.test(String(o.rawMessage || '').trim()) ? 1000 : mins >= 45 ? 100 + mins : mins;   // the routine METAR first
                 if (!byHour[k] || score > byHour[k].score) byHour[k] = { o, score, t };
             });
-            // every report: the routine hourly one plus any specials between hours (duplicates from two feeds dropped)
+            // the routine hourly report plus true specials (SPECI) only; the 5-minute automated readings are left out unless
+            // they carry a significant change (precipitation starting or stopping, thunder, gusts 25 mph+, visibility under 3 or 1 mi)
             const routine = new Set(Object.values(byHour).map(x => x.o));
-            const seen = new Set(), rows = obs.map(o => ({ o, t: Date.parse(o.timestamp), special: !routine.has(o) }))
-                .sort((a, b) => b.t - a.t).filter(r => { const k = Math.round(r.t / 120000); if (seen.has(k)) return false; seen.add(k); return true; });
+            const wetOf = o => /rain|drizzle|snow|thunder|shower|sleet|freezing|ice|hail/i.test(o.textDescription || '') || (Array.isArray(o.presentWeather) && o.presentWeather.some(w => /(RA|DZ|SN|TS|PL|GR|GS|SG|UP)/.test(w.rawString || '')));
+            const visBand = o => { const v = o.visibility && n(o.visibility.value) ? o.visibility.value : null; return v === null ? null : v < 1609 ? 0 : v < 4828 ? 1 : 2; };
+            const chron = obs.map(o => ({ o, t: Date.parse(o.timestamp) })).sort((a, b) => a.t - b.t);
+            const keep = []; let prev = null, lastExtra = 0;
+            chron.forEach(r => {
+                const raw = String(r.o.rawMessage || '').trim();
+                let show = routine.has(r.o), special = false;
+                if (!show && /^SPECI\b/.test(raw)) { show = true; special = true; }
+                else if (!show && !raw && prev && r.t - lastExtra >= 15 * 60e3) {
+                    const g = kmh(r.o.windGust);
+                    const sig = wetOf(r.o) !== wetOf(prev) || (/thunder/i.test(r.o.textDescription || '') && !/thunder/i.test(prev.textDescription || ''))
+                        || (g !== null && g >= 40) || (visBand(r.o) !== null && visBand(prev) !== null && visBand(r.o) < visBand(prev));
+                    if (sig) { show = true; special = true; lastExtra = r.t; }
+                }
+                if (show) keep.push({ ...r, special });
+                prev = r.o;
+            });
+            const seen = new Set(), rows = keep.sort((a, b) => b.t - a.t).filter(r => { const k = Math.round(r.t / 120000); if (seen.has(k)) return false; seen.add(k); return true; });
             const td = (x, c = '') => `<td class="p-2 whitespace-nowrap ${c}">${x}</td>`;
             const th = x => `<th class="p-2 whitespace-nowrap">${x}</th>`;
             const body = rows.map(({ o, t, special }) => {
@@ -43,5 +60,5 @@
             }).join('');
             const sid = nwsObs && nwsObs.stationId ? nwsObs.stationId : '';
             w.innerHTML = `<table class="dclim w-full text-xs text-left text-slate-300 font-mono"><thead class="text-[11px] text-slate-400 uppercase bg-slate-800/80"><tr>${th('Time')}${th('Temp')}${th('Dewpt')}${th('RH')}${th('Wind')}${th('Gust')}${th('Sky / weather')}${th('Vis')}${th('Pressure')}${th('Precip')}</tr></thead><tbody>${body}</tbody></table>
-                <div class="text-[11px] text-slate-400 mt-2">${esc(sid)} reports, newest first. Specials are extra reports between the hourly ones when conditions change. Hourly precipitation is for the hour ending at that time; a special's is since the last hourly report.</div>`;
+                <div class="text-[11px] text-slate-400 mt-2">${esc(sid)} reports, newest first. Specials are extra reports issued between the hourly ones for significant changes. Hourly precipitation is for the hour ending at that time; a special's is since the last hourly report.</div>`;
         }
