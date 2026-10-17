@@ -1915,3 +1915,8 @@ out = out[:_a] + """        function togglePlaces(force) {
             } catch (x) {}
         });
 """ + out[_a:]
+
+# ---- location header: the badge row is never shown, so it takes no space ----
+_r("""                <div class="flex flex-wrap items-center gap-2">
+                    <span id="nwsStatusBadge\"""", """                <div class="hidden">
+                    <span id="nwsStatusBadge\"""")

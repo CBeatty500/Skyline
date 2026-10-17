@@ -107,7 +107,7 @@ CH = dict(temp=_cut('<!-- Hourly Temp Multi-Model Chart -->', '<!-- Raw Model Co
 for _k, _v in CH.items(): assert _v.count('<div') == _v.count('</div>'), (_k, _v.count('<div'), _v.count('</div>'))
 QUICK = open('/home/claude/quick_view.html').read()
 MODEL_HTML = open('/home/claude/model_analysis.html').read()
-main = f'''<main class="wrap pb-16 pt-5 space-y-5">
+main = f'''<main class="wrap pb-16 pt-3 sm:pt-5 space-y-5">
 {B['hero'].split(chr(10))[0] and ''}
         <div id="toastContainer" role="status" aria-live="polite" class="toast-float hidden glass-panel border-l-4 border-amber-500 p-4 rounded-xl flex justify-between items-center text-sm shadow-xl">
             <div class="flex items-center gap-3"><i class="fa-solid fa-circle-exclamation text-amber-400 text-lg"></i><span id="toastMessage" class="text-slate-200">System Notification</span></div>
