@@ -190,11 +190,13 @@
             } catch (e) { console.warn('Warnings unavailable', e); }
         }
         // at start-up: open the radar when precipitation is falling or expected later today, otherwise keep it closed
-        let rmAutoDone = false, rmAutoAt = 0;
+        let rmAutoDone = false, rmAutoAt = 0, rmUserSet = false;
+        // the visitor opening or closing the radar themselves ends the automatic opening for this visit
+        document.addEventListener('click', e => { if (e.target.closest && e.target.closest('#sec-radar .sec-head')) rmUserSet = true; }, true);
         function rainNowOrToday() {
             try {
                 const nc = obsNowcast(); if (nc && nc.wet) return true;
-                if (radarNow && Date.now() - radarNow.t < 25 * 60e3 && ((radarNow.z || 0) >= 20 || radarNow.drizzle || (radarNow.any || 0) >= 5)) return true;   // overhead, drizzle, or rain within ~60 miles
+                if (radarNow && Date.now() - radarNow.t < 50 * 60e3 && ((radarNow.z || 0) >= 20 || radarNow.drizzle || (radarNow.near50 || 0) >= 3 || (radarNow.any || 0) >= 5)) return true;   // overhead, drizzle, or precipitation within 50 miles
                 const h = ensembleData.hourly, cur = hourlyStart(), day = h.time[cur].slice(0, 10);
                 for (let j = cur; j < h.time.length && h.time[j].startsWith(day); j++) if (hourWetCode(j) > 0) return true;
             } catch (e) {}
@@ -205,7 +207,7 @@
             if (!rmAutoDone) {   // first view of this visit: the forecast decides (not saved, so it is decided fresh each visit)
                 rmAutoDone = true; rmAutoAt = Date.now();
                 setSecOpen(cfg, rainNowOrToday(), false);
-            } else if (final && Date.now() - rmAutoAt < 60e3 && cfg._panel.classList.contains('collapsed') && rainNowOrToday()) {
+            } else if (final && !rmUserSet && cfg._panel.classList.contains('collapsed') && rainNowOrToday()) {   // any later radar update (also on an open page brought back to the screen), unless the visitor chose
                 // radar arriving moments later found precipitation: open without moving what the visitor is looking at
                 const above = cfg._panel.getBoundingClientRect().bottom < 0, h0 = document.documentElement.scrollHeight;
                 setSecOpen(cfg, true, false);

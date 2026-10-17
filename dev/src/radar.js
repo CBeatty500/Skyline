@@ -124,10 +124,10 @@
             let any = 0; for (let i = 0; i < N * N; i++) if (B[i] >= 20) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 100) any++; }
             let arrive = null; for (let t = 0; t <= 180; t += 10) if (ahead(t) >= 20) { arrive = t; break; }
             // light echoes (10-19 dBZ) covering the area around the location: drizzle or sprinkles when the low levels are moist
-            let ln = 0, lt = 0; for (let i = 0; i < N * N; i++) { const x = i % N, y = Math.floor(i / N); if (Math.hypot((x - C) * kmX, (y - C) * kmY) <= 25) { lt++; if (B[i] >= 10) ln++; } }
+            let ln = 0, lt = 0, near50 = 0; for (let i = 0; i < N * N; i++) { const x = i % N, y = Math.floor(i / N), d = Math.hypot((x - C) * kmX, (y - C) * kmY); if (d <= 25) { lt++; if (B[i] >= 10) ln++; } if (d <= 80 && B[i] >= 15) near50++; }   // near50: precipitation within 50 miles
             const speedKmh = Math.hypot(vx * kmX, vy * kmY) * 60;
             const timeSure = motionSrc === 'radar' && !!(m30 && m30.s >= 0.5);   // exact times only when the echoes were tracked well
-            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), lightFrac: lt ? ln / lt : 0, passed, clearUpstream, endMin, motionSrc, timeSure, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
+            return { here: g(B, C, C), here3: near({ x: 0, y: 0 }, 1), lightFrac: lt ? ln / lt : 0, near50, passed, clearUpstream, endMin, motionSrc, timeSure, ahead, any, arrive, speedKmh, vx, vy, kmX, kmY, peak: arrive !== null ? Math.max(...[0, 10, 20, 30, 40, 50, 60].map(d => ahead(arrive + d))) : 0, t: tEnd, moving };
         }
         function applyRadarNowcast(rn) {
             const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
@@ -192,9 +192,10 @@
                 const rn = await (pre && pre.k === k && Date.now() - pre.at < 120e3 ? pre.p : radarNowcast(+lat, +lon));   // started with the forecast request
                 if (token !== fetchToken) return;
                 radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin, timeSure: rn.timeSure };
-                window._lastRadar = { here: rn.here, here3: rn.here3, passed: rn.passed, clearUpstream: rn.clearUpstream, endMin: rn.endMin, motionSrc: rn.motionSrc, moving: rn.moving, mph: Math.round(rn.speedKmh * 0.621), arrive: rn.arrive, peak: rn.peak, any: rn.any, ahead: [0, 30, 60, 90, 120, 150, 180].map(t => rn.ahead(t)) };   // diagnostics
+                window._lastRadar = { near50: rn.near50, ageMin: Math.round((Date.now() - rn.t) / 6e4), here: rn.here, here3: rn.here3, passed: rn.passed, clearUpstream: rn.clearUpstream, endMin: rn.endMin, motionSrc: rn.motionSrc, moving: rn.moving, mph: Math.round(rn.speedKmh * 0.621), arrive: rn.arrive, peak: rn.peak, any: rn.any, ahead: [0, 30, 60, 90, 120, 150, 180].map(t => rn.ahead(t)) };   // diagnostics
                 applyRadarNowcast(rn);
-                radarNow.drizzle = !!rn.drizzle; radarNow.any = rn.any || 0;
+                radarNow.drizzle = !!rn.drizzle; radarNow.any = rn.any || 0; radarNow.near50 = rn.near50 || 0;
+                if (/[?&]debug=1/.test(location.search)) showToast(`Radar ${Math.round((Date.now() - rn.t) / 6e4)} min old: ${rn.near50} rain samples within 50 mi, ${rn.here} dBZ here${rn.drizzle ? ', drizzle' : ''}.`);
                 if (applyRadarNowcast._st) saveRadarState({ ...applyRadarNowcast._st, now: radarNow, info: radarInfo });   // this run's result, for a quick reload
                 if (window._lastRadar) { window._lastRadar.drizzle = radarNow.drizzle; window._lastRadar.lightFrac = Math.round((rn.lightFrac || 0) * 100) / 100; }
                 recomputeForecast();
