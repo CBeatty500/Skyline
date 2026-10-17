@@ -1,6 +1,13 @@
 desk warning: Radar nowcast unavailable: Error: radar samples
-    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1897:60)
+    at radarFrame (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1900:60)
     at async Promise.all (
-phone warning: Radar nowcast unavailable: Error: radar not current
-    at radarNowcast (file:///home/runner/work/Skyline/Skyline/index.html?city=Ashburn%2C%20VA&lat=39.0437&lon=-77.4875:1910:63)
-    at async loadRad
+desk error: Failed to load resource: the server responded with a status of 400 ()
+desk bounds {"map":[38.1,-80.7166,39.9771,-74.2566],"radar":[38.1,-80.7166,39.9771,-74.2566],"time":"Radar unavailable"}
+desk looping false frames 0
+desk error: Failed to load resource: the server responded with a status of 400 ()
+desk after resize looping false frames 0 Radar unavailable
+phone error: Failed to load resource: the server responded with a status of 400 ()
+phone bounds {"map":[37.4923,-79.2114,40.5639,-75.7617],"radar":[37.4923,-79.2114,40.5639,-75.7617],"time":"Radar unavailable"}
+phone looping false frames 0
+phone error: Failed to load resource: the server responded with a status of 400 ()
+phone after resize looping false frames 0 Radar unavailable
