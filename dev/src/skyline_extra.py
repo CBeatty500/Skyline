@@ -1661,3 +1661,31 @@ _r("""            renderClimateAnalytics();
 _r("""            if (!((wetCode && (hp >= 30 || (ha >= 0.1 && hp >= 20))) || hp >= 40)) return 0;""", """            if (hp < 40) return 0;""")
 _r("""            if (th != null && th >= 40) return 95;""", """            if (th != null && th >= 40 && hp >= 40) return 95;""")
 out = out.replace("// A forecast hour is wet when the chance is 40%+ (whatever the deterministic code says), or the code is wet with 30%+\n        // (20%+ with a measurable amount).", "// A forecast hour is wet when its chance is 40%+ (the icon follows the number shown with it).", 1)
+# ---- first view as soon as the forecast and station data are in; climate records, totals and air quality fill in after ----
+_r("""                const [models, nws, aq, pt, sn, cl, intl] = await Promise.all([modelsP, nwsP, aqP, ptP, snP, clP, intlP]);""",
+   """                const [models, nws, intl] = await Promise.all([modelsP, nwsP, intlP]);
+                const aq = null, pt = null, sn = null, cl = null;   // these arrive after the first view (below)""")
+_r("""                (async () => { try { await updateLearning(); if (token !== fetchToken) return; recomputeForecast(); saveForecastSnapshot(); } catch (e) {} })();
+                renderDiscussion();
+
+                // Climate history (large request) loads last, then the dashboard re-renders with records and normals
+                if (!cl) getClimLite(""", """                renderDiscussion();
+                aqP.then(a => { if (token !== fetchToken) return; airQuality = (a && a.current) ? a.current : null; try { renderDashboard(); } catch (e) {} }).catch(() => {});
+                Promise.all([ptP.catch(() => null), snP.catch(() => null), clP]).then(([pt2, sn2, cl2]) => {
+                    if (token !== fetchToken) return;
+                    precipTotals = pt2; snowTotals = sn2; cliTotals = cl2;
+                    if (!cl2) getClimLite(lat, lon).then(d => { if (token !== fetchToken || !d || historicalData) return; climLite = d; buildClimIndex(); renderDashboard(); renderDiscussion(); }).catch(() => {});
+                    try { renderDashboard(); renderDiscussion(); } catch (e) {}
+                    (async () => { try { await updateLearning(); if (token !== fetchToken) return; recomputeForecast(); saveForecastSnapshot(); } catch (e) {} })();
+                });
+
+                // Climate history (large request) loads last, then the dashboard re-renders with records and normals
+                if (false) getClimLite(""")
+
+# ---- continuity between loads (hourly) and the last radar result on a quick reload ----
+_a = out.index('        function restOfDayPhrase() {')
+out = out[:_a] + open('/home/claude/continuity_hourly.js').read() + out[_a:]
+_r("""                try { snapHourlyRaw(); } catch (e) {}""", """                try { snapHourlyRaw(); } catch (e) {}
+                radarDry = {};
+                try { hourlyContinuity(); } catch (e) {}
+                try { restoreRadarState(); } catch (e) {}""")

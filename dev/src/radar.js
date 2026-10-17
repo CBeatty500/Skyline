@@ -13,13 +13,25 @@
         // wet/thunder codes when echoes are on the way; trims the next hour when there are no echoes anywhere nearby. ----------
         let radarInfo = null, radarNow = null, radarDry = {};   // radarDry: hour indices radar shows clear of precipitation   // radarNow: reflectivity right over the location { z (dBZ), z3 (max within ~15 km), t }
         const RADAR_IS = 'https://mapservices.weather.noaa.gov/eventdriven/rest/services/radar/radar_base_reflectivity_time/ImageServer';
-        const DBZ_COLORS = [[5, [4, 233, 231]], [10, [1, 159, 244]], [15, [3, 0, 244]], [20, [2, 253, 2]], [25, [1, 197, 1]], [30, [0, 142, 0]], [35, [253, 248, 2]], [40, [229, 188, 0]], [45, [253, 149, 0]], [50, [253, 0, 0]], [55, [212, 0, 0]], [60, [188, 0, 0]], [65, [248, 0, 253]], [70, [152, 84, 198]], [75, [253, 253, 253]]];
+        // This NOAA mosaic draws reflectivity on a continuous colour path (calibrated Oct 2026 against IEM's numeric N0Q
+        // composite): grey-blue -> blue -> cyan -> teal -> bright green -> dark green -> yellow, then (standard positions,
+        // not yet calibrated) orange -> red -> magenta. A sample is placed on the nearest segment and its dBZ interpolated.
+        const DBZ_PATH = [[[138, 148, 178], 2], [[114, 129, 172], 6], [[86, 108, 164], 10], [[67, 94, 159], 13], [[75, 118, 173], 15], [[86, 149, 193], 17],
+            [[94, 173, 207], 19], [[89, 189, 189], 21], [[83, 210, 167], 23], [[82, 214, 162], 24], [[55, 214, 105], 26], [[14, 214, 20], 28],
+            [[13, 191, 19], 31], [[12, 159, 17], 34], [[10, 119, 13], 36], [[9, 94, 9], 38], [[58, 120, 7], 40], [[206, 200, 2], 41], [[255, 226, 0], 42],
+            [[255, 202, 0], 44], [[255, 150, 0], 47], [[255, 90, 0], 50], [[230, 0, 0], 53], [[180, 0, 0], 57], [[255, 0, 255], 62], [[150, 80, 200], 67]];
         function rgbToDbz(v) {
             const p = String(v || '').trim().split(/[\s,]+/).map(Number);
             if (p.length < 3 || (p.length >= 4 && p[3] === 0) || (p[0] + p[1] + p[2] === 0)) return 0;
             let best = 0, bd = Infinity;
-            DBZ_COLORS.forEach(([z, c]) => { const d = (p[0] - c[0]) ** 2 + (p[1] - c[1]) ** 2 + (p[2] - c[2]) ** 2; if (d < bd) { bd = d; best = z; } });
-            return bd < 90 * 90 ? best : 0;
+            for (let i = 0; i < DBZ_PATH.length - 1; i++) {
+                const [a, za] = DBZ_PATH[i], [b, zb] = DBZ_PATH[i + 1];
+                const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]], ap = [p[0] - a[0], p[1] - a[1], p[2] - a[2]];
+                const L = ab[0] ** 2 + ab[1] ** 2 + ab[2] ** 2, t = L ? Math.max(0, Math.min(1, (ap[0] * ab[0] + ap[1] * ab[1] + ap[2] * ab[2]) / L)) : 0;
+                const d = (ap[0] - t * ab[0]) ** 2 + (ap[1] - t * ab[1]) ** 2 + (ap[2] - t * ab[2]) ** 2;
+                if (d < bd) { bd = d; best = za + t * (zb - za); }
+            }
+            return bd < 40 * 40 ? Math.round(best) : 0;   // not on the radar colour path (map features, artefacts)
         }
         async function radarFrame(pts, t) {
             const body = new URLSearchParams({ geometry: JSON.stringify({ points: pts, spatialReference: { wkid: 4326 } }), geometryType: 'esriGeometryMultipoint', returnFirstValueOnly: 'true', interpolation: 'RSP_NearestNeighbor', f: 'json' });
@@ -98,6 +110,7 @@
         function applyRadarNowcast(rn) {
             const h = ensembleData && ensembleData.hourly; if (!h || !rn) return;
             radarDry = {};
+            if (h._preRadar) { Object.entries(h._preRadar).forEach(([j, v]) => { h.precipitation_probability[j] = v.pp; h.weather_code[j] = v.code; }); h._preRadar = null; }   // undo the carried-over result
             const cur = hourlyStart(), ct = ensembleData.current && ensembleData.current.time;
             const mm = ct ? (parseInt(ct.slice(14, 16)) || 0) : 0;
             const P = [90, 80, 65, 50];
@@ -109,8 +122,10 @@
                 if (z >= 20) {
                     h.precipitation_probability[j] = Math.max(pp, z >= 30 ? P[k] : P[k] - 15);
                     const wc = h.weather_code[j] || 0;
-                    if (z >= 45) h.weather_code[j] = Math.max(wc, 95);
-                    else if (!(wc >= 51 && wc <= 99)) h.weather_code[j] = 80;
+                    const th = typeof thunderAt === 'function' ? thunderAt(j) : null;
+                    const thunderOK = z >= 50 && ((th != null && th >= 15) || (typeof spcThunderAt === 'function' && spcThunderAt(Date.now() + k * 36e5)));
+                    if (thunderOK) h.weather_code[j] = Math.max(wc, 95);
+                    else if (!(wc >= 51 && wc <= 94)) h.weather_code[j] = z >= 40 ? 82 : z >= 30 ? 81 : 80;   // showers by intensity
                 } else if (rn.passed && k <= 2) {
                     h.precipitation_probability[j] = Math.min(pp, 20);
                     radarDry[j] = true;
@@ -122,13 +137,19 @@
                     if (h.precipitation_probability[j] < 40) radarDry[j] = true;
                 }
             }
+            try {   // remember this result for a quick reload
+                const st = { saved: Date.now(), pp: {}, code: {}, dry: {} };
+                for (let k = 0; k <= 3; k++) { const j = cur + k; if (j >= h.time.length) break; st.pp[h.time[j]] = h.precipitation_probability[j]; st.code[h.time[j]] = h.weather_code[j]; if (radarDry[j]) st.dry[h.time[j]] = true; }
+                applyRadarNowcast._st = st;
+            } catch (e) {}
             // one line for the forecast text, only for precipitation on the way (rain overhead is handled by current conditions)
             radarInfo = null;
             if (rn.motionSrc === 'radar' && rn.arrive !== null && rn.arrive >= 15 && rn.arrive <= 150) {
                 const tz = ensembleData.timezone;
                 const when = new Date(Math.round((Date.now() + rn.arrive * 60e3) / 9e5) * 9e5).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: tz });
                 const snowy = (() => { const c = getCurrentConditions(); return c && c.temp != null && c.temp <= 0.5; })();
-                const what = snowy ? (rn.peak >= 30 ? 'Snow' : 'Light snow') : rn.peak >= 45 ? 'Heavy rain and thunderstorms' : rn.peak >= 30 ? 'Rain' : 'Light rain';
+                const th0 = typeof thunderAt === 'function' ? thunderAt(hourlyStart() + 1) : null, tsOK = rn.peak >= 50 && ((th0 != null && th0 >= 15) || (typeof spcThunderAt === 'function' && spcThunderAt(Date.now())));
+                const what = snowy ? (rn.peak >= 30 ? 'Snow' : 'Light snow') : tsOK ? 'Thunderstorms' : rn.peak >= 40 ? 'Heavy rain' : rn.peak >= 30 ? 'Rain' : 'Light rain';
                 radarInfo = { msg: `${what} arriving around ${when}.` };
             }
         }
@@ -138,6 +159,7 @@
                 const rn = await radarNowcast(+lat, +lon);
                 if (token !== fetchToken) return;
                 radarNow = { z: rn.here, z3: rn.here3, t: rn.t, clearAhead: rn.passed || rn.arrive === null || rn.clearUpstream, endMin: rn.endMin };
+                if (applyRadarNowcast._st) saveRadarState({ ...applyRadarNowcast._st, now: radarNow, info: radarInfo });
                 window._lastRadar = { here: rn.here, here3: rn.here3, passed: rn.passed, clearUpstream: rn.clearUpstream, endMin: rn.endMin, motionSrc: rn.motionSrc, moving: rn.moving, mph: Math.round(rn.speedKmh * 0.621), arrive: rn.arrive, peak: rn.peak, any: rn.any, ahead: [0, 30, 60, 90, 120, 150, 180].map(t => rn.ahead(t)) };   // diagnostics
                 applyRadarNowcast(rn);
                 recomputeForecast();
