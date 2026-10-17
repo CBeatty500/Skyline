@@ -1746,3 +1746,61 @@ _r("""                const amt = periodAmount(s, e);
                 if (g >= 40) bits.push(`Gusts to ${formatSpeed(g)}.`);""", """                const sv = ph.wet && /thunder/.test(ph.text) ? thunderRisk(s, e) : null;
                 if (sv) bits.push(sv.n >= 3 ? 'Severe storms possible.' : 'A few storms could be severe.');
                 bits.push(...periodExtras(p.segs.map(([l, a, b]) => [l, a, b])));""")
+# ---- start-up: saved home, else the device location when already allowed, else the intro page; home button ----
+_r("""                    <h2 id="displayLocationName" class="text-2xl md:text-3xl font-black tracking-tight text-white">Location Name</h2>""",
+   """                    <div class="flex items-center gap-2"><h2 id="displayLocationName" class="text-2xl md:text-3xl font-black tracking-tight text-white">Location Name</h2><button type="button" id="homeBtn" class="home-btn" onclick="toggleHome()" title="Make this my home location" aria-label="Make this my home location"><i class="fa-solid fa-house"></i></button></div>""")
+_r("""            document.getElementById('displayLocationName').innerText = currentLoc.name;""",
+   """            document.getElementById('displayLocationName').innerText = currentLoc.name;
+            try { updateHomeBtn(); } catch (e) {}""")
+_r("""            try { const s = JSON.parse(localStorage.getItem('skyline:lastLoc') || 'null'); if (s && isFinite(s.lat) && isFinite(s.lon)) currentLoc = s; } catch (e) {}
+        }""", """            const home = getHome();
+            if (home) { currentLoc = { ...home }; return 'home'; }
+            // the device's location, only when the visitor has already allowed it (no permission prompt at start-up)
+            try {
+                if (navigator.permissions && navigator.geolocation) {
+                    const st = await navigator.permissions.query({ name: 'geolocation' });
+                    if (st.state === 'granted') {
+                        const p = await new Promise((res, rej) => navigator.geolocation.getCurrentPosition(res, rej, { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }));
+                        currentLoc = { name: 'My location', lat: +p.coords.latitude.toFixed(4), lon: +p.coords.longitude.toFixed(4), ele: 0, mine: true };
+                        return 'device';
+                    }
+                }
+            } catch (e) {}
+            return 'intro';
+        }
+        function getHome() { try { const h = JSON.parse(localStorage.getItem('skyline:home') || 'null'); return h && isFinite(h.lat) && isFinite(h.lon) ? h : null; } catch (e) { return null; } }
+        function isHome() { const h = getHome(); return !!(h && currentLoc && Math.abs(h.lat - currentLoc.lat) < 0.01 && Math.abs(h.lon - currentLoc.lon) < 0.01); }
+        function updateHomeBtn() {
+            const b = document.getElementById('homeBtn'); if (!b) return;
+            const on = isHome(); b.classList.toggle('on', on);
+            b.title = on ? 'Home location (tap to remove)' : 'Make this my home location'; b.setAttribute('aria-label', b.title);
+        }
+        function toggleHome() {
+            try {
+                if (isHome()) { localStorage.removeItem('skyline:home'); showToast('Home location removed.'); }
+                else { localStorage.setItem('skyline:home', JSON.stringify({ name: currentLoc.name, lat: +currentLoc.lat, lon: +currentLoc.lon, ele: currentLoc.ele || 0 })); showToast(`${currentLoc.name} is now your home location.`); }
+            } catch (e) {}
+            updateHomeBtn();
+        }""")
+_r("""            if (isFinite(lat) && isFinite(lon)) { currentLoc = { name: city || `${lat.toFixed(2)}, ${lon.toFixed(2)}`, lat, lon, ele: 0 }; return; }""",
+   """            if (isFinite(lat) && isFinite(lon)) {
+                currentLoc = { name: city || `${lat.toFixed(2)}, ${lon.toFixed(2)}`, lat, lon, ele: 0 };
+                if (q.get('home') === '1') { try { localStorage.setItem('skyline:home', JSON.stringify({ name: currentLoc.name, lat, lon, ele: 0 })); } catch (e) {} }   // a link that sets home
+                return 'link';
+            }""")
+_r("""                    if (g) { currentLoc = { name: [g.name, g.admin1, g.country].filter(Boolean).join(', '), lat: g.latitude, lon: g.longitude, ele: g.elevation || 0 }; return; }""",
+   """                    if (g) { currentLoc = { name: [g.name, g.admin1, g.country].filter(Boolean).join(', '), lat: g.latitude, lon: g.longitude, ele: g.elevation || 0 }; return 'link'; }""")
+_r("""        window.onload = async function() {
+            await startLocation();
+            if (cityInput) cityInput.value = currentLoc.name;
+            fetchForecastData();
+        };""", """        window.onload = async function() {
+            const how = await startLocation();
+            if (how === 'intro') { if (cityInput) { cityInput.value = ''; if (window.innerWidth >= 1024) cityInput.focus(); } return; }   // wait for a town to be chosen
+            if (cityInput) cityInput.value = currentLoc.name;
+            fetchForecastData();
+        };""")
+_r(""".rec-btn { background: none;""", """.home-btn { width: 32px; height: 32px; border-radius: 999px; border: 1px solid rgba(255,255,255,.15); background: rgba(255,255,255,.06); color: #94a3b8; display: grid; place-items: center; font-size: 13px; cursor: pointer; flex-shrink: 0; }
+.home-btn:hover { color: #e2e8f0; border-color: rgba(255,255,255,.3); }
+.home-btn.on { color: #1a1205; background: linear-gradient(135deg, #ffc062, #ff7a59); border-color: transparent; }
+.rec-btn { background: none;""")

@@ -151,13 +151,18 @@
         function radarMapMe(on) {
             if (RM.me) { RM.me.remove(); RM.me = null; }
             if (!on || !RM.map) return;
-            if (!navigator.geolocation) { document.getElementById('rmMe').checked = false; return; }
+            const no = msg => { document.getElementById('rmMe').checked = false; showToast(msg); };
+            if (!navigator.geolocation || !window.isSecureContext) { no('This browser cannot share your location with this page.'); return; }
             navigator.geolocation.getCurrentPosition(p => {
                 if (!document.getElementById('rmMe').checked) return;
                 const ll = [p.coords.latitude, p.coords.longitude];
                 RM.me = L.layerGroup([L.circle(ll, { radius: Math.min(p.coords.accuracy || 0, 3000), color: '#38bdf8', weight: 1, fillOpacity: 0.12, pane: 'rmLabels' }),
                     L.circleMarker(ll, { radius: 5, color: '#e0f2fe', weight: 2, fillColor: '#38bdf8', fillOpacity: 1, pane: 'rmLabels' })]).addTo(RM.map);
-            }, () => { document.getElementById('rmMe').checked = false; }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 120000 });
+            }, err => {
+                no(err && err.code === 1 ? 'Location is turned off for this site. Allow location access in your browser or phone settings to show where you are.'
+                   : err && err.code === 3 ? 'Your location took too long to arrive. Try again.'
+                   : 'Your location is not available right now (location services may be off on this device).');
+            }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 120000 });
         }
         async function radarMapWarnings(on) {
             if (!RM.map) return;

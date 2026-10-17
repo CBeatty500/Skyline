@@ -53,5 +53,8 @@ Los Angeles hourly checks and current conditions use Burbank (KBUR) since Oct 17
 ## Current-conditions stations
 Tracked cities show current conditions from the same station their forecasts are verified against (VERIFY_STATIONS in the app, matching `obs` in data/locations.json; within 12 km of the city). Order: that station from the NWS API, then the same station from IEM, then the next nearest station. Keep the two lists in sync when cities or stations change.
 
+## Start-up
+A link naming a city (or a reload of one) opens that city; ?home=1 on such a link also saves it as home. Otherwise: the saved home location (house button beside the city name), else the device location when location access is already allowed (no prompt at start-up), else the intro page waits for a town to be chosen. Owner's home: Ashburn, VA.
+
 ## Climate station choices
 Nearest representative station within 40 km and 300 m elevation (observing station's own site to 60 km); per-location override in the picker. Burke uses Reagan (DCA) climate; Mammoth Lakes uses the Mammoth airport observations plus IEM daily data.
